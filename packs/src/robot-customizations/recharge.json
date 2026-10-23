@@ -1,0 +1,56 @@
+{
+  "_id": "656fcdfcbfd39f86",
+  "name": "Recharge",
+  "type": "feat",
+  "img": "modules/sf2e-missing-tech-pets/assets/icons/powerful-chassis.svg",
+  "effects": [],
+  "system": {
+    "slug": "recharge",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 1
+    },
+    "category": "bonus",
+    "location": null,
+    "level": {
+      "value": 1,
+      "taken": 1
+    },
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "prerequisites": {
+      "value": []
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>Spend one concentrate action to recharge a touched battery. The robot then becomes clumsy 1 for 1 round.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "concentrate"
+      ],
+      "otherTags": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.robot-customizations.Item.656fcdfcbfd39f86"
+    },
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "robotCustomization": true,
+      "catalogId": "recharge",
+      "customizationGrade": "advanced",
+      "automation": "manual"
+    }
+  }
+}

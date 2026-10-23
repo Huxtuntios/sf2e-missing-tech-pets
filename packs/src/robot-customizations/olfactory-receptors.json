@@ -1,0 +1,61 @@
+{
+  "_id": "bb1e8756dc08e83b",
+  "name": "Olfactory Receptors",
+  "type": "feat",
+  "img": "modules/sf2e-missing-tech-pets/assets/icons/powerful-chassis.svg",
+  "effects": [],
+  "system": {
+    "slug": "olfactory-receptors",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "bonus",
+    "location": null,
+    "level": {
+      "value": 1,
+      "taken": 1
+    },
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "prerequisites": {
+      "value": []
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>Your robot gains imprecise scent with a range of 30 feet.</p><p>@Localize[SFMTP.CustomRulesHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    },
+    "rules": [
+      {
+        "key": "Sense",
+        "selector": "scent",
+        "acuity": "imprecise",
+        "range": 30
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.robot-customizations.Item.bb1e8756dc08e83b"
+    },
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "robotCustomization": true,
+      "catalogId": "olfactory-receptors",
+      "customizationGrade": "commercial",
+      "automation": "rules"
+    }
+  }
+}

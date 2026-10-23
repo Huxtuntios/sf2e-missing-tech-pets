@@ -51,7 +51,7 @@ execFileSync(
 import pathlib,sys,zipfile
 root=pathlib.Path(sys.argv[1]);dist=pathlib.Path(sys.argv[2])
 files=['module.json','module.css','README.md','README.ru.md','CHANGELOG.md','LICENSE.txt','docs/RELEASING.md','docs/RELEASE-NOTES.md','docs/COMPANION-SOURCES.md']
-files += ['scripts/'+s for s in ['main.mjs','dailies.mjs','sheet-integration.mjs','dialog.mjs','item-sources.mjs','familiars.mjs','familiar-ui.mjs','familiar-sources.mjs','i18n.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs']]
+files += ['scripts/'+s for s in ['main.mjs','customization-sources.mjs','dailies.mjs','sheet-integration.mjs','dialog.mjs','item-sources.mjs','familiars.mjs','familiar-ui.mjs','familiar-sources.mjs','i18n.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs']]
 for folder in ['assets','data','lang','packs']:
  for p in (root/folder).rglob('*'):
   if p.is_file() and not p.is_symlink() and p.name not in ['LOG','LOG.old','LOCK']:

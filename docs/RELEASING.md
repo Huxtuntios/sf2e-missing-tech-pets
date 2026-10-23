@@ -6,7 +6,7 @@
 https://github.com/Huxtuntios/sf2e-missing-tech-pets
 ```
 
-Текущая версия: **0.16.0**, тег первого подготовленного выпуска: **v0.16.0**. Сам репозиторий и релиз автоматически не создаются.
+Текущая версия: **0.16.2**, тег первого подготовленного выпуска: **v0.16.2**. Сам репозиторий и релиз автоматически не создаются.
 
 ## Подготовка на Windows
 
@@ -32,8 +32,8 @@ CI устанавливает зависимости через `npm ci`, про
 GitHub Desktop не создаёт релизы: следующие действия выполняются на сайте GitHub.
 
 1. В репозитории откройте **Releases → Draft a new release / Create a new release**.
-2. В **Choose a tag** введите **v0.16.0** и выберите создание нового тега при публикации. **Target: main**.
-3. В **Release title** укажите `0.16.0`.
+2. В **Choose a tag** введите **v0.16.2** и выберите создание нового тега при публикации. **Target: main**.
+3. В **Release title** укажите `0.16.2`.
 4. Вставьте описание из `docs/RELEASE-NOTES.md`.
 5. Для обычного выпуска включите **Set as the latest release** и не включайте **Set as a pre-release**.
 6. Нажмите **Publish release**, откройте **Actions** и дождитесь зелёного **Release**.
@@ -50,7 +50,7 @@ https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/latest/download/mo
 Ссылка на конкретную версию:
 
 ```text
-https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/download/v0.16.0/module.json
+https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/download/v0.16.2/module.json
 ```
 
 `latest` не выбирает pre-release. Если первым выпуском будет pre-release, устанавливайте его по ссылке конкретного тега.
@@ -91,8 +91,16 @@ npm run package
 Другой репозиторий можно указать явно:
 
 ```sh
-npm run package -- --repo OWNER/REPOSITORY --tag v0.16.0
+npm run package -- --repo OWNER/REPOSITORY --tag v0.16.2
 npm run verify:release
 ```
 
 Для ручной установки `module.zip` распаковывается в заранее созданную папку `Data/modules/sf2e-missing-tech-pets/`. Чтобы без Node.js вручную прикрепить уже подготовленные Assets к релизу, загрузите выданные `module.json` и `module.zip` **из одного комплекта**, не редактируя манифест отдельно.
+
+## Если Foundry не предлагает обновление
+
+1. Откройте постоянный `releases/latest/download/module.json` и проверьте поле `version`. Это версия, которую получает Foundry, не версия README или локального архива.
+2. Если версия старая, опубликуйте новый релиз с тегом `v0.16.2`, снимите prerelease и выберите **Set as the latest release**. В Assets должны лежать новые `module.json`, `module.zip`, `SHA256SUMS.txt`, а не один архив с ними внутри.
+3. Дождитесь зелёного workflow Release, включая **Check public latest manifest**. При красном шаге прочитайте сообщение: старый latest, HTTP-ошибка и несовпадение ZIP больше не считаются успехом.
+4. Если установленный модуль использует tag-specific `manifest`, переустановите его один раз по постоянной latest-ссылке. Обновление исходников в main само по себе не публикует новые Assets.
+5. Публичный latest endpoint можно проверить без публикации: задайте `GH_REPO=Huxtuntios/sf2e-missing-tech-pets`, `RELEASE_TAG=v0.16.2` и запустите `node tools/check-published-release.mjs`. До публикации соответствующего Latest-релиза ошибка ожидаема.

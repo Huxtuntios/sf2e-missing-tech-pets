@@ -1,0 +1,60 @@
+{
+  "_id": "e7699eb9aa05e31e",
+  "name": "Hardened Chassis",
+  "type": "feat",
+  "img": "modules/sf2e-missing-tech-pets/assets/icons/powerful-chassis.svg",
+  "effects": [],
+  "system": {
+    "slug": "hardened-chassis",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "bonus",
+    "location": null,
+    "level": {
+      "value": 1,
+      "taken": 1
+    },
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "prerequisites": {
+      "value": []
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>Your robot gains 2 additional Hit Points per level.</p><p>@Localize[SFMTP.CustomRulesHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    },
+    "rules": [
+      {
+        "key": "FlatModifier",
+        "selector": "hp-per-level",
+        "value": 2
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.robot-customizations.Item.e7699eb9aa05e31e"
+    },
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "robotCustomization": true,
+      "catalogId": "hardened-chassis",
+      "customizationGrade": "tactical",
+      "automation": "rules"
+    }
+  }
+}

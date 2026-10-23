@@ -1,0 +1,54 @@
+{
+  "_id": "eb370f54d0561534",
+  "name": "Skill Module",
+  "type": "feat",
+  "img": "modules/sf2e-missing-tech-pets/assets/icons/powerful-chassis.svg",
+  "effects": [],
+  "system": {
+    "slug": "skill-module",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "bonus",
+    "location": null,
+    "level": {
+      "value": 1,
+      "taken": 1
+    },
+    "onlyLevel1": false,
+    "maxTakable": null,
+    "prerequisites": {
+      "value": []
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>Choose one skill in which the robot becomes trained. Repeat selections must choose different skills.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.robot-customizations.Item.eb370f54d0561534"
+    },
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "robotCustomization": true,
+      "catalogId": "skill-module",
+      "customizationGrade": "commercial",
+      "automation": "manual"
+    }
+  }
+}

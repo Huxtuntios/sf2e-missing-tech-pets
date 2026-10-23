@@ -1,260 +1,484 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "source": "Archives of Nethys — Starfinder 2e Tech Core",
   "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
-  "note": "Names, grade, and links only; detailed rules remain on Archives of Nethys. The picker tracks chosen customizations but does not automatically implement every numeric effect.",
+  "note": "Own SF2e bonus feats supply full mechanical descriptions for all customizations. Only entries marked rules contain passive Rule Elements; other effects and choices are resolved manually.",
   "entries": [
     {
       "id": "aquatic-adaptation",
       "name": "Aquatic Adaptation",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "The robot companion gains a swim Speed of 20 feet. This customization adds that movement mode; it does not replace its other Speeds.",
+      "rules": [
+        {
+          "key": "BaseSpeed",
+          "selector": "swim",
+          "value": 20
+        }
+      ],
+      "automation": "rules",
+      "itemId": "73244eafcc76f082"
     },
     {
       "id": "armored-plates",
       "name": "Armored Plates",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot gains a +1 item bonus to AC, or +2 if it is a superior robot companion. Use unarmored proficiency. Choose the appropriate bonus when adding this Item; update that choice if the companion advances.",
+      "rules": [
+        {
+          "key": "ChoiceSet",
+          "flag": "armoredPlatesBonus",
+          "adjustName": false,
+          "prompt": "SFMTP.CustomArmorPrompt",
+          "choices": [
+            {
+              "label": "SFMTP.CustomArmorNormal",
+              "value": 1
+            },
+            {
+              "label": "SFMTP.CustomArmorSuperior",
+              "value": 2
+            }
+          ]
+        },
+        {
+          "key": "FlatModifier",
+          "selector": "ac",
+          "type": "item",
+          "value": "{item|flags.sf2e.rulesSelections.armoredPlatesBonus}",
+          "fromEquipment": false
+        }
+      ],
+      "automation": "rules",
+      "itemId": "b280797f59395ce8"
     },
     {
       "id": "artificial-personality",
       "name": "Artificial Personality",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "The robot companion gains an artificial personality. It can attempt skill checks that require Charisma and can speak Common.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "0131b13e97f3864c"
     },
     {
       "id": "cameras",
       "name": "Cameras",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Cameras built into the robot companion transmit its view to the owner. Using a comm unit or a similar device, you can see what the robot sees.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "5643c994f42b46e1"
     },
     {
       "id": "climber",
       "name": "Climber",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot gains a climb Speed of 20 feet.",
+      "rules": [
+        {
+          "key": "BaseSpeed",
+          "selector": "climb",
+          "value": 20
+        }
+      ],
+      "automation": "rules",
+      "itemId": "d3c973c2e9ff03c6"
     },
     {
       "id": "flier",
       "name": "Flier",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot gains a fly Speed of 20 feet.",
+      "rules": [
+        {
+          "key": "BaseSpeed",
+          "selector": "fly",
+          "value": 20
+        }
+      ],
+      "automation": "rules",
+      "itemId": "1703564ef0d8e887"
     },
     {
       "id": "grounded",
       "name": "Grounded",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Remove the robot’s weakness to electricity.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "69f3f651c5eb1e21"
     },
     {
       "id": "integrated-weapon-mount",
       "name": "Integrated Weapon Mount",
       "grade": "commercial",
       "repeatable": true,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Gain one weapon mount per selection. Installing or removing a weapon takes 10 minutes and has the manipulate trait. One-handed weapons require one mount; two-handed weapons require two. A mounted weapon is wielded and cannot be Disarmed. Interact to reload it requires no hands and loses the manipulate trait.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "c17c99ae5a060683"
     },
     {
       "id": "light-mounts",
       "name": "Light Mounts",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Shed bright light within 20 feet and dim light for 20 feet beyond that. Switch the light on or off with one action.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "014028713a67b53a"
     },
     {
       "id": "linguistic-upload",
       "name": "Linguistic Upload",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "The robot speaks two additional languages. Requires Artificial Personality or Sapient.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "71662a3a6b3a8294"
     },
     {
       "id": "manual-dexterity",
       "name": "Manual Dexterity",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Use up to two limbs as hands for manipulate actions.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "ca59467e7b076f15"
     },
     {
       "id": "mount",
       "name": "Mount",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot gains the mount ability.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "b17ac63803dcb2b8"
     },
     {
       "id": "nightvision-sensors",
       "name": "Nightvision Sensors",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot gains darkvision.",
+      "rules": [
+        {
+          "key": "Sense",
+          "selector": "darkvision"
+        }
+      ],
+      "automation": "rules",
+      "itemId": "ceb4bf79b55d8fe7"
     },
     {
       "id": "olfactory-receptors",
       "name": "Olfactory Receptors",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot gains imprecise scent with a range of 30 feet.",
+      "rules": [
+        {
+          "key": "Sense",
+          "selector": "scent",
+          "acuity": "imprecise",
+          "range": 30
+        }
+      ],
+      "automation": "rules",
+      "itemId": "bb1e8756dc08e83b"
     },
     {
       "id": "skill-module",
       "name": "Skill Module",
       "grade": "commercial",
       "repeatable": true,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Choose one skill in which the robot becomes trained. Repeat selections must choose different skills.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "eb370f54d0561534"
     },
     {
       "id": "speakers",
       "name": "Speakers",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "The robot companion has built-in speakers. You can speak through those speakers, allowing your voice to be heard from the robot.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "ea4ec3d676832bc7"
     },
     {
       "id": "upgrade-slot",
       "name": "Upgrade Slot",
       "grade": "commercial",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot gains one armor upgrade slot.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "0b5bf7777061b5ee"
     },
     {
       "id": "assistant",
       "name": "Assistant",
       "grade": "tactical",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Choose a skill in which both owner and robot are trained. While the robot is within reach, the owner gains a +1 circumstance bonus to that skill’s checks.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "6289b4aaa21f25f0"
     },
     {
       "id": "biotech-healing-circuit",
       "name": "Biotech Healing Circuit",
       "grade": "tactical",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "The robot loses its immunity to healing and can be healed as a living creature.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "5e036fffdbfb4520"
     },
     {
       "id": "burrower",
       "name": "Burrower",
       "grade": "tactical",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot gains a burrow Speed of 20 feet.",
+      "rules": [
+        {
+          "key": "BaseSpeed",
+          "selector": "burrow",
+          "value": 20
+        }
+      ],
+      "automation": "rules",
+      "itemId": "5702794e7b890aa9"
     },
     {
       "id": "echolocation",
       "name": "Echolocation",
       "grade": "tactical",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot can use hearing as a precise sense within 30 feet.",
+      "rules": [
+        {
+          "key": "Sense",
+          "selector": "echolocation",
+          "acuity": "precise",
+          "range": 30
+        }
+      ],
+      "automation": "rules",
+      "itemId": "8de19def12cf25b1"
     },
     {
       "id": "expertise-module",
       "name": "Expertise Module",
       "grade": "tactical",
       "repeatable": true,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Choose a skill in which the robot is trained, including training from Skill Module. Its proficiency becomes expert. Repeat selections must choose different skills.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "437e90258cbbabf5"
     },
     {
       "id": "hardened-chassis",
       "name": "Hardened Chassis",
       "grade": "tactical",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot gains 2 additional Hit Points per level.",
+      "rules": [
+        {
+          "key": "FlatModifier",
+          "selector": "hp-per-level",
+          "value": 2
+        }
+      ],
+      "automation": "rules",
+      "itemId": "e7699eb9aa05e31e"
     },
     {
       "id": "high-speed",
       "name": "High Speed",
       "grade": "tactical",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Increase one of the robot’s Speeds to 40 feet. Choose which Speed manually.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "7df2af0f61909025"
     },
     {
       "id": "network",
       "name": "Network",
       "grade": "tactical",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "The robot has an integrated hacking kit. Connecting to an adjacent computer takes one action. While connected, the owner can attempt Computers checks as if adjacent to that computer.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "03ed382696868239"
     },
     {
       "id": "share-charge",
       "name": "Share Charge",
       "grade": "tactical",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "The robot can power battery-using items from its reserves, even if the item has no battery or charges.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "d8903991bcd09e59"
     },
     {
       "id": "emergency-repair",
       "name": "Emergency Repair",
       "grade": "advanced",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Once per 10 minutes, spend one action to restore HP equal to the robot’s level, or twice its level if superior.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "3cddbcf49952f350"
     },
     {
       "id": "maneuver-module",
       "name": "Maneuver Module",
       "grade": "advanced",
       "repeatable": true,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Choose two of Disarm, Grapple, Reposition, Shove or Trip. Gain a +1 circumstance bonus to those actions, or +2 if superior. Repeat selections must choose different actions.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "49658a20b8d5b1db"
     },
     {
       "id": "optimized-avoidance",
       "name": "Optimized Avoidance",
       "grade": "advanced",
       "repeatable": true,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Choose a saving throw. A success on that save prevents damage, but not other effects. This customization can be selected more than once.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "1dba9ce0ddda8c56"
     },
     {
       "id": "recharge",
       "name": "Recharge",
       "grade": "advanced",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Spend one concentrate action to recharge a touched battery. The robot then becomes clumsy 1 for 1 round.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "656fcdfcbfd39f86"
     },
     {
       "id": "resistant-panels",
       "name": "Resistant Panels",
       "grade": "advanced",
       "repeatable": true,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Choose acid, bludgeoning, cold, fire, piercing, slashing or sonic. Gain resistance to that damage equal to half the robot’s level, rounded up. This customization can be selected more than once.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "442bc16a6513e405"
     },
     {
       "id": "sapient",
       "name": "Sapient",
       "grade": "advanced",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "The robot companion becomes sapient, but is not yet fully autonomous and does not gain a soul. It loses immunity to mental damage, its Intelligence modifier becomes +0, and it can attempt actions requiring Intelligence, Wisdom or Charisma. It can speak Common. In combat, the stress of battle means you must still Command it before it can act.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "2447f193936e3c68"
     },
     {
       "id": "agility-optimization",
       "name": "Agility Optimization",
       "grade": "superior",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "The robot’s movement does not trigger reactions. Acrobatics becomes expert, or master if already expert.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "b793db50d6f0437c"
     },
     {
       "id": "camoflage",
       "name": "Camoflage",
       "grade": "superior",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Choose a biome, such as plains or urban terrain. In that biome the robot companion can Sneak even while observed. Its Stealth proficiency becomes expert, or master if it was already expert.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "98cddaa4ac5bbd5b"
     },
     {
       "id": "glow-up",
       "name": "Glow Up",
       "grade": "superior",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "The robot companion becomes more expressive. Its Diplomacy proficiency becomes expert, or master if it was already expert, and its Charisma modifier becomes +3. Selecting this customization requires Artificial Personality or Sapient.",
+      "rules": [],
+      "automation": "manual",
+      "itemId": "0625f916d2cdde45"
     },
     {
       "id": "speedster",
       "name": "Speedster",
       "grade": "superior",
       "repeatable": false,
-      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations"
+      "sourceUrl": "https://2e.aonsrd.com/companions/types/robot/customizations",
+      "description": "Your robot gains a +10-foot status bonus to all Speeds.",
+      "rules": [
+        {
+          "key": "FlatModifier",
+          "selector": "speed",
+          "type": "status",
+          "value": 10
+        }
+      ],
+      "automation": "rules",
+      "itemId": "bb478ba107c9d171"
     }
   ]
 }

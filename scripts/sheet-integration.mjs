@@ -228,14 +228,14 @@ export function registerSheetIntegration(services) {
               : `<input type="checkbox" data-sfmtp-id="${esc(entry.id)}" ${oldCount ? "checked" : ""} ${disabled ? "disabled" : ""}>`;
           const detail = familiar
             ? t(`Category.${entry.category}`)
-            : t(`Grade.${entry.grade}`);
+            : `${t(`Grade.${entry.grade}`)} · ${t(entry.automation === "rules" ? "FamiliarRulesShort" : "FamiliarManualShort")}`;
           const status =
             familiar && locked
               ? t("InlineProtected")
               : !familiar && locked
                 ? t("InlineGradeLocked")
                 : "";
-          return `<details class="sfmtp-inline-entry" data-sfmtp-entry="${esc(`${entry.name} ${detail}`.toLocaleLowerCase())}"><summary><label>${control} ${esc(entry.name)}</label><small>${esc(detail)} ${esc(status)}</small></summary><p>${esc(entry.description ?? t("InlineRulesOnSource"))}</p>${entry.sourceUrl ? `<a href="${esc(entry.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(t("SourcePage"))}</a>` : ""}</details>`;
+          return `<details class="sfmtp-inline-entry" data-sfmtp-entry="${esc(`${entry.name} ${detail}`.toLocaleLowerCase())}"><summary><label>${control} ${esc(entry.name)}</label><small>${esc(detail)} ${esc(status)}</small></summary><p class="sfmtp-rules-text">${esc(entry.description ?? t("InlineRulesOnSource"))}</p>${entry.sourceUrl ? `<a href="${esc(entry.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(t("SourcePage"))}</a>` : ""}</details>`;
         })
         .join(
           "",

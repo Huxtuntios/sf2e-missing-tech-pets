@@ -1,0 +1,54 @@
+{
+  "_id": "03ed382696868239",
+  "name": "Network",
+  "type": "feat",
+  "img": "modules/sf2e-missing-tech-pets/assets/icons/powerful-chassis.svg",
+  "effects": [],
+  "system": {
+    "slug": "network",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 1
+    },
+    "category": "bonus",
+    "location": null,
+    "level": {
+      "value": 1,
+      "taken": 1
+    },
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "prerequisites": {
+      "value": []
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>The robot has an integrated hacking kit. Connecting to an adjacent computer takes one action. While connected, the owner can attempt Computers checks as if adjacent to that computer.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.robot-customizations.Item.03ed382696868239"
+    },
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "robotCustomization": true,
+      "catalogId": "network",
+      "customizationGrade": "tactical",
+      "automation": "manual"
+    }
+  }
+}

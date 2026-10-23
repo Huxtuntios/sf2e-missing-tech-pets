@@ -145,6 +145,7 @@ async function harness({
     "robot-chassis",
     "robot-advanced-maneuvers",
     "robot-support",
+    "robot-customizations",
   ]) {
     const sources = (
       await readFile(path.join(root, "packs", name + ".db"), "utf8")
@@ -274,7 +275,7 @@ async function harness({
     let code = await readFile(filename, "utf8");
     if (filename.endsWith("/main.mjs"))
       code +=
-        "\nglobalThis.subject={isCompatibleItemPack,missingCompanionPacks,handleCompanionBuildItem,syncAutomation,generatedItemsForController,cleanupPreviousCompanion,findSourceItem,itemFingerprint,canReplaceManagedItem,validLink,getRobotData,openCompanionSources};";
+        "\nglobalThis.subject={isCompatibleItemPack,missingCompanionPacks,handleCompanionBuildItem,syncAutomation,generatedItemsForController,cleanupPreviousCompanion,findSourceItem,itemFingerprint,canReplaceManagedItem,validLink,getRobotData,openCompanionSources,openCuratedCatalog};";
     const module = new SourceTextModule(code, {
       context,
       identifier: filename,
@@ -1107,4 +1108,297 @@ test("Сводка linked-дрона добавляет целевые слот�
   assert.equal(h.api.getRobotData(owner).gradeLimit, "commercial");
   await owner.setFlag(ID, "sourceCounts", { "tactical-customization": 3 });
   assert.equal(h.api.getModificationSlots(owner).total, 7);
+});
+
+// Регрессии собственных источников кастомизаций, без запуска движка RE.
+const customizationChoice = (catalogId, id = catalogId) => ({
+  id,
+  catalogId,
+  name: catalogId,
+  grade: "commercial",
+  cost: 1,
+});
+test("Aquatic Adaptation, Armored Plates и Speakers получают свои Items без предупреждения missing source", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      baseSlots: 3,
+      modifications: ["aquatic-adaptation", "armored-plates", "speakers"].map(
+        (id) => customizationChoice(id),
+      ),
+    });
+  const result = await h.api.syncAutomation(owner);
+  assert.equal(result.skipped, 0);
+  for (const slug of ["aquatic-adaptation", "armored-plates", "speakers"]) {
+    const item = robot.items.find((i) => i.system.slug === slug);
+    assert.ok(item, slug);
+    assert.equal(
+      item.flags[ID].automationSource.sourcePack,
+      ID + ".robot-customizations",
+    );
+  }
+  assert.ok(
+    !h.notifications.some((n) =>
+      n.msg.includes(h.game.i18n.localize("SFMTP.AutomationSkipped") + ":"),
+    ),
+  );
+  assert.ok(
+    h.notifications.some((n) =>
+      n.msg.includes(h.game.i18n.localize("SFMTP.CustomManualSelections")),
+    ),
+  );
+  const previous = clone(robot.writes);
+  await h.api.syncAutomation(owner);
+  assert.deepEqual(robot.writes, previous);
+  assert.equal(
+    owner.getFlag(ID, "lastAutomationSync").manualCustomizations.length,
+    1,
+  );
+});
+test("Climber игнорирует совпавший familiar Item в чужом паке", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      modifications: [customizationChoice("climber")],
+    });
+  h.packs.set(
+    "sf2e.familiar-abilities",
+    pack("sf2e.familiar-abilities", [
+      {
+        _id: "wrong",
+        name: "Climber",
+        type: "action",
+        system: {
+          slug: "climber",
+          category: "familiar",
+          rules: [{ key: "BaseSpeed", selector: "climb", value: 5 }],
+        },
+      },
+    ]),
+  );
+  await h.api.syncAutomation(owner);
+  const item = robot.items.find((i) => i.system.slug === "climber");
+  assert.equal(item.system.rules[0].value, 20);
+  assert.equal(
+    item.flags[ID].automationSource.sourcePack,
+    ID + ".robot-customizations",
+  );
+});
+test("Смена выбора удаляет только неизменённые собственные кастомизации", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      baseSlots: 2,
+      modifications: ["aquatic-adaptation", "speakers"].map((id) =>
+        customizationChoice(id),
+      ),
+    });
+  await h.api.syncAutomation(owner);
+  const protectedItem = robot.items.find((i) => i.system.slug === "speakers");
+  protectedItem.source.name = "Мой динамик";
+  await owner.setFlag(ID, "robot", {
+    ...h.api.getRobotData(owner),
+    modifications: [],
+  });
+  await h.api.syncAutomation(owner);
+  assert.ok(robot.items.has(protectedItem.id));
+  assert.ok(!robot.items.find((i) => i.system.slug === "aquatic-adaptation"));
+});
+test("Ручной drag-and-drop собственной кастомизации не дублируется и не удаляется", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      modifications: [customizationChoice("aquatic-adaptation")],
+    });
+  const source = JSON.parse(
+    await readFile(
+      path.join(root, "packs/src/robot-customizations/aquatic-adaptation.json"),
+      "utf8",
+    ),
+  );
+  const [manual] = await robot.createEmbeddedDocuments("Item", [source]);
+  await h.api.syncAutomation(owner);
+  assert.equal(
+    robot.items.filter((i) => i.system.slug === "aquatic-adaptation").length,
+    1,
+  );
+  await owner.setFlag(ID, "robot", {
+    ...h.api.getRobotData(owner),
+    modifications: [],
+  });
+  await h.api.syncAutomation(owner);
+  assert.ok(robot.items.has(manual.id));
+});
+test("Старый неверный источник Climber обновляется на месте, изменённая пользователем копия защищена", async () => {
+  for (const edited of [false, true]) {
+    const h = await harness(),
+      { owner, robot } = await pair(h, {
+        modifications: [customizationChoice("climber")],
+      });
+    await h.api.syncAutomation(owner);
+    const item = robot.items.find((i) => i.system.slug === "climber");
+    const metadata = item.getFlag(ID, "automationSource");
+    item.source.system.rules = [
+      { key: "BaseSpeed", selector: "climb", value: 5 },
+    ];
+    item.source.flags[ID].familiarAbility = true;
+    metadata.sourceUuid = "Compendium.sf2e.familiar-abilities.Item.old";
+    metadata.sourcePack = "sf2e.familiar-abilities";
+    metadata.fingerprint = h.subject.itemFingerprint(item.toObject());
+    if (edited) item.source.name = "Моя старая копия";
+    const beforeId = item.id;
+    await h.api.syncAutomation(owner);
+    assert.equal(
+      robot.items.filter((i) => i.system.slug === "climber").length,
+      1,
+    );
+    assert.equal(item.id, beforeId);
+    assert.equal(item.system.rules[0].value, edited ? 5 : 20);
+    assert.equal(item.flags[ID].familiarAbility, edited);
+    assert.equal(
+      item.flags[ID].automationSource.sourcePack,
+      edited ? "sf2e.familiar-abilities" : ID + ".robot-customizations",
+    );
+  }
+});
+test("Выбор ChoiceSet Armored Plates сохраняется повторной синхронизацией", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      modifications: [customizationChoice("armored-plates")],
+    });
+  await h.api.syncAutomation(owner);
+  const item = robot.items.find((i) => i.system.slug === "armored-plates");
+  item.source.flags.sf2e = { rulesSelections: { armoredPlatesBonus: 2 } };
+  item.getFlag(ID, "automationSource").fingerprint = h.subject.itemFingerprint(
+    item.toObject(),
+  );
+  const writes = clone(robot.writes);
+  await h.api.syncAutomation(owner);
+  assert.equal(item.flags.sf2e.rulesSelections.armoredPlatesBonus, 2);
+  assert.deepEqual(robot.writes, writes);
+});
+
+test("Отсутствующий собственный пак кастомизаций использует локальный источник", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      modifications: [customizationChoice("aquatic-adaptation")],
+    });
+  h.packs.delete(ID + ".robot-customizations");
+  const result = await h.api.syncAutomation(owner);
+  assert.equal(result.skipped, 0);
+  assert.equal(
+    robot.items.find((i) => i.system.slug === "aquatic-adaptation").system
+      .rules[0].value,
+    20,
+  );
+});
+
+// Миграция Action -> feat создаёт замену до удаления прежнего предмета.
+async function legacyCustomization(
+  h,
+  owner,
+  robot,
+  slug,
+  { edited = false, manual = false } = {},
+) {
+  await h.api.syncAutomation(owner);
+  const item = robot.items.find((item) => item.system.slug === slug);
+  item.source.type = "action";
+  item.source.system.category = "interaction";
+  delete item.source.system.location;
+  delete item.source.system.level;
+  if (slug === "armored-plates")
+    item.source.flags.sf2e = { rulesSelections: { armoredPlatesBonus: 2 } };
+  if (manual) delete item.source.flags[ID].automationSource;
+  else
+    item.getFlag(ID, "automationSource").fingerprint =
+      h.subject.itemFingerprint(item.toObject());
+  if (edited) item.source.name = "Мой изменённый предмет";
+  return item;
+}
+test("Выбранная кастомизация мигрирует в бонусный feat без второй копии RE и сохраняет выбор брони", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      modifications: [customizationChoice("armored-plates")],
+    });
+  const old = await legacyCustomization(h, owner, robot, "armored-plates");
+  await h.api.syncAutomation(owner);
+  const items = robot.items.filter(
+    (item) => item.system.slug === "armored-plates",
+  );
+  assert.equal(items.length, 1);
+  const item = items[0];
+  assert.equal(item.type, "feat");
+  assert.equal(item.system.category, "bonus");
+  assert.equal(item.system.location, null);
+  assert.equal(item.flags.sf2e.rulesSelections.armoredPlatesBonus, 2);
+  assert.equal(
+    item.system.rules.find((rule) => rule.key === "ChoiceSet").selection,
+    2,
+  );
+  assert.equal(
+    item.system.rules.filter((rule) => rule.key === "FlatModifier").length,
+    1,
+  );
+  assert.ok(!robot.items.has(old.id));
+  const writes = clone(robot.writes);
+  await h.api.syncAutomation(owner);
+  assert.deepEqual(robot.writes, writes);
+});
+test("Ошибка создания бонусного feat не удаляет прежний Action", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      modifications: [customizationChoice("aquatic-adaptation")],
+    });
+  const old = await legacyCustomization(h, owner, robot, "aquatic-adaptation");
+  robot.createEmbeddedDocuments = async () => {
+    throw new Error("Нет записи");
+  };
+  await assert.rejects(h.api.syncAutomation(owner), /Нет записи/);
+  assert.ok(robot.items.has(old.id));
+  assert.equal(old.type, "action");
+});
+test("Изменённый или ручной прежний Action не удаляется и не получает дублирующий feat", async () => {
+  for (const manual of [false, true]) {
+    const h = await harness(),
+      { owner, robot } = await pair(h, {
+        modifications: [customizationChoice("aquatic-adaptation")],
+      });
+    const old = await legacyCustomization(
+      h,
+      owner,
+      robot,
+      "aquatic-adaptation",
+      { manual, edited: !manual },
+    );
+    await h.api.syncAutomation(owner);
+    assert.ok(robot.items.has(old.id));
+    assert.equal(
+      robot.items.filter((item) => item.system.slug === "aquatic-adaptation")
+        .length,
+      1,
+    );
+    assert.equal(old.type, "action");
+  }
+});
+
+test("Отмена preCreate без исключения сохраняет прежнюю кастомизацию", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      modifications: [customizationChoice("aquatic-adaptation")],
+    });
+  const old = await legacyCustomization(h, owner, robot, "aquatic-adaptation");
+  robot.createEmbeddedDocuments = async () => [];
+  const result = await h.api.syncAutomation(owner);
+  assert.ok(robot.items.has(old.id));
+  assert.equal(result.skipped, 1);
+  assert.equal(old.type, "action");
+});
+test("Каталог инструментов содержит раскрываемое описание, а не одну ссылку AON", async () => {
+  const h = await harness(),
+    { owner } = await pair(h);
+  await h.subject.openCuratedCatalog(owner, "robot-customizations");
+  const content = h.dialogs.at(-1).content;
+  const entries = JSON.parse(
+    await readFile(path.join(root, "data/robot-customizations.json"), "utf8"),
+  ).entries.filter((e) => e.grade === "commercial");
+  assert.match(content, /<details><summary>/);
+  for (const entry of entries)
+    assert.ok(content.includes(entry.description), entry.id);
 });

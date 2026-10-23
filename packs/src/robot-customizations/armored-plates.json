@@ -1,0 +1,78 @@
+{
+  "_id": "b280797f59395ce8",
+  "name": "Armored Plates",
+  "type": "feat",
+  "img": "modules/sf2e-missing-tech-pets/assets/icons/powerful-chassis.svg",
+  "effects": [],
+  "system": {
+    "slug": "armored-plates",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "bonus",
+    "location": null,
+    "level": {
+      "value": 1,
+      "taken": 1
+    },
+    "onlyLevel1": false,
+    "maxTakable": 1,
+    "prerequisites": {
+      "value": []
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>Your robot gains a +1 item bonus to AC, or +2 if it is a superior robot companion. Use unarmored proficiency. Choose the appropriate bonus when adding this Item; update that choice if the companion advances.</p><p>@Localize[SFMTP.CustomRulesHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    },
+    "rules": [
+      {
+        "key": "ChoiceSet",
+        "flag": "armoredPlatesBonus",
+        "adjustName": false,
+        "prompt": "SFMTP.CustomArmorPrompt",
+        "choices": [
+          {
+            "label": "SFMTP.CustomArmorNormal",
+            "value": 1
+          },
+          {
+            "label": "SFMTP.CustomArmorSuperior",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "key": "FlatModifier",
+        "selector": "ac",
+        "type": "item",
+        "value": "{item|flags.sf2e.rulesSelections.armoredPlatesBonus}",
+        "fromEquipment": false
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.robot-customizations.Item.b280797f59395ce8"
+    },
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "robotCustomization": true,
+      "catalogId": "armored-plates",
+      "customizationGrade": "commercial",
+      "automation": "rules"
+    }
+  }
+}

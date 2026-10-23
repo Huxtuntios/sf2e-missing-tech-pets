@@ -1,12 +1,12 @@
-# 0.16.0 — PF2e Dailies integration
+# 0.16.2 — Descriptions, bonus abilities and update checks
 
-- Optional PF2e Dailies 4.23.1+ integration: prepare the 38 Tech Core familiar abilities in its normal daily workflow.
-- Explicit per-owner/familiar connection in the existing familiar abilities section; no new character-header buttons.
-- Only the owner's standard familiar set is disabled, with safe restoration on disconnect. The local editor is hidden while connected.
-- Capacity, known prerequisites, duplicate prevention, stable UUIDs and protected Items are handled by the existing synchronizer.
-- Rest removes only this module's unchanged managed daily Items; innate, manual, edited and third-party Items remain protected.
-- Local selection remains available without a compatible Dailies API. Companion Compendia 7.6.3+ remains required.
+- Read customization descriptions inside expanded catalog entries; AON links are supplementary.
+- Selected robot customizations are native bonus feats on the companion character sheet, with no duplicate Rule Elements.
+- Safe create-first migration of unchanged module-managed Actions; valid Armored Plates choices are preserved. Manual/edited copies remain protected. Embedded Item IDs change during type conversion; compendium IDs remain stable.
+- Familiar abilities, Support Benefits and advanced maneuvers keep their native action format.
+- Release validation now enforces the stable latest manifest and matching versioned ZIP; the workflow also checks the public latest endpoint after upload.
+- Unified ES module formatting and removed a redundant factory wrapper.
 
-Close existing preparation windows before switching modes. If temporary abilities from the standard Dailies set are present, rest through Dailies first. This integration does not automate all active ability effects or repeatable Skilled variants.
+Reload the world and save the robot customization selection again. Publish a normal Latest release with its individual Assets before expecting Foundry to offer an update.
 
-GitHub release tag: `v0.16.0`.
+GitHub release tag: `v0.16.2`.

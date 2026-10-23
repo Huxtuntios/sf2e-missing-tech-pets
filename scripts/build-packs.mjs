@@ -22,6 +22,7 @@ import {
   buildSupportSource,
 } from "./item-sources.mjs";
 
+import { buildCustomizationSource } from "./customization-sources.mjs";
 import { buildFamiliarSource } from "./familiar-sources.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -31,8 +32,17 @@ const catalog = JSON.parse(
 const familiars = JSON.parse(
   await readFile(path.join(root, "data/familiar-abilities.json"), "utf8"),
 );
+const customizations = JSON.parse(
+  await readFile(path.join(root, "data/robot-customizations.json"), "utf8"),
+);
 const temporary = await mkdtemp(path.join(tmpdir(), "sfmtp-build-"));
 const definitions = [
+  {
+    name: "robot-customizations",
+    prefix: "customization",
+    builder: buildCustomizationSource,
+    entries: customizations.entries,
+  },
   { name: "robot-chassis", prefix: "chassis", builder: buildChassisSource },
   {
     name: "robot-advanced-maneuvers",
@@ -59,7 +69,7 @@ for (const {
   await mkdir(sourceDir, { recursive: true });
   const items = entries.map((entry) => {
     if (
-      prefix !== "familiar" &&
+      !["familiar", "customization"].includes(prefix) &&
       (!entry.advancedManeuverId || !entry.advancedManeuverDescription)
     )
       throw new Error(`Не описан манёвр: ${entry.id}`);

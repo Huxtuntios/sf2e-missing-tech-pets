@@ -1,5 +1,35 @@
 # SF2e Missing Tech Pets
 
+## Descriptions, bonus abilities and updates
+
+Expand an entry in **Robot customizations** or in the tools catalog to read its mechanical description in the module; the Archives of Nethys link is an additional reference, not a replacement for the description.
+
+Selected robot customizations are native **feat** Items with category **bonus**, shown in **Bonus Feats/Abilities** on the companion's `character` sheet. They belong to the companion, not automatically to its owner. They retain the same passive Rules, action costs and source UUIDs; no second Action/Rule Element copy is granted. Familiar abilities remain native actions on the `familiar` actor because that actor has no character bonus-feat group. Support and advanced maneuvers remain actions.
+
+On saving the current selection, an unchanged module-managed customization from the old Action format is replaced with a bonus feat. The replacement is created first; the old Item is removed only after successful creation. Valid Armored Plates choices are carried over. Embedded Item IDs change during this type conversion, so update saved actor-Item shortcuts if necessary; compendium IDs remain stable. Manual and edited copies are not silently converted or duplicated. Review protected old Actions and their source before making a deliberate replacement.
+
+The installation/update URL remains:
+
+```text
+https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/latest/download/module.json
+```
+
+Foundry only sees a newer version after its public GitHub release and updated Assets exist. Committing files or receiving a ZIP does not publish a release. Publish tag **v0.16.2** as a normal **Latest** release, not a draft or prerelease. The release workflow now verifies the version returned by the public latest manifest after verifying the uploaded Assets. If an old installation uses a tag-specific manifest, reinstall once using the stable URL above. See [release instructions](docs/RELEASING.md).
+
+
+## Robot customization sources
+
+All **36 robot customizations** now have their own SF2e bonus feat Items in `robot-customizations`. Saving the selection no longer depends on finding a same-named Item in a third-party or familiar pack.
+
+- **Passive Rule Elements (10):** Aquatic Adaptation, Armored Plates, Climber, Flier, Burrower, Nightvision Sensors, Olfactory Receptors, Echolocation, Hardened Chassis and Speedster.
+- **Manual resolution (26):** the other customizations have descriptions and source links, without invented numerical effects. Speakers, for example, describes speaking through the robot; it does not need an artificial bonus. The catalog marks the difference, and synchronization reports manual selections as information rather than as missing sources.
+- **Armored Plates:** the native ChoiceSet asks for +1, or +2 for an actual Superior robot companion. Select the appropriate bonus when the Item is added; update its Rule Element selection if the robot advances. The catalog's grade limit does not itself grant advancement or decide this bonus.
+- Slot costs, grade limits and existing prerequisites still apply. Possessing an Item does not automate every active effect in its description.
+
+**Upgrading:** reload the world, open the robot's **Feats/Abilities → Robot customizations** section and save the current selection again. Keep the same profile choices. A previously module-generated, unchanged customization is corrected safely; old Actions are replaced with bonus feats after creating their replacement. Manually added or edited Items are retained; review any protected old copy yourself instead of deleting Items in bulk. An exact native drag-and-drop copy of an included customization is not duplicated or adopted for automatic deletion.
+
+Rules reference: [Robot Customizations — Archives of Nethys](https://2e.aonsrd.com/companions/types/robot/customizations).
+
 ## Optional PF2e Dailies integration
 
 **PF2e Dailies (`pf2e-dailies`) 4.23.1+ is optional. PF2e Companion Compendia 7.6.3+ remains required.** Integration uses the public `game.dailies.api.registerCustomDailies` API, without replacing methods or modifying the Dailies API. The API contract was checked against Dailies 4.23.1.
@@ -22,7 +52,7 @@ Reference: [PF2e Dailies](https://github.com/reonZ/pf2e-dailies), [public API](h
 
 Character-sheet header buttons have been removed. Open **Configure Settings → Module Settings → SF2e Missing Tech Pets → Open tools** for initial creation, links, source references and advanced tools. Select the actor there; the public API remains available.
 
-- **Robot companion:** open the companion's **Feats/Abilities** tab and expand **Robot customizations**. Current selections, all 36 catalog entries, grades and repeatable counts are shown together. Change the choices and click **Save selection**. Slot and grade checks apply. Manual and unknown legacy records are preserved; automation still requires a compatible source Item.
+- **Robot companion:** open the companion's **Feats/Abilities** tab and expand **Robot customizations**. Current selections, all 36 catalog entries, grades and repeatable counts are shown together. Change the choices and click **Save selection**. Slot and grade checks apply. Manual and unknown legacy records are preserved; the included customization Items supply the sources; entries marked manual still require manual resolution.
 - **Native familiar:** expand **Choose familiar abilities** in its existing **Abilities** section. Inspect the 38 available abilities, change the daily set and save. Innate, manually added and edited Items cannot be removed here. Native ability Items remain visible in the system's list.
 - The inline editors are shown on the companion/familiar, not every owner character. Only owners of both linked actors can save. If actor data changes while editing, reopen the sheet rather than overwrite the newer data.
 - Robot chassis are hidden from the native character ancestry picker, including world copies with retained source metadata. Drag them from **Robot Chassis (Tech Core)** onto a separate companion actor of type `character`, as with Companion Compendia. The catalog is reference-only; it no longer assigns chassis through a selection button. Existing chassis and user data are retained.
@@ -35,7 +65,7 @@ After updating, reload the world page to refresh translations. Existing imported
 ![Foundry VTT 14](https://img.shields.io/badge/Foundry_VTT-14-informational)
 ![Starfinder 2e](https://img.shields.io/badge/System-Starfinder_2e-orange)
 
-**Version 0.16.0.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition.
+**Version 0.16.2.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition.
 
 > Action descriptions and automated mechanics are different. See the automation notes below for effects that require manual resolution.
 
@@ -168,6 +198,7 @@ An actor cannot have two ancestry Items. The module **does not delete** a confli
 | `robot-advanced-maneuvers` | 5 action Items: Surgical Strike, Disturbing Display, Hydraulic Flipper, Blinding Spotlight, and Ram Slam |
 | `robot-support` | 5 separate action Items containing each chassis's Support Benefit |
 | `familiar-abilities` | 38 action Items: Pet, Familiar, and Master abilities from Tech Core |
+| `robot-customizations` | 36 bonus feat Items with descriptions; 10 contain passive Rule Elements |
 
 Chassis use native ancestry fields and Rule Elements for base attribute modifiers, HP, size, Speeds, senses, skill training, traits, and Strikes. The base companion class is granted through `GrantItem` from the dependency's **SF2e** pack:
 
@@ -196,9 +227,9 @@ Conditional, calculated, and ranged attacks, as well as sources with ambiguous s
 
 ## Customizations, Abilities, and Slots
 
-- The 36 customizations, search tools, and compendium browser are retained. The 38 familiar abilities now have standalone Items and a dedicated panel.
+- The 36 customizations have their own source Items; search tools and the compendium browser are retained. The 38 familiar abilities now have standalone Items and a dedicated panel.
 - Only compatible SF2e Item packs are used. PF2e packs, packs explicitly assigned to another system, PF2e references in Rules, and Rule Element keys unknown to the installed system are rejected.
-- Exact slug/identifier matches are searched across all allowed packs **before** falling back to names. Item types are checked. Imports preserve Rules and `flags.core.sourceId`.
+- Known robot customizations use exact own-catalog IDs, never familiar Items with matching names. For other searches, exact slug/identifier matches are searched across all allowed packs **before** falling back to names. Item types are checked. Imports preserve Rules and `flags.core.sourceId`.
 - Unidentified third-party packs without system metadata are not automatically considered safe.
 - If a source is unavailable, the selection stays in the profile; effects are not invented. A previously applied Item is not deleted merely because its source is temporarily unavailable.
 - A manual entry is a note and slot bookkeeping, not a functioning Rule Element.
@@ -311,7 +342,9 @@ npm test
 
 Robot Item sources are defined in `data/robot-chassis.json` and `scripts/item-sources.mjs`. Familiar sources are defined in `data/familiar-abilities.json` and `scripts/familiar-sources.mjs`.
 
-The build updates the four `packs/src/` directories, textual `.db` snapshots, and ready-to-use LevelDB directories. The manifest loads **LevelDB**. The `.db` files are retained as inspectable text snapshots, not as the runtime pack paths for v14.
+Customization sources are defined in `data/robot-customizations.json` and `scripts/customization-sources.mjs`.
+
+The build updates the five `packs/src/` directories, textual `.db` snapshots, and ready-to-use LevelDB directories. The manifest loads **LevelDB**. The `.db` files are retained as inspectable text snapshots, not as the runtime pack paths for v14.
 
 Reproducibility is checked by document contents and IDs, not by byte-for-byte equality of LevelDB's internal files. The builder first compiles into a temporary directory, extracts and verifies the documents, then replaces the generated pack.
 

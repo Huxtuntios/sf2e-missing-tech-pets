@@ -1,1 +1,0 @@
-PASS: 38 entries, RU labels, native attribute, filter, selection, save, innate lock, sheet/item/chat links, single window, layout, no script errors. Browser fixture only; not Foundry runtime.

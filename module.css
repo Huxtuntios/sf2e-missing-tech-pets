@@ -208,3 +208,10 @@
 }
 
 .sfmtp-dialog .window-content { min-height: 0; overflow: auto; }
+
+/* Полные описания сохраняют абзацы и не обрезаются по высоте строки. */
+.sfmtp-rules-text {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  max-height: none;
+}

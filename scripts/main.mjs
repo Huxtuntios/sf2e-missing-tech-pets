@@ -1,3 +1,7 @@
+import {
+  buildCustomizationSource,
+  preserveCustomizationChoices,
+} from "./customization-sources.mjs";
 import { initializeDailiesIntegration } from "./dailies.mjs";
 import { registerSheetIntegration } from "./sheet-integration.mjs";
 import { t, initializeLocalization } from "./i18n.mjs";
@@ -26,6 +30,7 @@ import {
   COMPANION_CLASS_UUID,
   buildChassisSource as createChassisSource,
   buildManeuverSource as createManeuverSource,
+  slugify as normalizedSlug,
 } from "./item-sources.mjs";
 import { TechPetsDialog as Dialog } from "./dialog.mjs";
 
@@ -905,7 +910,7 @@ async function findChassisEntry(...values) {
       ) ?? null
     );
   } catch (error) {
-    console.warn(`${MODULE_ID} | Could not load chassis catalog`, error);
+    console.warn(`${MODULE_ID} | Не удалось загрузить каталог шасси`, error);
     return null;
   }
 }
@@ -930,18 +935,13 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
       title: t("ChassisCatalog"),
       type: "chassis",
     },
-    "familiar-abilities": {
-      file: "familiar-abilities.json",
-      title: t("FamiliarCatalog"),
-      type: "familiar",
-    },
   }[catalogType];
   if (!config) return;
   let catalog;
   try {
     catalog = await loadCatalog(config.file);
   } catch (error) {
-    console.error(`${MODULE_ID} | Catalog load failed`, error);
+    console.error(`${MODULE_ID} | Не удалось загрузить каталог`, error);
     ui.notifications.error(t("NoEntries"));
     return;
   }
@@ -969,9 +969,9 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
             : `${entry.grade ? t(`Grade.${entry.grade}`) : t(`Category.${entry.category}`) || entry.category || ""}${entry.repeatable ? ` · ${t("Repeatable")}` : ""}`;
         const extra =
           config.type === "chassis"
-            ? `${entry.special ? `<small>${esc(entry.special)}</small>` : ""}<small>${esc(entry.supportBenefit ?? "")}</small><small>${esc(entry.rulesNote ?? "")}</small>`
+            ? `${entry.special ? `<p class="sfmtp-rules-text">${esc(entry.special)}</p>` : ""}<p class="sfmtp-rules-text"><strong>${esc(t("Support"))}:</strong> ${esc(entry.supportBenefit ?? "")}</p><p class="sfmtp-rules-text"><strong>${esc(entry.advancedManeuver ?? "")}:</strong> ${esc(entry.advancedManeuverDescription ?? "")}</p><p>${esc(entry.rulesNote ?? "")}</p>`
             : "";
-        return `<div class="sfmtp-catalog-row"><div><strong>${esc(entry.name)}</strong><small>${esc(detail)}</small>${extra}</div><div><button type="button" data-source-index="${esc(entry.id)}">${esc(t("SourcePage"))}</button>${config.type === "chassis" ? "" : `<button type="button" data-select-index="${esc(entry.id)}">${esc(t("AddSelection"))}</button>`}</div></div>`;
+        return `<div class="sfmtp-catalog-row"><div><details><summary><strong>${esc(entry.name)}</strong><small>${esc(detail)}</small></summary>${entry.description ? `<p class="sfmtp-rules-text">${esc(entry.description)}</p>` : ""}${extra}</details></div><div><button type="button" data-source-index="${esc(entry.id)}">${esc(t("SourcePage"))}</button>${config.type === "chassis" ? "" : `<button type="button" data-select-index="${esc(entry.id)}">${esc(t("AddSelection"))}</button>`}</div></div>`;
       })
       .join("");
     return rows || `<p>${esc(t("NoEntries"))}</p>`;
@@ -1038,24 +1038,6 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
             await actor.setFlag(FLAG, "robot", data);
             await syncAutomation(actor);
             ui.notifications.info(t("CustomizationAdded"));
-          } else if (config.type === "familiar") {
-            if (
-              !entry.repeatable &&
-              data.familiarAbilities.some(
-                (ability) => ability.catalogId === entry.id,
-              )
-            )
-              return ui.notifications.warn(t("AlreadyImported"));
-            data.familiarAbilities.push({
-              id: foundry.utils.randomID(),
-              name: entry.name,
-              category: entry.category,
-              source: entry.sourceUrl,
-              catalogId: entry.id,
-            });
-            await actor.setFlag(FLAG, "robot", data);
-            await syncAutomation(actor);
-            ui.notifications.info(t("AbilityAdded"));
           }
           openHome(actor);
         });
@@ -1066,19 +1048,11 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
 }
 
 /**
- * Шасси и действия поставляются собственными SF2e-паками с локальным резервным источником.
- * Кастомизации и способности требуют подходящих исходных Items: эффекты не выдумываются.
+ * Шасси, кастомизации и действия поставляются собственными SF2e-паками.
+ * Неизвестные записи требуют совместимого источника; эффекты не выдумываются.
  */
 const AUTOMATION_FLAG = "automationSource";
 const AUTOMATION_PREFIX = "sfmtp-generated:";
-function normalizedSlug(value) {
-  return String(value ?? "")
-    .toLocaleLowerCase()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
 async function findSourceItem({
   catalogId = "",
   name = "",
@@ -1296,15 +1270,11 @@ async function moduleManeuverSource(selection) {
     entry.advancedManeuverId,
   );
   return {
-    source: localSource ?? buildModuleManeuverSource(entry),
+    source: localSource ?? createManeuverSource(entry),
     uuid: localSource ? `Compendium.${packId}.Item.${localSource._id}` : "",
     pack: packId,
     entry,
   };
-}
-
-function buildModuleManeuverSource(entry) {
-  return createManeuverSource(entry);
 }
 
 // Снимок сравнивает исходные поля предмета, а не подготовленные данные SF2e.
@@ -1384,6 +1354,49 @@ async function moduleSupportSource(selection) {
         entry,
       }
     : null;
+}
+
+// Известные кастомизации разрешаются только по собственному точному каталогу.
+// В частности, Climber/Flier нельзя случайно взять из пакета фамильяров.
+async function moduleCustomizationSource(selection) {
+  const catalog = await loadCatalog("robot-customizations.json");
+  const entry = catalog.entries.find(
+    (entry) => entry.id === selection.catalogId,
+  );
+  if (!entry) return findSourceItem(selection);
+  const packId = `${MODULE_ID}.robot-customizations`;
+  const pack = game.packs.get(packId);
+  if (pack) {
+    try {
+      const document = await pack.getDocument(entry.itemId);
+      if (
+        document?.type === "feat" &&
+        document.system?.slug === entry.id &&
+        document.flags?.[MODULE_ID]?.robotCustomization &&
+        compatibleSourceDocument(document)
+      )
+        return { document, pack: packId, uuid: document.uuid, entry };
+    } catch (error) {
+      console.debug(
+        `${MODULE_ID} | Не удалось прочитать кастомизацию, используется локальный источник`,
+        error,
+      );
+    }
+  }
+  const local = await loadOwnItemSource("robot-customizations", entry.id);
+  const source =
+    local?.type === "feat" &&
+    local.system?.slug === entry.id &&
+    local.flags?.[MODULE_ID]?.robotCustomization
+      ? local
+      : buildCustomizationSource(entry);
+  if (!compatibleSourceDocument(source)) return null;
+  return {
+    source,
+    pack: packId,
+    uuid: `Compendium.${packId}.Item.${entry.itemId}`,
+    entry,
+  };
 }
 
 async function loadOwnItemSource(pack, slug) {
@@ -1607,6 +1620,9 @@ async function syncAutomationNow(ownerActor) {
   const toUpdate = [];
   const updatedIds = new Set();
   let chassisBlocked = false;
+  const manualCustomizations = [];
+  const claimedNativeCustomizations = new Set();
+  const pendingCustomizationMigrations = new Map();
   for (const selection of wanted) {
     const found =
       selection.kind === "robot-chassis"
@@ -1619,7 +1635,9 @@ async function syncAutomationNow(ownerActor) {
               ? // Старый профиль сохраняем, но знакомые familiar Rules не применяем к character-роботу.
                 // Неразрешённый вид защищает уже существовавшие предметы от очистки.
                 null
-              : await findSourceItem(selection);
+              : selection.kind === "robot-customization"
+                ? await moduleCustomizationSource(selection)
+                : await findSourceItem(selection);
 
     if (!found) {
       if (selection.kind === "robot-chassis") chassisBlocked = true;
@@ -1630,6 +1648,11 @@ async function syncAutomationNow(ownerActor) {
       );
       continue;
     }
+    if (
+      selection.kind === "robot-customization" &&
+      found.entry?.automation === "manual"
+    )
+      manualCustomizations.push(selection.name);
     if (
       chassisBlocked &&
       ["robot-maneuver", "robot-support"].includes(selection.kind)
@@ -1768,12 +1791,71 @@ async function syncAutomationNow(ownerActor) {
         continue;
       }
     }
+    if (selection.kind === "robot-customization" && found.entry) {
+      const native = companion.items.find(
+        (item) =>
+          !existing.some((managed) => managed.id === item.id) &&
+          !claimedNativeCustomizations.has(item.id) &&
+          ["action", "feat"].includes(item.type) &&
+          item.flags?.core?.sourceId === found.uuid &&
+          item.flags?.[MODULE_ID]?.robotCustomization,
+      );
+      if (native) {
+        if (native.type !== "feat") ui.notifications.warn(t("ProtectedItems"));
+        claimedNativeCustomizations.add(native.id);
+        resolvedSignatures.add(
+          `${selection.kind}:${normalizedSlug(selection.catalogId)}`,
+        );
+        continue;
+      }
+    }
     const sameGenerated = existing.find(
       (item) =>
         item.getFlag?.(FLAG, AUTOMATION_FLAG)?.key ===
         `${AUTOMATION_PREFIX}${selection.key}`,
     );
     if (sameGenerated) {
+      // Безопасно заменяем старый неверный источник (например, одноимённую
+      // способность фамильяра), но только у неизменённого собственного Item.
+      const metadata = sameGenerated.getFlag(FLAG, AUTOMATION_FLAG);
+      if (
+        selection.kind === "robot-customization" &&
+        found.entry &&
+        (metadata.sourceUuid !== found.uuid || sameGenerated.type !== "feat") &&
+        canReplaceManagedItem(sameGenerated)
+      ) {
+        const replacement = found.source
+          ? foundry.utils.deepClone(found.source)
+          : found.document.toObject();
+        preserveCustomizationChoices(replacement, sameGenerated);
+        replacement.flags ??= {};
+        replacement.flags[FLAG] ??= {};
+        // Foundry объединяет flags при update: прежний familiar-маркер
+        // не должен перенаправлять исправленную кастомизацию на фамильяра.
+        if (sameGenerated.flags?.[FLAG]?.familiarAbility)
+          replacement.flags[FLAG].familiarAbility = false;
+        replacement.flags[FLAG][AUTOMATION_FLAG] = {
+          ...metadata,
+          sourceUuid: found.uuid,
+          sourcePack: found.pack,
+        };
+        replacement.flags[FLAG][AUTOMATION_FLAG].fingerprint =
+          itemFingerprint(replacement);
+        if (sameGenerated.type !== replacement.type) {
+          // Тип embedded Item не меняем через update: сначала создаём feat.
+          // Прежний неизменённый Action удаляется только после успешного создания.
+          delete replacement._id;
+          toCreate.push(replacement);
+          pendingCustomizationMigrations.set(
+            metadata.key,
+            `${selection.kind}:${normalizedSlug(selection.catalogId)}`,
+          );
+          applied++;
+          continue;
+        }
+        replacement._id = sameGenerated.id;
+        toUpdate.push(replacement);
+      }
       // Повторная синхронизация не пересоздаёт действие или кастомизацию.
       updatedIds.add(sameGenerated.id);
       if (!canReplaceManagedItem(sameGenerated))
@@ -1809,10 +1891,21 @@ async function syncAutomationNow(ownerActor) {
     await stampManagedItems(
       await companion.updateEmbeddedDocuments("Item", toUpdate),
     );
-  if (toCreate.length)
-    await stampManagedItems(
-      await companion.createEmbeddedDocuments("Item", toCreate),
-    );
+  if (toCreate.length) {
+    const created = await companion.createEmbeddedDocuments("Item", toCreate);
+    await stampManagedItems(created);
+    for (const item of created) {
+      const key = item.getFlag?.(FLAG, AUTOMATION_FLAG)?.key;
+      const signature = pendingCustomizationMigrations.get(key);
+      if (!signature) continue;
+      resolvedSignatures.add(signature);
+      pendingCustomizationMigrations.delete(key);
+    }
+    // preCreate/ChoiceSet может отменить создание без исключения.
+    // В этом случае старый Action не считаем заменённым и не удаляем.
+    skipped += pendingCustomizationMigrations.size;
+    applied -= pendingCustomizationMigrations.size;
+  }
   const removeIds = existing
     .filter((item) => {
       if (updatedIds.has(item.id)) return false;
@@ -1849,7 +1942,12 @@ async function syncAutomationNow(ownerActor) {
     applied,
     skipped,
     timestamp: Date.now(),
+    manualCustomizations: [...new Set(manualCustomizations)],
   });
+  if (manualCustomizations.length)
+    ui.notifications.info(
+      `${t("CustomManualSelections")}: ${[...new Set(manualCustomizations)].join(", ")}`,
+    );
   if (overSlotCount > 0)
     ui.notifications.warn(`${t("NoSlots")}: ${overSlotCount}`);
   if (skipped > 0)

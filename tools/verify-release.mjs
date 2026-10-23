@@ -1,3 +1,4 @@
+import { validateUpdateManifest } from "./release-manifest.mjs";
 // Проверяем и локальную сборку, и файлы, повторно скачанные из Assets релиза.
 import { readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
@@ -28,8 +29,7 @@ if (
   )
 )
   throw new Error("Отсутствует обязательная зависимость 7.6.3");
-if (!manifest.download.endsWith(`/releases/download/${tag}/module.zip`))
-  throw new Error("Неверная ссылка скачивания");
+validateUpdateManifest(manifest, { expectedVersion: tag.slice(1) });
 const lines = (await readFile(path.join(directory, "SHA256SUMS.txt"), "utf8"))
   .trim()
   .split("\n");
@@ -65,7 +65,7 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
   assert pack['system']=='sf2e' and pack['type']=='Item','Некорректный пак'
   assert pack['path']+'/CURRENT' in names,'Отсутствует готовый LevelDB'
  for script in manifest['esmodules']:assert script in names,'Отсутствует entrypoint'
- for script in ['dailies.mjs','sheet-integration.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
+ for script in ['customization-sources.mjs','dailies.mjs','sheet-integration.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
  for language in manifest['languages']:assert language['path'] in names,'Отсутствует язык'
  for name in names:
   if name.endswith('.json'):json.loads(archive.read(name))
@@ -78,7 +78,7 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
  for language in manifest['languages']:
   translations=json.loads(archive.read(language['path']))
   assert isinstance(translations.get('SFMTP',{}).get('ManualActionHint'),str),'Не разрешается ключ Foundry SFMTP.ManualActionHint'
- assert len([p for p in names if p.startswith('packs/src/') and p.endswith('.json')])==53,'Неполные источники'
+ assert len([p for p in names if p.startswith('packs/src/') and p.endswith('.json')])==89,'Неполные источники'
  assert not any(p.startswith(('node_modules/','.git/','.github/','tests/','tools/')) for p in names),'В ZIP попали файлы разработки'
 `,
     directory,
@@ -86,5 +86,5 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
   { stdio: "pipe" },
 );
 console.log(
-  "Проверены SHA256, версия/тег, манифест, ZIP, четыре LevelDB-пака и 53 исходника Items.",
+  "Проверены SHA256, версия/тег, манифест, ZIP, пять LevelDB-паков и 89 исходников Items.",
 );

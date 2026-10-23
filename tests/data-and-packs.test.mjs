@@ -33,7 +33,7 @@ async function packSources(name) {
     .sort();
   return Promise.all(names.map((file) => json(`packs/src/${name}/${file}`)));
 }
-test("Манифест v14/SF2e, обязательная зависимость 7.6.3 и четыре собственных пака", async () => {
+test("Манифест v14/SF2e, обязательная зависимость 7.6.3 и пять собственных паков", async () => {
   const manifest = await json("module.json");
   assert.equal(manifest.id, "sf2e-missing-tech-pets");
   assert.match(manifest.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
@@ -52,7 +52,7 @@ test("Манифест v14/SF2e, обязательная зависимость
     manifest.relationships.requires[0].compatibility.minimum,
     "7.6.3",
   );
-  assert.equal(manifest.packs.length, 4);
+  assert.equal(manifest.packs.length, 5);
   for (const pack of manifest.packs) {
     assert.equal(pack.system, "sf2e");
     assert.equal(pack.type, "Item");
@@ -277,7 +277,11 @@ test("Реальные LevelDB читаются CLI: все документы �
 });
 test("Повторная сборка сохраняет JSON, JSONL и ID; двоичный LevelDB не сравнивается", async () => {
   const before = new Map();
-  const names = [...definitions.map(([name]) => name), "familiar-abilities"];
+  const names = [
+    ...definitions.map(([name]) => name),
+    "familiar-abilities",
+    "robot-customizations",
+  ];
   for (const name of names)
     before.set(name, {
       sources: await packSources(name),
@@ -309,7 +313,7 @@ test("Ключи локализации разрешаются по пути Fou
           : leaves(entry, fullKey);
       });
     const entries = leaves(translations.SFMTP);
-    assert.equal(entries.length, 355);
+    assert.equal(entries.length, 361);
     for (const [key, value] of entries) {
       assert.equal(typeof value, "string");
       assert.ok(lookup(translations, `SFMTP.${key}`));
