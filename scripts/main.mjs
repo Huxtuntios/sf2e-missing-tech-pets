@@ -1282,7 +1282,7 @@ function itemFingerprint(source) {
 
 function canReplaceManagedItem(item) {
   const metadata = item.getFlag?.(FLAG, AUTOMATION_FLAG);
-  // В 0.10.0 снимка не было: без доказательства не перезаписываем старый предмет.
+  // У старых предметов снимка нет: без доказательства не перезаписываем старый предмет.
   return Boolean(
     metadata?.fingerprint &&
     metadata.fingerprint === itemFingerprint(item.toObject()),
@@ -1353,7 +1353,7 @@ function generatedItemsForController(
     const metadata = item.getFlag?.(FLAG, AUTOMATION_FLAG);
     if (!String(metadata?.key ?? "").startsWith(AUTOMATION_PREFIX))
       return false;
-    // В 0.4.0 не было controllerActorId. Старые копии распознаются только при
+    // В старых записях не было controllerActorId. Старые копии распознаются только при
     // подтверждённом lastAutomationSync; отсутствие снимка запрещает удаление.
     return metadata.controllerActorId
       ? metadata.controllerActorId === controllerActorId

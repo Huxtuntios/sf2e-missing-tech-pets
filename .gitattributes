@@ -6,3 +6,5 @@
 packs/robot-chassis/** -text
 packs/robot-advanced-maneuvers/** -text
 packs/robot-support/** -text
+packs/familiar-abilities/** -text
+*.yml text eol=lf

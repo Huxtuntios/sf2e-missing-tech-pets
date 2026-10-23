@@ -2,10 +2,11 @@
   "id": "sf2e-missing-tech-pets",
   "title": "SF2e Missing Tech Pets",
   "description": "SF2e robot companions and native familiar management, with Tech Core chassis, maneuvers, support benefits and familiar abilities. Requires PF2e Companion Compendia.",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "authors": [
     {
-      "name": "Community module"
+      "name": "Huxtuntios",
+      "url": "https://github.com/Huxtuntios"
     }
   ],
   "esmodules": [
@@ -109,10 +110,16 @@
       "packs": [
         "robot-chassis",
         "robot-advanced-maneuvers",
-        "robot-support"
+        "robot-support",
+        "familiar-abilities"
       ]
     }
   ],
   "license": "LICENSE.txt",
-  "readme": "README.md"
+  "readme": "README.md",
+  "url": "https://github.com/Huxtuntios/sf2e-missing-tech-pets",
+  "manifest": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/latest/download/module.json",
+  "download": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/download/v0.12.1/module.zip",
+  "bugs": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/issues",
+  "changelog": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/blob/main/CHANGELOG.md"
 }

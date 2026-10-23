@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "source": "Archives of Nethys — Starfinder 2e Tech Core",
   "sourceUrl": "https://2e.aonsrd.com/familiars/abilities",
-  "note": "Full Tech Core descriptions; rules only for explicitly audited passive abilities. Other abilities require manual resolution.",
+  "note": "Full Tech Core descriptions; native rules for the listed passive abilities. Other abilities require manual resolution.",
   "entries": [
     {
       "id": "accompanist",

@@ -1,0 +1,45 @@
+name: Release
+on:
+  release:
+    types: [published]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check automatic-upload compatibility
+        if: ${{ github.event.release.immutable }}
+        run: |
+          echo "::error::For immutable releases, attach prepared assets to a draft before publishing."
+          exit 1
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Validate the release tag before building
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: node --input-type=module -e 'import fs from "node:fs"; const m=JSON.parse(fs.readFileSync("module.json")); const p=JSON.parse(fs.readFileSync("package.json")); if (p.version!==m.version || process.env.RELEASE_TAG!==`v${m.version}`) throw new Error("Tag must match module.json and package.json versions");'
+      - run: npm run check
+      - run: npm test
+      - name: Build and verify assets for this repository
+        run: npm run package -- --repo "${{ github.repository }}" --tag "${{ github.event.release.tag_name }}"
+      - name: Attach release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" dist/module.json dist/module.zip dist/SHA256SUMS.txt --clobber
+      - name: Download and verify published assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release download "$RELEASE_TAG" --pattern module.json --pattern module.zip --pattern SHA256SUMS.txt --dir dist/published --clobber
+          node tools/verify-release.mjs dist/published "$RELEASE_TAG"

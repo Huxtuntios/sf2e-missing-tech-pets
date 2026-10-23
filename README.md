@@ -1,12 +1,17 @@
 # SF2e Missing Tech Pets
 
-**Version 0.12.0.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition. This continues the existing 0.10.2 project rather than replacing it with a new module.
+[Русская версия](README.ru.md) · [Releases](https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases) · [Report a bug](https://github.com/Huxtuntios/sf2e-missing-tech-pets/issues)
 
-> Source code, data, compendium builds, and mocked integration scenarios have been checked. A live Foundry v14 game world has **not** been used for testing. An action description does not mean its effects are automated.
+![Foundry VTT 14](https://img.shields.io/badge/Foundry_VTT-14-informational)
+![Starfinder 2e](https://img.shields.io/badge/System-Starfinder_2e-orange)
+
+**Version 0.12.1.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition.
+
+> Action descriptions and automated mechanics are different. See the automation notes below for effects that require manual resolution.
 
 ## Compatibility and Required Dependency
 
-- Foundry VTT **v14**, minimum **14.361**. The `minimum`, `verified`, and `maximum` fields limit support to v14. `verified: "14"` is a compatibility declaration, not a report of live testing on a particular build.
+- Foundry VTT **v14**, minimum **14.361**. The `minimum`, `verified`, and `maximum` fields limit support to v14.
 - Starfinder Second Edition: **sf2e 1.6.0+**.
 - **PF2e Companion Compendia (`pf2e-animal-companions`) 7.6.3+ is required and must be active.** It is declared in `relationships.requires`. The main interface and integration do not start without it.
 - The dependency's source code, SF2e items, release 7.7.3, and the SF2e reference fixes in 7.6.3 were reviewed. Its minimum required version has not been raised.
@@ -19,8 +24,23 @@ https://github.com/TikaelSol/PF2e-Animal-Companions/releases/latest/download/mod
 
 ## Installation and Updating
 
+### Install through Foundry
+
+Install and enable the required dependency first. In **Add-on Modules → Install Module**, paste:
+
+```text
+https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/latest/download/module.json
+```
+
+This address becomes available after the first regular GitHub release has been published and its **Release** workflow has completed. It does not resolve to prereleases. To install a prerelease, use its version-specific `module.json` asset.
+
+### Manual installation
+
+For the release asset **module.zip**, create `Data/modules/sf2e-missing-tech-pets/` and extract the archive **into that directory**. Its `module.json` must be directly inside the module directory. GitHub's automatic **Source code** archives are not installation packages.
+
+
 1. Back up your world, actors, and existing module folder. Use a copy of your world for the first test.
-2. With Foundry shut down, extract the ZIP into `Data/modules/`. The resulting manifest path should be `Data/modules/sf2e-missing-tech-pets/module.json`, without an extra nested folder.
+2. With Foundry shut down, extract the installation archive using the appropriate path described above. The resulting manifest path must be `Data/modules/sf2e-missing-tech-pets/module.json`, without an extra nested folder.
 3. When updating, replace the old module folder completely. Do not mix files from different versions.
 4. Install or update the required dependency, then enable both modules in your SF2e world.
 5. Open the character sheet's header menu and choose **Tech Pets**. A world setting can hide this entry.
@@ -29,7 +49,7 @@ The archive includes ready-to-use **LevelDB compendiums**. Node.js and a build s
 
 ## Familiars on Character Sheets
 
-SF2e 1.6.0 already includes the native `familiar` actor type, its system sheet, `system.master.id` / `system.master.ability`, inherited master statistics, and Rule Element processing. Version 0.12.0 adds convenient entry points and Tech Core content. It does not copy PF2e's actor engine or duplicate the system's calculations.
+SF2e 1.6.0 already includes the native `familiar` actor type, its system sheet, `system.master.id` / `system.master.ability`, inherited master statistics, and Rule Element processing. The familiar panel adds convenient entry points and Tech Core content. It does not copy PF2e's actor engine or duplicate the system's calculations.
 
 1. Choose **Familiars** from the **character** sheet's header menu. The same entry is available on the native familiar sheet. The familiar ability catalog in Tech Pets also opens this panel.
 2. Create a native familiar, or select an existing `familiar` actor that is not assigned to another master. Select the master's attribute and click **Link / save attribute**. A newly created familiar copies the master's ownership permissions. Foundry still enforces permission to create actors; if you cannot create one, ask your GM to do so.
@@ -54,7 +74,7 @@ The `familiar-abilities` pack contains **38 standalone SF2e Action Items** in th
 - **Tough:** +2 HP per level.
 - **Dragon, Fungus, and Plant:** replace the animal trait with the corresponding trait.
 
-The `BaseSpeed`, `Sense`, `FlatModifier`, and `ActorTraits` schemas were checked against SF2e 1.6.0. Their actual application in a live game world has not yet been tested.
+The `BaseSpeed`, `Sense`, `FlatModifier`, and `ActorTraits` schemas were checked against SF2e 1.6.0.
 
 **The remaining 28 abilities provide rules text for manual resolution.** In particular:
 
@@ -137,13 +157,13 @@ Conditional, calculated, and ranged attacks, as well as sources with ambiguous s
 - The generic `customization` slug does not grant slots by itself. Duplicate sources do not grant slots repeatedly, and a rule plus a flag on the same Item do not stack.
 - Selections exceeding available slots are saved but skipped during synchronization. A catalog grade does not replace checking all gameplay prerequisites.
 
-## Data Safety and Upgrading from 0.10.x
+## Data Safety and Upgrading
 
 Synchronization is serialized for each controller/companion. Running it again does not recreate Items that have already been applied.
 
 Only module-generated Items belonging to the relevant `controllerActorId` and matching their unchanged control snapshot can be deleted or replaced. Manually added Items, Items belonging to other controllers, and user-edited copies are retained.
 
-**Items from 0.10.x do not have a snapshot.** They are protected from automatic replacement even if they have an old module marker. After making a backup, compare them against the new compendiums. To migrate, manually remove only confirmed old chassis copies and their related old actions, then select and synchronize again. Do not delete unrelated Items or clear flags in bulk.
+**Older Items may not have a snapshot.** They are protected from automatic replacement even if they have an old module marker. After making a backup, compare them against the new compendiums. To migrate, manually remove only confirmed old chassis copies and their related old actions, then select and synchronize again. Do not delete unrelated Items or clear flags in bulk.
 
 Legacy entries without a `controllerActorId` are recognized only when the previous companion is confirmed through `lastAutomationSync`. A missing snapshot still prevents automatic deletion.
 
@@ -201,7 +221,7 @@ The build updates the four `packs/src/` directories, textual `.db` snapshots, an
 
 Reproducibility is checked by document contents and IDs, not by byte-for-byte equality of LevelDB's internal files. The builder first compiles into a temporary directory, extracts and verifies the documents, then replaces the generated pack.
 
-See the [audit](docs/AUDIT.md), [test report and in-game checklist](docs/TEST-REPORT.md), and [changelog](CHANGELOG.md). These supporting documents are currently in Russian.
+See the [changelog](CHANGELOG.md) and [release instructions](docs/RELEASING.md). These supporting documents are in Russian.
 
 ## Sources and Rights
 

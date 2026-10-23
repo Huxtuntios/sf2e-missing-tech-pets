@@ -3,3 +3,8 @@ node_modules/
 Thumbs.db
 *.zip
 coverage/
+dist/
+npm-debug.log*
+packs/*/LOG
+packs/*/LOG.old
+packs/*/LOCK

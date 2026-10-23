@@ -1,13 +1,15 @@
 {
   "name": "sf2e-missing-tech-pets",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "private": true,
   "type": "module",
-  "description": "Инструменты роботизированных компаньонов SF2e",
+  "description": "Tech Core robot companions and native familiar management for Starfinder Second Edition.",
   "scripts": {
     "build:packs": "node scripts/build-chassis-pack.mjs",
     "test": "node --experimental-vm-modules --test --test-concurrency=1 tests/*.test.mjs",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs",
+    "package": "node tools/build-release.mjs",
+    "verify:release": "node tools/verify-release.mjs"
   },
   "devDependencies": {
     "@foundryvtt/foundryvtt-cli": "3.0.5"

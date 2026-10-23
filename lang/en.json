@@ -117,7 +117,7 @@
   "SFMTP.FamiliarLimit": "The selection exceeds the allowance, including innate and manually added abilities.",
   "SFMTP.FamiliarPrerequisites": "Check ability prerequisites and the master’s level. Further requirements in the description must be checked manually.",
   "SFMTP.FamiliarSelectionInvalid": "Invalid familiar selection or allowance.",
-  "SFMTP.FamiliarRules": "Native Rule Elements are supplied for this passive benefit. Application in a live Foundry world has not been tested.",
+  "SFMTP.FamiliarRules": "Native Rule Elements are supplied for this passive benefit.",
   "SFMTP.FamiliarManual": "Rules text only: resolve choices, actions, resources and effects manually. No numerical automation is supplied.",
   "SFMTP.FamiliarRulesShort": "Rule Elements",
   "SFMTP.FamiliarManualShort": "Manual effect",

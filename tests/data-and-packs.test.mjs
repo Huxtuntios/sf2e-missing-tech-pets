@@ -36,7 +36,7 @@ async function packSources(name) {
 test("Манифест v14/SF2e, обязательная зависимость 7.6.3 и четыре собственных пака", async () => {
   const manifest = await json("module.json");
   assert.equal(manifest.id, "sf2e-missing-tech-pets");
-  assert.equal(manifest.version, "0.12.0");
+  assert.match(manifest.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
   assert.deepEqual(manifest.compatibility, {
     minimum: "14.361",
     verified: "14",
