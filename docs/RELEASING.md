@@ -6,7 +6,7 @@
 https://github.com/Huxtuntios/sf2e-missing-tech-pets
 ```
 
-Текущая версия: **0.12.1**, тег первого подготовленного выпуска: **v0.12.1**. Сам репозиторий и релиз автоматически не создаются.
+Текущая версия: **0.13.0**, тег первого подготовленного выпуска: **v0.13.0**. Сам репозиторий и релиз автоматически не создаются.
 
 ## Подготовка на Windows
 
@@ -32,8 +32,8 @@ CI устанавливает зависимости через `npm ci`, про
 GitHub Desktop не создаёт релизы: следующие действия выполняются на сайте GitHub.
 
 1. В репозитории откройте **Releases → Draft a new release / Create a new release**.
-2. В **Choose a tag** введите **v0.12.1** и выберите создание нового тега при публикации. **Target: main**.
-3. В **Release title** укажите `0.12.1`.
+2. В **Choose a tag** введите **v0.13.0** и выберите создание нового тега при публикации. **Target: main**.
+3. В **Release title** укажите `0.13.0`.
 4. Вставьте описание из `docs/RELEASE-NOTES.md`.
 5. Для обычного выпуска включите **Set as the latest release** и не включайте **Set as a pre-release**.
 6. Нажмите **Publish release**, откройте **Actions** и дождитесь зелёного **Release**.
@@ -50,7 +50,7 @@ https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/latest/download/mo
 Ссылка на конкретную версию:
 
 ```text
-https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/download/v0.12.1/module.json
+https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/download/v0.13.0/module.json
 ```
 
 `latest` не выбирает pre-release. Если первым выпуском будет pre-release, устанавливайте его по ссылке конкретного тега.
@@ -91,7 +91,7 @@ npm run package
 Другой репозиторий можно указать явно:
 
 ```sh
-npm run package -- --repo OWNER/REPOSITORY --tag v0.12.1
+npm run package -- --repo OWNER/REPOSITORY --tag v0.13.0
 npm run verify:release
 ```
 

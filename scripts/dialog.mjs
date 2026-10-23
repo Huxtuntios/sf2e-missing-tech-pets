@@ -1,3 +1,4 @@
+import { t } from "./i18n.mjs";
 // Небольшой DOM-адаптер позволяет сохранить обработчики окон без jQuery и ApplicationV1.
 export class DomQuery {
   constructor(nodes) {
@@ -37,7 +38,7 @@ export class DomQuery {
         });
         Promise.resolve(callback(proxy)).catch((error) => {
           console.error("sf2e-missing-tech-pets | Ошибка действия", error);
-          ui.notifications.error(game.i18n.localize("SFMTP.AddFailed"));
+          ui.notifications.error(t("AddFailed"));
         });
       });
     return this;

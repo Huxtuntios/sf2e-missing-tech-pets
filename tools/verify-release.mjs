@@ -65,9 +65,19 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
   assert pack['system']=='sf2e' and pack['type']=='Item','Некорректный пак'
   assert pack['path']+'/CURRENT' in names,'Отсутствует готовый LevelDB'
  for script in manifest['esmodules']:assert script in names,'Отсутствует entrypoint'
+ for script in ['exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
  for language in manifest['languages']:assert language['path'] in names,'Отсутствует язык'
  for name in names:
   if name.endswith('.json'):json.loads(archive.read(name))
+  if name.startswith('packs/src/') and name.endswith('.json'):
+   item=json.loads(archive.read(name))
+   image=item.get('img','')
+   prefix='modules/'+manifest['id']+'/'
+   if image.startswith(prefix):
+    assert image[len(prefix):] in names,'Отсутствует встроенная иконка: '+image
+ for language in manifest['languages']:
+  translations=json.loads(archive.read(language['path']))
+  assert isinstance(translations.get('SFMTP',{}).get('ManualActionHint'),str),'Не разрешается ключ Foundry SFMTP.ManualActionHint'
  assert len([p for p in names if p.startswith('packs/src/') and p.endswith('.json')])==53,'Неполные источники'
  assert not any(p.startswith(('node_modules/','.git/','.github/','tests/','tools/')) for p in names),'В ZIP попали файлы разработки'
 `,

@@ -1,11 +1,17 @@
 # SF2e Missing Tech Pets
 
+## Header buttons and language
+
+The module loads its EN/RU dictionary before opening its managers. After an update, reload the world page. In **Configure Settings → Module Settings → SF2e Missing Tech Pets**, use **Show Tech Pets button on actor sheets** and **Show Familiars button on actor sheets** independently. These are world settings; reopen actor sheets after changing them. Hiding buttons does not disable the API or modify actor data.
+
+After updating, reload the world page to refresh translations. Existing imported chassis retain their saved image: choose the matching SVG in `modules/sf2e-missing-tech-pets/assets/icons/` in the Item image picker. Custom images are not overwritten.
+
 [Русская версия](README.ru.md) · [Releases](https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases) · [Report a bug](https://github.com/Huxtuntios/sf2e-missing-tech-pets/issues)
 
 ![Foundry VTT 14](https://img.shields.io/badge/Foundry_VTT-14-informational)
 ![Starfinder 2e](https://img.shields.io/badge/System-Starfinder_2e-orange)
 
-**Version 0.12.1.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition.
+**Version 0.13.0.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition.
 
 > Action descriptions and automated mechanics are different. See the automation notes below for effects that require manual resolution.
 
@@ -167,6 +173,40 @@ Only module-generated Items belonging to the relevant `controllerActorId` and ma
 
 Legacy entries without a `controllerActorId` are recognized only when the previous companion is confirmed through `lastAutomationSync`. A missing snapshot still prevents automatic deletion.
 
+## Mechanic: Exocortex
+
+Open **Tech Pets → Mechanic: Exocortex** on the mechanic's character. First choose the exocortex through the **native SF2e class feature**. The panel recognizes owned Drone, Mine and Turret features, including multiple variants obtained legitimately. It does not grant the class, dedication, feats or an extra exocortex.
+
+The integration uses the existing **SF2e 1.6.0** feature and action UUIDs rather than distributing duplicate class features. **Add missing native actions to my sheet** imports only eligible Modify, Deploy Mine, Detonate Mine, Deploy Turret, Reposition Exocortex and Synchronized Step actions, preserving their source IDs and avoiding duplicate imports. Existing and manually imported actions are not replaced or deleted. Native rules can be opened or sent to chat.
+
+### Drone
+
+- Link the mechanic and a separate **character** companion in Tech Pets; select its chassis normally. The link must be reciprocal.
+- The Drone feature adds **two restricted commercial customization slots** to that linked companion's profile. These are separate from ordinary slots: higher-grade customizations and manual notes cannot use them. Their removal does not erase profile selections.
+- Save whether Command costs **one or two actions**, as a reminder of the normal two or three drone actions. The module does not spend actions or command tokens.
+- Confirm completion of repair/daily preparations to restore the linked drone's HP, or completion of its one-minute emergency reboot to restore **1 HP from 0**. These buttons update only HP; they do not advance time, remove conditions or apply shutdown immunity.
+- Control range, exclusive owner control/repair, Desperate Repair, Killbot and critical-specialization reminders are shown. Mod effects and range enforcement remain manual.
+
+### Mines
+
+- Track prepared/carried mines separately from individually labelled deployed mines. Capacity, damage dice, burst radius and Smart Mine target allowance follow owner level and Intelligence.
+- Record deployment, collect all deployed mines, craft up to two mines after ten minutes, or confirm daily preparations to replace all unused mines. Deployed mines do not occupy carried slots. Collection preserves all remaining mines even when it exceeds the carried limit; resolve excess capacity manually.
+- Detonating a selected mine uses the **native SF2e DamageRoll** with fire or piercing damage, then removes that mine from the ledger. A failed roll leaves the mine recorded. Base damage scales with level; mod bonuses are not silently added.
+- The ledger does **not** create scene objects, measure distance, choose targets, roll saves, apply damage or trigger reactions. Check the action/reaction and trigger yourself. Smart Mine exclusions and Targeting Mine are manual.
+
+### Turret
+
+- Track one stored/deployed turret, current HP, broken threshold, Hardness, mechanic class DC as AC and base Fortitude/Reflex bonuses, including Proficiency Without Level.
+- Choose and save one of **six arrays**, with its base damage type, range increment, trait and weapon group. Changing an array requires its normal time or the appropriate mod; this panel does not apply a mod's duration.
+- At 0 HP the recorded turret returns to storage. Confirm daily repair for full HP. At the end of the owner's active combat turn, the stored turret's **+5 HP** button can be used once for that turn. Recovery is explicitly confirmed, not an automatic combat hook.
+- This is a device record, **not a generated weapon or autonomous actor**. Strikes, weapon grade/upgrades, shared MAP, targeting and cover are resolved using the native system sheet. A broken turret cannot Strike; the panel does not offer a separate attack that bypasses the owner's MAP.
+
+### Interaction with the mechanic class
+
+The panel distinguishes a full mechanic from **Mechanic Dedication**: dedication alone does not unlock Modify. It accounts for Mobile Exocortex, Remote Mods, Enduring Mods, Manifold Mods and Instant Mods in the displayed eligibility/ranges and action imports. The archetype Remote Mods range does not receive the full mechanic's level-15 increase. These reminders do not automatically apply mod Rule Elements, duration, daily targets or the once-per-round limit.
+
+State is stored in `flags.sf2e-missing-tech-pets.exocortex`, separately from existing robot/familiar profiles. Operations are queued per owner in the current client. Simultaneous edits from different clients are not transaction-locked: use one controlling client for device bookkeeping.
+
 ## API
 
 ```js
@@ -205,6 +245,17 @@ await api.syncFamiliarAbilities(owner, familiar, ["flier", "tough"]);
 
 `createFamiliar` requires that no other familiar is already linked and does not grant a feat to the master. `linkFamiliar` does not take over an actor assigned to another master. `syncFamiliarAbilities` returns `{ created, removed, protected }` and rejects invalid selections with a localized error. These methods also require the mandatory dependency to be active.
 
+Additional exocortex API (all existing methods remain available):
+
+```js
+await api.openExocortex(owner);
+const state = api.getExocortexData(owner); // Detached, normalized snapshot.
+await api.updateExocortex(owner, "mine-craft");
+await api.installExocortexActions(owner);
+```
+
+`updateExocortex` accepts `mine-daily` (`confirmed: true`), `mine-craft`, `mine-deploy` (`label`), `mine-collect`, `mine-detonate` (`id`, `damageType: "fire" | "piercing"`), `turret-array` (`array`), `turret-deploy` (toggle), `turret-hp` (`hp`), `turret-repair` (`confirmed: true`), `turret-recover`, and `drone-command` (`actions: 1 | 2`) as its operation; arguments are the third parameter. This is explicit bookkeeping, not permission to bypass gameplay costs. `getModificationSlots` now also returns `generalTotal` and `commercialSlots`; `free` includes restricted slots and is not an allowance for arbitrary grades.
+
 ## Development and Checks
 
 The runtime code uses ES modules and does not require a JavaScript build step. For development, use Node.js 22+ and run `npm install`.
@@ -234,3 +285,6 @@ See the [changelog](CHANGELOG.md) and [release instructions](docs/RELEASING.md).
 - [PF2e Familiar Ability Sources](https://github.com/foundryvtt/pf2e/tree/master/packs/familiar-abilities)
 
 The interface is localized in English and Russian. Original rules and catalog names/descriptions are primarily in English. See `LICENSE.txt` for legal notices and caveats. The archive does not itself establish permission to redistribute third-party content publicly.
+
+- [Mechanic and Exocortex — Archives of Nethys](https://2e.aonsrd.com/classes/7-mechanic/exocortex)
+- [Mechanic class — Archives of Nethys](https://2e.aonsrd.com/classes/7-mechanic)

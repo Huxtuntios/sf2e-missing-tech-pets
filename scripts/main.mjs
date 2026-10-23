@@ -1,4 +1,13 @@
+import { t, initializeLocalization } from "./i18n.mjs";
 import { openFamiliarManager } from "./familiar-ui.mjs";
+import { openExocortexManager } from "./exocortex-ui.mjs";
+import { isMechanic, customizationCapacity } from "./exocortex-rules.mjs";
+import {
+  droneCommercialSlots,
+  exocortexState,
+  updateExocortex,
+  installExocortexActions,
+} from "./exocortex.mjs";
 import {
   familiarOwner,
   linkedFamiliars,
@@ -34,7 +43,6 @@ const PACKS = [
   { key: "sf-AC-Followers", label: "Followers" },
 ];
 
-const t = (key) => game.i18n.localize(`SFMTP.${key}`);
 const esc = (value) => foundry.utils.escapeHTML(String(value ?? ""));
 const dependency = () => game.modules.get(DEPENDENCY_ID);
 const packId = (key) => `${DEPENDENCY_ID}.${key}`;
@@ -464,12 +472,21 @@ function robotSummary(actor) {
     (sum, mod) => sum + Math.max(1, Number(mod.cost) || 1),
     0,
   );
+  const generalTotal = Math.max(0, Number(data.baseSlots) || 0) + bonus;
+  const commercialSlots = droneCommercialSlots(actor);
+  const capacity = customizationCapacity(
+    data.modifications,
+    generalTotal,
+    commercialSlots,
+  );
   return {
     data,
     bonus,
     used,
-    total: Math.max(0, Number(data.baseSlots) || 0) + bonus,
-    free: Math.max(0, (Number(data.baseSlots) || 0) + bonus - used),
+    generalTotal,
+    commercialSlots,
+    total: generalTotal + commercialSlots,
+    free: capacity.free,
   };
 }
 
@@ -516,6 +533,7 @@ async function openHome(actor = activeActor()) {
   }).join("");
   const content = `<div class="sfmtp-home">
     <p>${esc(actor.name)} — ${esc(missingPacks.length ? t("CompendiaPacksMissing") : t("UsesCompendia"))}</p>
+    ${isMechanic(actor) ? `<button type="button" data-open-exocortex>${esc(t("ExoTitle"))}</button>` : ""}
     <h3>${esc(t("Packs"))}</h3><div class="sfmtp-pack-grid">${packButtons}</div>
     <hr><h3>${esc(t("RobotTools"))}</h3>
     <div class="sfmtp-action-row"><button type="button" data-open-catalog="robot-customizations">${esc(t("RobotCatalog"))}</button><button type="button" data-open-catalog="robot-chassis">${esc(t("ChassisCatalog"))}</button><button type="button" data-open-catalog="familiar-abilities">${esc(t("FamiliarCatalog"))}</button><button type="button" data-search-familiar>${esc(t("FamiliarSearch"))}</button></div>
@@ -540,6 +558,7 @@ async function openHome(actor = activeActor()) {
       )}</select><p class="hint">${esc(t("CompanionActorHint"))}</p></div>
     <div class="sfmtp-action-row"><button type="button" data-sync-automation>${esc(t("ApplyAutomation"))}</button><span class="hint">${esc(t("AutomationHint"))}</span></div>
     <p>${esc(t("BaseSlots"))}: <strong>${summary.data.baseSlots}</strong> · ${esc(t("ExtraSlots"))}: <strong>${summary.bonus}</strong> · ${esc(t("UsedSlots"))}: <strong>${summary.used}/${summary.total}</strong></p>
+    ${summary.commercialSlots ? `<p class="hint">${esc(t("ExoDroneSlots"))}</p>` : ""}
     <div class="form-group"><label>${esc(t("BaseSlots"))}</label><input name="sfmtp-base-slots" type="number" min="0" value="${esc(summary.data.baseSlots)}"></div>
     <div class="form-group"><label>${esc(t("GradeLimit"))}</label><select name="sfmtp-grade-limit">${["commercial", "tactical", "advanced", "superior"].map((g) => `<option value="${g}" ${summary.data.gradeLimit === g ? "selected" : ""}>${esc(t(`Grade.${g}`))}</option>`).join("")}</select></div>
     <div class="sfmtp-mod-list">${summary.data.modifications.map((m, i) => `<div class="sfmtp-mod-row"><span>${esc(m.name)} <small>(${esc(m.grade ? t(`Grade.${m.grade}`) : t("ManualEntry"))}; ${esc(m.cost || 1)} ${esc(t("SlotsUnit"))})</small></span><button type="button" data-remove-mod="${i}">${esc(t("Remove"))}</button></div>`).join("") || `<p>${esc(t("NoEntries"))}</p>`}</div>
@@ -626,6 +645,9 @@ async function openHome(actor = activeActor()) {
           await syncAutomation(actor);
           openHome(actor);
         });
+        html.on("click", "[data-open-exocortex]", () =>
+          openExocortexManager(actor, { openTechPets: openHome }),
+        );
         html.on("click", "[data-remove-familiar]", async (event) => {
           const index = Number(event.currentTarget.dataset.removeFamiliar);
           const current = getRobotData(actor);
@@ -643,13 +665,16 @@ async function openHome(actor = activeActor()) {
           ).trim();
           if (!name) return ui.notifications.warn(t("ModificationName"));
           const current = getRobotData(actor);
-          const used = current.modifications.reduce(
-            (sum, m) => sum + Math.max(1, Number(m.cost) || 1),
-            0,
-          );
-          const slots =
-            Math.max(0, Number(current.baseSlots) || 0) + grantedSlots(actor);
-          if (used + 1 > slots) return ui.notifications.warn(t("NoSlots"));
+          const candidate = { manual: true, cost: 1 };
+          const summary = robotSummary(actor);
+          if (
+            !customizationCapacity(
+              [...current.modifications, candidate],
+              summary.generalTotal,
+              summary.commercialSlots,
+            ).accepted.includes(candidate)
+          )
+            return ui.notifications.warn(t("NoSlots"));
           current.modifications.push({
             id: foundry.utils.randomID(),
             name,
@@ -958,7 +983,14 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
           const data = getRobotData(actor);
           if (config.type === "robot") {
             const summary = robotSummary(actor);
-            if (summary.free < Math.max(1, Number(entry.cost) || 1))
+            const candidate = { ...entry, catalogId: entry.id };
+            if (
+              !customizationCapacity(
+                [...data.modifications, candidate],
+                summary.generalTotal,
+                summary.commercialSlots,
+              ).accepted.includes(candidate)
+            )
               return ui.notifications.warn(t("NoSlots"));
             if (
               !entry.repeatable &&
@@ -1475,7 +1507,13 @@ async function syncAutomationNow(ownerActor) {
 
   await cleanupPreviousCompanion(ownerActor, companion.id);
   const slotSummary = robotSummary(ownerActor);
-  let remainingSlots = slotSummary.total;
+  const allowedModifications = new Set(
+    customizationCapacity(
+      data.modifications,
+      slotSummary.generalTotal,
+      slotSummary.commercialSlots,
+    ).accepted,
+  );
   const wanted = [];
   let chassisSelection = null;
   if (data.chassisCatalogId || data.chassis) {
@@ -1513,12 +1551,10 @@ async function syncAutomationNow(ownerActor) {
   let overSlotCount = 0;
   let manualCount = 0;
   for (const entry of data.modifications ?? []) {
-    const cost = Math.max(1, Number(entry.cost) || 1);
-    if (cost > remainingSlots) {
+    if (!allowedModifications.has(entry)) {
       overSlotCount++;
       continue;
     }
-    remainingSlots -= cost;
     // Ручная запись — учёт, а не доказательство наличия действующего Rule Element.
     if (entry.manual || !entry.catalogId) {
       manualCount++;
@@ -2044,15 +2080,24 @@ async function searchFamiliarItems(actor = activeActor(), query = "familiar") {
 
 Hooks.once("init", () => {
   game.settings.register(MODULE_ID, "addActorButton", {
-    name: t("ShowActorButton"),
+    name: "SFMTP.ShowActorButton",
+    hint: "SFMTP.ShowActorButtonHint",
     scope: "world",
     config: true,
     type: Boolean,
     default: true,
   });
+  game.settings.register(MODULE_ID, "addFamiliarButton", {
+    name: "SFMTP.ShowFamiliarButton",
+    hint: "SFMTP.ShowFamiliarButtonHint",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: game.settings.get(MODULE_ID, "addActorButton") !== false,
+  });
   game.settings.register(MODULE_ID, "slotGrantRules", {
-    name: t("SlotConfig"),
-    hint: t("SlotConfigHint"),
+    name: "SFMTP.SlotConfig",
+    hint: "SFMTP.SlotConfigHint",
     scope: "world",
     config: true,
     type: String,
@@ -2061,7 +2106,17 @@ Hooks.once("init", () => {
   });
 });
 
-Hooks.once("ready", () => {
+Hooks.once("i18nInit", () => {
+  void initializeLocalization().catch(() => {});
+});
+
+Hooks.once("ready", async () => {
+  try {
+    await initializeLocalization();
+  } catch {
+    ui.notifications.error(t("LocalizationLoadFailed"));
+    return;
+  }
   if (game.system.id !== "sf2e") {
     console.warn(
       `${MODULE_ID} | Current system is ${game.system.id}; SF2e required.`,
@@ -2092,6 +2147,11 @@ Hooks.once("ready", () => {
     open: (actor = activeActor()) => openHome(actor),
     searchFamiliarItems,
     openFamiliar: (actor = activeActor()) => openFamiliarManager(actor),
+    openExocortex: (actor = activeActor()) =>
+      openExocortexManager(actor, { openTechPets: openHome }),
+    getExocortexData: exocortexState,
+    updateExocortex,
+    installExocortexActions,
     createFamiliar,
     linkFamiliar,
     syncFamiliarAbilities,
@@ -2117,44 +2177,47 @@ Hooks.once("ready", () => {
       openPackBrowser(packId(key), actor),
   };
   Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
+    if (!app.actor || app.actor.type === "loot") return;
     if (
-      !game.settings.get(MODULE_ID, "addActorButton") ||
-      !app.actor ||
-      app.actor.type === "loot"
+      game.settings.get(MODULE_ID, "addFamiliarButton") &&
+      ["character", "familiar"].includes(app.actor.type)
     )
-      return;
-    if (["character", "familiar"].includes(app.actor.type))
       buttons.unshift({
         label: t("FamiliarTitle"),
         class: "sfmtp-familiar",
         icon: "fas fa-paw",
         onclick: () => openFamiliarManager(app.actor),
       });
-    buttons.unshift({
-      label: t("Title"),
-      class: "sfmtp-open",
-      icon: "fas fa-robot",
-      onclick: () => openHome(app.actor),
-    });
+    if (game.settings.get(MODULE_ID, "addActorButton"))
+      buttons.unshift({
+        label: t("Title"),
+        class: "sfmtp-open",
+        icon: "fas fa-robot",
+        onclick: () => openHome(app.actor),
+      });
   });
   Hooks.on("getHeaderControlsActorSheetV2", (app, controls) => {
     if (
-      !game.settings.get(MODULE_ID, "addActorButton") ||
       !app.actor ||
-      app.actor.type !== "character" ||
+      !["character", "familiar"].includes(app.actor.type) ||
       app.actor.isOwner === false
     )
       return;
-    controls.push({
-      label: t("FamiliarTitle"),
-      icon: "fas fa-paw",
-      onClick: () => openFamiliarManager(app.actor),
-    });
-    controls.push({
-      label: t("Title"),
-      icon: "fas fa-robot",
-      onClick: () => openHome(app.actor),
-    });
+    if (game.settings.get(MODULE_ID, "addFamiliarButton"))
+      controls.push({
+        label: t("FamiliarTitle"),
+        icon: "fas fa-paw",
+        onClick: () => openFamiliarManager(app.actor),
+      });
+    if (
+      game.settings.get(MODULE_ID, "addActorButton") &&
+      app.actor.type === "character"
+    )
+      controls.push({
+        label: t("Title"),
+        icon: "fas fa-robot",
+        onClick: () => openHome(app.actor),
+      });
   });
   console.info(
     `${MODULE_ID} | Ready. Required Companion Compendia dependency verified; missing SF2e packs: ${missingPacks.join(", ") || "none"}.`,

@@ -295,3 +295,47 @@ test("Повторная сборка сохраняет JSON, JSONL и ID; дв
     );
   }
 });
+test("Ключи локализации разрешаются по пути Foundry, включая @Localize в Items", async () => {
+  const lookup = (object, key) =>
+    key.split(".").reduce((value, part) => value?.[part], object);
+  for (const language of ["en", "ru"]) {
+    const translations = await json(`lang/${language}.json`);
+    assert.equal(Object.keys(translations).length, 1);
+    const leaves = (value, prefix = "") =>
+      Object.entries(value).flatMap(([key, entry]) => {
+        const fullKey = prefix ? `${prefix}.${key}` : key;
+        return typeof entry === "string"
+          ? [[fullKey, entry]]
+          : leaves(entry, fullKey);
+      });
+    const entries = leaves(translations.SFMTP);
+    assert.equal(entries.length, 273);
+    for (const [key, value] of entries) {
+      assert.equal(typeof value, "string");
+      assert.ok(lookup(translations, `SFMTP.${key}`));
+    }
+    for (const entry of catalog.entries) {
+      for (const build of [buildSupportSource, buildManeuverSource]) {
+        const description = build(entry).system.description.value;
+        for (const match of description.matchAll(/@Localize\[([^\]]+)\]/g)) {
+          assert.equal(typeof lookup(translations, match[1]), "string");
+          assert.ok(lookup(translations, match[1]).length > 0);
+        }
+      }
+    }
+  }
+});
+test("Иконки всех пяти шасси поставляются вместе с модулем", async () => {
+  for (const entry of catalog.entries) {
+    const item = buildChassisSource(entry);
+    const prefix = "modules/sf2e-missing-tech-pets/";
+    assert.ok(item.img.startsWith(prefix));
+    const svg = await readFile(
+      path.join(root, item.img.slice(prefix.length)),
+      "utf8",
+    );
+    assert.match(svg, /<svg /);
+    assert.match(svg, /viewBox="0 0 128 128"/);
+    assert.doesNotMatch(svg, /(?:href=|<script)/);
+  }
+});

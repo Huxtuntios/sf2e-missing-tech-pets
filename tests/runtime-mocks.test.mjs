@@ -131,7 +131,12 @@ function pack(collection, sources, system = "sf2e") {
     getDocument: async (id) => docs.find((item) => item.id === id),
   };
 }
-async function harness({ active = true, system = "sf2e" } = {}) {
+async function harness({
+  active = true,
+  system = "sf2e",
+  language = "en",
+  nativeLocalization = true,
+} = {}) {
   const once = new Map(),
     hooks = new Map(),
     notifications = [];
@@ -169,6 +174,8 @@ async function harness({ active = true, system = "sf2e" } = {}) {
     ]),
   );
   const settings = new Map();
+  const settingsConfigs = new Map();
+  const dialogs = [];
   const game = {
     system: { id: system },
     user: { id: "user", isGM: true },
@@ -178,9 +185,22 @@ async function harness({ active = true, system = "sf2e" } = {}) {
       [ID, { path: root }],
       [DEP, { active }],
     ]),
-    i18n: { lang: "en", localize: (key) => key },
+    i18n: {
+      lang: language,
+      translations: {},
+      localize(key) {
+        return nativeLocalization
+          ? (key
+              .split(".")
+              .reduce((value, part) => value?.[part], this.translations) ?? key)
+          : key;
+      },
+    },
     settings: {
-      register: (_scope, key, config) => settings.set(key, config.default),
+      register: (_scope, key, config) => {
+        settingsConfigs.set(key, config);
+        settings.set(key, config.default);
+      },
       get: (_scope, key) => settings.get(key),
       set: async (_scope, key, value) => settings.set(key, value),
     },
@@ -188,6 +208,7 @@ async function harness({ active = true, system = "sf2e" } = {}) {
   class FakeDialog {
     constructor(config) {
       this.config = config;
+      dialogs.push(config);
     }
     render() {
       return this;
@@ -233,6 +254,8 @@ async function harness({ active = true, system = "sf2e" } = {}) {
     },
     canvas: { tokens: { controlled: [] } },
     fetch: async (url) => {
+      if (url.startsWith(`modules/${ID}/`))
+        url = path.join(root, url.slice(`modules/${ID}/`.length));
       try {
         return {
           ok: true,
@@ -263,13 +286,15 @@ async function harness({ active = true, system = "sf2e" } = {}) {
   const module = await load(path.join(root, "scripts/main.mjs"));
   await module.evaluate();
   once.get("init")();
-  once.get("ready")();
+  await once.get("ready")();
   return {
     game,
     packs,
     hooks,
     notifications,
     settings,
+    settingsConfigs,
+    dialogs,
     subject: context.subject,
     api: game.modules.get(ID).api,
   };
@@ -386,7 +411,11 @@ test("Изменённые пользователем и старые предм
   await h.api.syncAutomation(owner);
   assert.equal(ancestry.name, "Моё шасси");
   assert.equal(robot.items.size, 3);
-  assert.ok(h.notifications.some((n) => n.msg.endsWith("ProtectedItems")));
+  assert.ok(
+    h.notifications.some(
+      (n) => n.msg === h.game.i18n.localize("SFMTP.ProtectedItems"),
+    ),
+  );
 });
 test("Конфликтующее ancestry не удаляется и не получает чужие манёвры", async () => {
   const h = await harness(),
@@ -735,7 +764,9 @@ test("Импорт отклоняет PF2e UUID и неизвестный Rule E
   }
   assert.equal(robot.items.size, 0);
   assert.equal(
-    h.notifications.filter((n) => n.msg.endsWith("IncompatibleSource")).length,
+    h.notifications.filter(
+      (n) => n.msg === h.game.i18n.localize("SFMTP.IncompatibleSource"),
+    ).length,
     2,
   );
 });
@@ -766,8 +797,8 @@ test("Кнопка Foundry v14 зарегистрирована и исполь�
   const controls = [];
   h.hooks.get("getHeaderControlsActorSheetV2")({ actor }, controls);
   assert.equal(controls.length, 2);
-  assert.equal(controls[0].label, "SFMTP.FamiliarTitle");
-  assert.equal(controls[1].label, "SFMTP.Title");
+  assert.equal(controls[0].label, "Familiars");
+  assert.equal(controls[1].label, "Tech Pets");
   assert.equal(typeof controls[0].onClick, "function");
 });
 test("Недоступный базовый класс не создаёт неполное шасси и сохраняет прежние Items", async () => {
@@ -786,7 +817,9 @@ test("Недоступный базовый класс не создаёт не�
     ids,
   );
   assert.ok(
-    h.notifications.some((n) => n.msg.endsWith("CompanionClassMissing")),
+    h.notifications.some(
+      (n) => n.msg === h.game.i18n.localize("SFMTP.CompanionClassMissing"),
+    ),
   );
 });
 
@@ -854,4 +887,197 @@ test("Старые familiar-записи не применяются к робо
   assert.equal(robot.items.filter((i) => i.system.slug === "tough").length, 1);
   assert.equal(h.api.getRobotData(owner).familiarAbilities.length, 1);
   assert.ok(result.skipped >= 1);
+});
+test("RU: заголовки листов и оба менеджера показывают переводы, не SFMTP-ключи", async () => {
+  const h = await harness({ language: "ru" });
+  const owner = new Actor("owner");
+  h.game.actors.set(owner.id, owner);
+  const controls = [];
+  h.hooks.get("getHeaderControlsActorSheetV2")({ actor: owner }, controls);
+  assert.deepEqual(
+    controls.map((button) => button.label),
+    ["Фамильяры", "Техно-питомцы"],
+  );
+  await h.api.open(owner);
+  assert.equal(h.dialogs.at(-1).window.title, "Техно-питомцы");
+  assert.doesNotMatch(h.dialogs.at(-1).content, /SFMTP\.[A-Za-z]/);
+  assert.match(h.dialogs.at(-1).content, /Настройка робота/);
+  await h.api.openFamiliar(owner);
+  assert.equal(h.dialogs.at(-1).window.title, "Фамильяры");
+  assert.doesNotMatch(h.dialogs.at(-1).content, /SFMTP\.[A-Za-z]/);
+  assert.match(h.dialogs.at(-1).content, /Создать/);
+  assert.equal(
+    h.game.i18n.localize("SFMTP.ManualActionHint"),
+    h.game.i18n.translations.SFMTP.ManualActionHint,
+  );
+});
+test("Собственный словарь переводит кнопки, даже если native localize возвращает ключ", async () => {
+  const h = await harness({ language: "ru", nativeLocalization: false });
+  const controls = [];
+  h.hooks.get("getHeaderControlsActorSheetV2")(
+    { actor: new Actor("owner") },
+    controls,
+  );
+  assert.deepEqual(
+    controls.map((button) => button.label),
+    ["Фамильяры", "Техно-питомцы"],
+  );
+});
+test("Кнопки Tech Pets и Familiars скрываются независимо в V1 и V2", async () => {
+  const h = await harness({ language: "ru" });
+  const actor = new Actor("owner");
+  for (const [robot, familiar, expected] of [
+    [true, true, 2],
+    [false, true, 1],
+    [true, false, 1],
+    [false, false, 0],
+  ]) {
+    h.settings.set("addActorButton", robot);
+    h.settings.set("addFamiliarButton", familiar);
+    for (const hook of [
+      "getActorSheetHeaderButtons",
+      "getHeaderControlsActorSheetV2",
+    ]) {
+      const controls = [];
+      h.hooks.get(hook)({ actor }, controls);
+      assert.equal(controls.length, expected);
+      if (expected === 1)
+        assert.equal(controls[0].label, robot ? "Техно-питомцы" : "Фамильяры");
+    }
+    assert.equal(typeof h.api.open, "function");
+    assert.equal(typeof h.api.openFamiliar, "function");
+  }
+  for (const key of ["addActorButton", "addFamiliarButton"]) {
+    const config = h.settingsConfigs.get(key);
+    assert.equal(config.config, true);
+    assert.equal(config.type.name, "Boolean");
+    assert.equal(config.scope, "world");
+    assert.doesNotMatch(h.game.i18n.localize(config.name), /^SFMTP\./);
+    assert.doesNotMatch(h.game.i18n.localize(config.hint), /^SFMTP\./);
+  }
+});
+
+test("Экзокортекс: все варианты доступны через Tech Pets, EN/RU без утечек ключей", async () => {
+  const fixture = JSON.parse(
+    await readFile(
+      path.join(root, "tests/fixtures/native-exocortex.json"),
+      "utf8",
+    ),
+  );
+  for (const language of ["en", "ru"]) {
+    const h = await harness({ language });
+    const { owner } = await pair(h);
+    owner.system = {
+      abilities: { int: { mod: 4 } },
+      details: { level: { value: 15 } },
+    };
+    await owner.createEmbeddedDocuments("Item", [
+      { type: "class", system: { slug: "mechanic" } },
+      ...fixture.items.filter((i) =>
+        ["drone", "mine", "turret"].includes(i.system.slug),
+      ),
+    ]);
+    await h.api.open(owner);
+    assert.match(h.dialogs.at(-1).content, /data-open-exocortex/);
+    await h.api.openExocortex(owner);
+    const panel = h.dialogs.at(-1);
+    assert.equal(
+      panel.window.title,
+      language === "ru" ? "Механик: экзокортекс" : "Mechanic: Exocortex",
+    );
+    assert.doesNotMatch(panel.content, /SFMTP\.[A-Za-z]/);
+    for (const operation of [
+      "drone-command",
+      "mine-deploy",
+      "mine-detonate",
+      "turret-deploy",
+      "turret-array",
+    ]) {
+      if (operation === "mine-detonate") continue;
+      assert.ok(panel.content.includes(operation), operation);
+    }
+    assert.match(panel.content, /data-exo-install/);
+    assert.equal(typeof h.api.getExocortexData, "function");
+    assert.equal(typeof h.api.updateExocortex, "function");
+    assert.equal(typeof h.api.installExocortexActions, "function");
+    const controls = [];
+    h.hooks.get("getHeaderControlsActorSheetV2")({ actor: owner }, controls);
+    assert.equal(
+      controls.length,
+      2,
+      "Новая панель не создаёт неподконтрольную третью кнопку хедера",
+    );
+  }
+});
+test("Синхронизация дрона применяет +2 только к коммерческим кастомизациям", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      baseSlots: 1,
+      modifications: [
+        {
+          id: "a",
+          catalogId: "test-a",
+          name: "Test A",
+          grade: "advanced",
+          cost: 1,
+        },
+        {
+          id: "b",
+          catalogId: "test-b",
+          name: "Test B",
+          grade: "commercial",
+          cost: 1,
+        },
+        {
+          id: "c",
+          catalogId: "test-c",
+          name: "Test C",
+          grade: "commercial",
+          cost: 1,
+        },
+        {
+          id: "d",
+          catalogId: "test-d",
+          name: "Test D",
+          grade: "advanced",
+          cost: 1,
+        },
+      ],
+    });
+  await owner.createEmbeddedDocuments("Item", [
+    { type: "class", system: { slug: "mechanic" } },
+    {
+      type: "feat",
+      system: { slug: "drone", traits: { otherTags: ["mechanic-exocortex"] } },
+    },
+  ]);
+  const sources = ["a", "b", "c", "d"].map((id) => ({
+    _id: id,
+    name: "Test " + id.toUpperCase(),
+    type: "feat",
+    system: { slug: "test-" + id, rules: [] },
+  }));
+  h.packs.set("sf2e.feats", pack("sf2e.feats", sources));
+  const summary = h.api.getModificationSlots(owner);
+  assert.equal(summary.total, 3);
+  assert.equal(summary.commercialSlots, 2);
+  assert.equal(summary.generalTotal, 1);
+  await h.api.syncAutomation(owner);
+  for (const slug of ["test-a", "test-b", "test-c"])
+    assert.ok(
+      robot.items.find((i) => i.system.slug === slug),
+      slug,
+    );
+  assert.equal(
+    robot.items.find((i) => i.system.slug === "test-d"),
+    undefined,
+  );
+  const count = robot.items.size;
+  await h.api.syncAutomation(owner);
+  assert.equal(robot.items.size, count);
+  assert.equal(
+    h.api.getRobotData(owner).modifications.length,
+    4,
+    "Превышающая лимит запись сохранена",
+  );
 });

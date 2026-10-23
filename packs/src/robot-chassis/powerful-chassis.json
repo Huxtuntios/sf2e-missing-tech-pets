@@ -1,7 +1,7 @@
 {
   "name": "Powerful Chassis",
   "type": "ancestry",
-  "img": "icons/commodities/tech/circuit-board.webp",
+  "img": "modules/sf2e-missing-tech-pets/assets/icons/powerful-chassis.svg",
   "effects": [],
   "ownership": {
     "default": 0

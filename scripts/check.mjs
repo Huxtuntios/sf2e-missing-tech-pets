@@ -22,8 +22,23 @@ for (const filename of jsonFiles) JSON.parse(await readFile(filename, "utf8"));
 const modules = all.filter((filename) => filename.endsWith(".mjs"));
 for (const filename of modules)
   execFileSync(process.execPath, ["--check", filename], { stdio: "pipe" });
-const en = JSON.parse(await readFile(path.join(root, "lang/en.json"), "utf8"));
-const ru = JSON.parse(await readFile(path.join(root, "lang/ru.json"), "utf8"));
+// Foundry разрешает точки как путь внутри объекта, а не как часть имени свойства.
+function flattenTranslations(value, prefix = "") {
+  return Object.fromEntries(
+    Object.entries(value).flatMap(([key, entry]) => {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      return typeof entry === "string"
+        ? [[fullKey, entry]]
+        : Object.entries(flattenTranslations(entry, fullKey));
+    }),
+  );
+}
+const en = flattenTranslations(
+  JSON.parse(await readFile(path.join(root, "lang/en.json"), "utf8")),
+);
+const ru = flattenTranslations(
+  JSON.parse(await readFile(path.join(root, "lang/ru.json"), "utf8")),
+);
 assert.deepEqual(Object.keys(en).sort(), Object.keys(ru).sort());
 for (const filename of modules.filter((name) =>
   name.includes(`${path.sep}scripts${path.sep}`),

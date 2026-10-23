@@ -1,8 +1,9 @@
+import { t } from "./i18n.mjs";
 // Нативный familiar SF2e отвечает за характеристики. Здесь только связь и выбор Items.
 import { MODULE_ID } from "./item-sources.mjs";
 import { buildFamiliarSource } from "./familiar-sources.mjs";
 const queues = new Map();
-const t = (key) => game.i18n.localize(`SFMTP.${key}`);
+
 const fail = (key) => {
   throw new Error(t(key));
 };

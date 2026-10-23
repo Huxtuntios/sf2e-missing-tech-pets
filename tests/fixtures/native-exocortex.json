@@ -1,0 +1,261 @@
+{
+  "system": "sf2e",
+  "version": "1.6.0",
+  "items": [
+    {
+      "_id": "23Km290iJ9SNG7w1",
+      "type": "feat",
+      "name": "Exocortex",
+      "system": {
+        "slug": "exocortex",
+        "traits": {
+          "rarity": "common",
+          "value": []
+        },
+        "actionType": {
+          "value": "passive"
+        },
+        "actions": {
+          "value": null
+        }
+      },
+      "flags": {
+        "core": {
+          "sourceId": "Compendium.sf2e.class-features.Item.23Km290iJ9SNG7w1"
+        }
+      }
+    },
+    {
+      "_id": "UCilslXlrd7ihsgY",
+      "type": "feat",
+      "name": "Drone",
+      "system": {
+        "slug": "drone",
+        "traits": {
+          "otherTags": [
+            "mechanic-exocortex"
+          ],
+          "rarity": "common",
+          "value": [
+            "mechanic"
+          ]
+        },
+        "actionType": {
+          "value": "passive"
+        },
+        "actions": {
+          "value": null
+        }
+      },
+      "flags": {
+        "core": {
+          "sourceId": "Compendium.sf2e.class-features.Item.UCilslXlrd7ihsgY"
+        }
+      }
+    },
+    {
+      "_id": "V7LMvEnxI7hN1n8Z",
+      "type": "feat",
+      "name": "Turret",
+      "system": {
+        "slug": "turret",
+        "traits": {
+          "otherTags": [
+            "mechanic-exocortex"
+          ],
+          "rarity": "common",
+          "value": []
+        },
+        "actionType": {
+          "value": "passive"
+        },
+        "actions": {
+          "value": null
+        }
+      },
+      "flags": {
+        "core": {
+          "sourceId": "Compendium.sf2e.class-features.Item.V7LMvEnxI7hN1n8Z"
+        }
+      }
+    },
+    {
+      "_id": "peXRQKUzkAGqduHP",
+      "type": "feat",
+      "name": "Mine",
+      "system": {
+        "slug": "mine",
+        "traits": {
+          "otherTags": [
+            "mechanic-exocortex"
+          ],
+          "rarity": "common",
+          "value": []
+        },
+        "actionType": {
+          "value": "passive"
+        },
+        "actions": {
+          "value": null
+        }
+      },
+      "flags": {
+        "core": {
+          "sourceId": "Compendium.sf2e.class-features.Item.peXRQKUzkAGqduHP"
+        }
+      }
+    },
+    {
+      "_id": "36WO6WJzTz2Qsm16",
+      "type": "action",
+      "name": "Reposition Exocortex",
+      "system": {
+        "slug": "reposition-exocortex",
+        "traits": {
+          "value": [
+            "concentrate",
+            "mechanic",
+            "teleportation"
+          ]
+        },
+        "actionType": {
+          "value": "action"
+        },
+        "actions": {
+          "value": 1
+        }
+      },
+      "flags": {
+        "core": {
+          "sourceId": "Compendium.sf2e.actions.Item.36WO6WJzTz2Qsm16"
+        }
+      }
+    },
+    {
+      "_id": "CZ3o2xTAZ4hlISya",
+      "type": "action",
+      "name": "Synchronized Step",
+      "system": {
+        "slug": "synchronized-step",
+        "traits": {
+          "value": [
+            "flourish",
+            "mechanic",
+            "traversal"
+          ]
+        },
+        "actionType": {
+          "value": "action"
+        },
+        "actions": {
+          "value": 1
+        }
+      },
+      "flags": {
+        "core": {
+          "sourceId": "Compendium.sf2e.actions.Item.CZ3o2xTAZ4hlISya"
+        }
+      }
+    },
+    {
+      "_id": "i2EksIx4It5FW2NM",
+      "type": "action",
+      "name": "Deploy Turret",
+      "system": {
+        "slug": "deploy-turret",
+        "traits": {
+          "value": [
+            "manipulate",
+            "mechanic"
+          ]
+        },
+        "actionType": {
+          "value": "action"
+        },
+        "actions": {
+          "value": 1
+        }
+      },
+      "flags": {
+        "core": {
+          "sourceId": "Compendium.sf2e.actions.Item.i2EksIx4It5FW2NM"
+        }
+      }
+    },
+    {
+      "_id": "ljJlGPTH8ZNH6DZj",
+      "type": "action",
+      "name": "Deploy Mine",
+      "system": {
+        "slug": "deploy-mine",
+        "traits": {
+          "value": [
+            "manipulate",
+            "mechanic"
+          ]
+        },
+        "actionType": {
+          "value": "action"
+        },
+        "actions": {
+          "value": 1
+        }
+      },
+      "flags": {
+        "core": {
+          "sourceId": "Compendium.sf2e.actions.Item.ljJlGPTH8ZNH6DZj"
+        }
+      }
+    },
+    {
+      "_id": "uVDYsnxq3hNNtYB2",
+      "type": "action",
+      "name": "Modify",
+      "system": {
+        "slug": "modify",
+        "traits": {
+          "value": [
+            "manipulate",
+            "mechanic"
+          ]
+        },
+        "actionType": {
+          "value": "action"
+        },
+        "actions": {
+          "value": 1
+        }
+      },
+      "flags": {
+        "core": {
+          "sourceId": "Compendium.sf2e.actions.Item.uVDYsnxq3hNNtYB2"
+        }
+      }
+    },
+    {
+      "_id": "x1XORr76jCEEDJJV",
+      "type": "action",
+      "name": "Detonate Mine",
+      "system": {
+        "slug": "detonate-mine",
+        "traits": {
+          "value": [
+            "concentrate",
+            "mechanic"
+          ]
+        },
+        "actionType": {
+          "value": "action"
+        },
+        "actions": {
+          "value": 1
+        }
+      },
+      "flags": {
+        "core": {
+          "sourceId": "Compendium.sf2e.actions.Item.x1XORr76jCEEDJJV"
+        }
+      }
+    }
+  ]
+}

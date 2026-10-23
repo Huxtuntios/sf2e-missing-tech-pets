@@ -133,7 +133,7 @@ export function buildChassisSource(entry) {
   return {
     name: entry.name,
     type: "ancestry",
-    img: "icons/commodities/tech/circuit-board.webp",
+    img: `modules/${MODULE_ID}/assets/icons/${entry.id}.svg`,
     effects: [],
     ownership: { default: 0 },
     system: {

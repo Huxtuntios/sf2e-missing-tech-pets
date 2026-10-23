@@ -1,9 +1,9 @@
 {
   "name": "sf2e-missing-tech-pets",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "private": true,
   "type": "module",
-  "description": "Tech Core robot companions and native familiar management for Starfinder Second Edition.",
+  "description": "Tech Core robot companions, native familiar management and mechanic exocortex tools for Starfinder Second Edition. Requires PF2e Companion Compendia.",
   "scripts": {
     "build:packs": "node scripts/build-chassis-pack.mjs",
     "test": "node --experimental-vm-modules --test --test-concurrency=1 tests/*.test.mjs",
