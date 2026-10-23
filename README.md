@@ -2,7 +2,6 @@
 
 **Version 0.12.0.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition. This continues the existing 0.10.2 project rather than replacing it with a new module.
 
-> Source code, data, compendium builds, and mocked integration scenarios have been checked. A live Foundry v14 game world has **not** been used for testing. An action description does not mean its effects are automated.
 
 ## Compatibility and Required Dependency
 
@@ -201,7 +200,6 @@ The build updates the four `packs/src/` directories, textual `.db` snapshots, an
 
 Reproducibility is checked by document contents and IDs, not by byte-for-byte equality of LevelDB's internal files. The builder first compiles into a temporary directory, extracts and verifies the documents, then replaces the generated pack.
 
-See the [audit](docs/AUDIT.md), [test report and in-game checklist](docs/TEST-REPORT.md), and [changelog](CHANGELOG.md). These supporting documents are currently in Russian.
 
 ## Sources and Rights
 
