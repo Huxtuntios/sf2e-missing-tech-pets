@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 2,
+  "source": "Archives of Nethys — Starfinder 2e Tech Core, p. 73",
+  "sourceUrl": "https://2e.aonsrd.com/companions/all",
+  "note": "Собственные Items задают параметры шасси через нативные поля и Rule Elements. Поддержка и манёвры представлены отдельными действиями; выполнение и условные эффекты остаются ручными. Манёвры выдаются при ступени Advanced/Superior.",
+  "entries": [
+    {
+      "id": "agile-chassis",
+      "name": "Agile Chassis",
+      "sourceUrl": "https://2e.aonsrd.com/companions/all#agile-chassis",
+      "type": "Robot",
+      "size": "Small or Medium",
+      "attacks": [
+        {
+          "name": "Blade",
+          "traits": [
+            "agile",
+            "finesse",
+            "versatile p"
+          ],
+          "damage": "1d6 slashing"
+        }
+      ],
+      "abilities": {
+        "str": 1,
+        "dex": 3,
+        "con": 2,
+        "int": -4,
+        "wis": 2,
+        "cha": -1
+      },
+      "hp": 6,
+      "skills": [
+        "Stealth"
+      ],
+      "senses": [
+        "low-light vision"
+      ],
+      "speeds": {
+        "land": 40,
+        "climb": 20
+      },
+      "supportBenefit": "An item or weapon carried by the robot is launched up to 20 feet into the air; you Interact to catch it.",
+      "advancedManeuver": "Surgical Strike",
+      "rulesNote": "Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.",
+      "advancedManeuverId": "surgical-strike",
+      "advancedManeuverActions": 2,
+      "advancedManeuverTraits": [
+        "traversal"
+      ],
+      "advancedManeuverDescription": "The robot companion Strides and then makes a blade Strike. If it hits, and the robot companion was undetected, the target takes an additional 1d6 precision damage (2d6 if the robot companion is burly or deft). If it was undetected at the start of its Surgical Strike, it remains undetected until after the Strike."
+    },
+    {
+      "id": "imitator-chassis",
+      "name": "Imitator Chassis",
+      "sourceUrl": "https://2e.aonsrd.com/companions/all#imitator-chassis",
+      "type": "Robot",
+      "size": "Varies (selected ancestry/animal)",
+      "attacks": [
+        {
+          "name": "Imitated unarmed attack",
+          "traits": [
+            "agile",
+            "finesse"
+          ],
+          "damage": "1d4; type follows selected attack"
+        }
+      ],
+      "abilities": {
+        "str": 2,
+        "dex": 2,
+        "con": 2,
+        "int": -4,
+        "wis": 2,
+        "cha": 1
+      },
+      "hp": 4,
+      "skills": [
+        "Deception"
+      ],
+      "senses": [
+        "low-light vision"
+      ],
+      "speeds": {},
+      "special": "Choose one ancestry or animal. The robot has that species’ size and Speeds and looks like it. Choose one unarmed attack from that species; the robot uses agile and finesse and deals 1d4 damage.",
+      "supportBenefit": "Focuses on a target within the first range increment or reach; your damaging Strikes against it make it off-guard until the start of your next turn.",
+      "advancedManeuver": "Disturbing Display",
+      "rulesNote": "Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.",
+      "advancedManeuverId": "disturbing-display",
+      "advancedManeuverActions": 1,
+      "advancedManeuverTraits": [],
+      "advancedManeuverDescription": "The robot companion morphs its features to reveal the machinery writhing beneath its synthetic skin. It attempts to Demoralize a creature using Deception instead of Intimidation. This display gains the visual trait and does not require a language. While frightened by this ability, the target is off-guard to your robot companion."
+    },
+    {
+      "id": "powerful-chassis",
+      "name": "Powerful Chassis",
+      "sourceUrl": "https://2e.aonsrd.com/companions/all#powerful-chassis",
+      "type": "Robot",
+      "size": "Medium or Large",
+      "attacks": [
+        {
+          "name": "Hydraulic fist",
+          "traits": [],
+          "damage": "1d8 bludgeoning"
+        },
+        {
+          "name": "Serrated blade",
+          "traits": [],
+          "damage": "1d8 slashing"
+        }
+      ],
+      "abilities": {
+        "str": 3,
+        "dex": 1,
+        "con": 2,
+        "int": -4,
+        "wis": 2,
+        "cha": -1
+      },
+      "hp": 8,
+      "skills": [
+        "Intimidation"
+      ],
+      "senses": [
+        "low-light vision"
+      ],
+      "speeds": {
+        "land": 30
+      },
+      "supportBenefit": "Until the start of your next turn, your Strikes that damage creatures within the robot companion's melee reach also deal 1d6 persistent bleed damage (2d6 if burly or deft).",
+      "advancedManeuver": "Hydraulic Flipper",
+      "rulesNote": "Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.",
+      "advancedManeuverId": "hydraulic-flipper",
+      "advancedManeuverActions": 2,
+      "advancedManeuverTraits": [],
+      "advancedManeuverDescription": "The robot companion makes a melee Strike. On a successful hit, it knocks the target prone."
+    },
+    {
+      "id": "surveillance-chassis",
+      "name": "Surveillance Chassis",
+      "sourceUrl": "https://2e.aonsrd.com/companions/all#surveillance-chassis",
+      "type": "Robot",
+      "size": "Small",
+      "attacks": [
+        {
+          "name": "Spark",
+          "traits": [
+            "ranged"
+          ],
+          "range": "30 feet",
+          "damage": "1d4 electricity"
+        }
+      ],
+      "abilities": {
+        "str": 0,
+        "dex": 3,
+        "con": 1,
+        "int": -4,
+        "wis": 3,
+        "cha": 0
+      },
+      "hp": 4,
+      "skills": [
+        "Stealth"
+      ],
+      "senses": [
+        "darkvision"
+      ],
+      "speeds": {
+        "land": 25,
+        "fly": 20
+      },
+      "supportBenefit": "Until the end of your next turn, creatures adjacent to the robot can’t flank you or make you off-guard.",
+      "advancedManeuver": "Blinding Spotlight",
+      "rulesNote": "Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.",
+      "advancedManeuverId": "blinding-spotlight",
+      "advancedManeuverActions": 2,
+      "advancedManeuverTraits": [
+        "light"
+      ],
+      "advancedManeuverDescription": "The robot companion shines a powerful spotlight on a creature it can see within 60 feet. The target becomes dazzled until the end of your next turn or until it uses the Avert Gaze action, whichever comes first. This Points Out the creature if it was undetected by you or one or more of your allies."
+    },
+    {
+      "id": "tank-chassis",
+      "name": "Tank Chassis",
+      "sourceUrl": "https://2e.aonsrd.com/companions/all#tank-chassis",
+      "type": "Robot",
+      "size": "Medium or Large",
+      "attacks": [
+        {
+          "name": "Battering ram",
+          "traits": [
+            "shove"
+          ],
+          "damage": "1d6 bludgeoning"
+        }
+      ],
+      "abilities": {
+        "str": 2,
+        "dex": 1,
+        "con": 3,
+        "int": -4,
+        "wis": 2,
+        "cha": -1
+      },
+      "hp": 10,
+      "skills": [
+        "Intimidation"
+      ],
+      "senses": [
+        "low-light vision"
+      ],
+      "speeds": {
+        "land": 20
+      },
+      "supportBenefit": "Gain a +1 circumstance bonus to your next Strike against a foe within the robot’s melee reach; it ends after the Strike or at the start of your next turn.",
+      "advancedManeuver": "Ram Slam",
+      "rulesNote": "Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.",
+      "advancedManeuverId": "ram-slam",
+      "advancedManeuverActions": 2,
+      "advancedManeuverTraits": [
+        "traversal"
+      ],
+      "advancedManeuverDescription": "The robot companion Strides in a straight line and makes a battering ram Strike. If it moved at least 20 feet and the Strike hits, the target is pushed back 10 feet."
+    }
+  ]
+}

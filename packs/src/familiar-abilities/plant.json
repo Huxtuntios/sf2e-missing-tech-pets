@@ -1,0 +1,52 @@
+{
+  "_id": "9074d3d1615cfae7",
+  "name": "Plant",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "plant",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Your familiar has the plant trait instead of the animal trait.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/12-plant\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [
+      {
+        "add": [
+          "plant"
+        ],
+        "key": "ActorTraits",
+        "remove": [
+          "animal"
+        ]
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.9074d3d1615cfae7"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "plant",
+      "abilityCategory": "familiar",
+      "automation": "rules"
+    }
+  },
+  "effects": []
+}

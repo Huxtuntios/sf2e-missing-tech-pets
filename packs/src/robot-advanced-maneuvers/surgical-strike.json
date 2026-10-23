@@ -1,0 +1,44 @@
+{
+  "name": "Surgical Strike",
+  "type": "action",
+  "img": "icons/svg/target.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "surgical-strike",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 2
+    },
+    "category": "offensive",
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>The robot companion Strides and then makes a blade Strike. If it hits, and the robot companion was undetected, the target takes an additional 1d6 precision damage (2d6 if the robot companion is burly or deft). If it was undetected at the start of its Surgical Strike, it remains undetected until after the Strike.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#agile-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "rules": [],
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "traversal"
+      ],
+      "otherTags": []
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "agile-chassis",
+      "itemKind": "robot-maneuver"
+    }
+  },
+  "_id": "79785e828bada3da"
+}

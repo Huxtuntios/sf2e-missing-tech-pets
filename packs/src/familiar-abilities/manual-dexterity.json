@@ -1,0 +1,42 @@
+{
+  "_id": "339a73bfffbd2f4c",
+  "name": "Manual Dexterity",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "manual-dexterity",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>It can use up to two of its limbs as if they were hands to perform manipulate actions.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/35-manual-dexterity\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.339a73bfffbd2f4c"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "manual-dexterity",
+      "abilityCategory": "pet",
+      "automation": "manual"
+    }
+  },
+  "effects": []
+}

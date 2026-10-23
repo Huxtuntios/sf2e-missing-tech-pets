@@ -1,0 +1,42 @@
+{
+  "_id": "fc7777d81ad30acf",
+  "name": "Master's Form",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "masters-form",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Your familiar can change shape as a single action, transforming into your ancestry with the same age a clearly unnatural remnant of its nature, such as a cat&#39;s eyes or a serpent&#39;s tongue. This form is always the same each time it uses this ability. This otherwise uses the effects of humanoid form, except the change is purely cosmetic. It only appears humanoid and gains no new capabilities. Your familiar must have the manual dexterity and speech abilities to select this.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/10-masters-form\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.fc7777d81ad30acf"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "masters-form",
+      "abilityCategory": "familiar",
+      "automation": "manual"
+    }
+  },
+  "effects": []
+}

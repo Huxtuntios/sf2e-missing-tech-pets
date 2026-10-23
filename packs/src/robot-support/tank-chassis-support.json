@@ -1,0 +1,42 @@
+{
+  "name": "Tank Chassis: Support",
+  "type": "action",
+  "img": "icons/svg/target.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "tank-chassis-support",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 1
+    },
+    "category": "offensive",
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>Gain a +1 circumstance bonus to your next Strike against a foe within the robot’s melee reach; it ends after the Strike or at the start of your next turn.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#tank-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "rules": [],
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "tank-chassis",
+      "itemKind": "robot-support"
+    }
+  },
+  "_id": "f525670c9703a05c"
+}

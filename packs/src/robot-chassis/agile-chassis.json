@@ -1,0 +1,181 @@
+{
+  "name": "Agile Chassis",
+  "type": "ancestry",
+  "img": "icons/commodities/tech/circuit-board.webp",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "agile-chassis",
+    "description": {
+      "value": "<p>Agile Chassis</p><p><strong>Support Benefit:</strong> An item or weapon carried by the robot is launched up to 20 feet into the air; you Interact to catch it.</p><p><strong>Advanced Maneuver:</strong> Surgical Strike</p><p>Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.</p><p><a href=\"https://2e.aonsrd.com/companions/all#agile-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "construct",
+        "robot",
+        "tech"
+      ],
+      "otherTags": []
+    },
+    "hp": 6,
+    "size": "med",
+    "speed": 40,
+    "reach": 5,
+    "vision": "low-light-vision",
+    "boosts": {
+      "0": {
+        "value": []
+      },
+      "1": {
+        "value": []
+      },
+      "2": {
+        "value": []
+      }
+    },
+    "flaws": {
+      "0": {
+        "value": []
+      }
+    },
+    "languages": {
+      "value": [],
+      "custom": ""
+    },
+    "additionalLanguages": {
+      "count": 0,
+      "value": [],
+      "custom": ""
+    },
+    "items": {},
+    "rules": [
+      {
+        "key": "GrantItem",
+        "uuid": "Compendium.pf2e-animal-companions.sf-AC-Features.Item.KKOgokqHa7RjVDN6",
+        "flag": "techPetCompanionClass",
+        "allowDuplicate": false
+      },
+      {
+        "key": "ActorTraits",
+        "add": [
+          "construct",
+          "robot",
+          "tech"
+        ],
+        "remove": [
+          "animal"
+        ]
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.str.mod",
+        "value": 1
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.dex.mod",
+        "value": 3
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.con.mod",
+        "value": 2
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.int.mod",
+        "value": -4
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.wis.mod",
+        "value": 2
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.cha.mod",
+        "value": -1
+      },
+      {
+        "key": "BaseSpeed",
+        "selector": "climb",
+        "value": 20
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "upgrade",
+        "path": "system.skills.stealth.rank",
+        "value": 1
+      },
+      {
+        "key": "ChoiceSet",
+        "flag": "chassisSize",
+        "adjustName": false,
+        "prompt": "SFMTP.ChooseSize",
+        "choices": [
+          {
+            "value": "sm",
+            "label": "SFMTP.Size.sm"
+          },
+          {
+            "value": "med",
+            "label": "SFMTP.Size.med"
+          }
+        ]
+      },
+      {
+        "key": "CreatureSize",
+        "value": "{item|flags.sf2e.rulesSelections.chassisSize}"
+      },
+      {
+        "key": "Strike",
+        "slug": "blade",
+        "category": "unarmed",
+        "label": "Blade",
+        "group": "brawling",
+        "replaceBasicUnarmed": true,
+        "traits": [
+          "unarmed",
+          "agile",
+          "finesse",
+          "versatile-p"
+        ],
+        "range": null,
+        "damage": {
+          "base": {
+            "dice": 1,
+            "die": "d6",
+            "damageType": "slashing"
+          }
+        }
+      }
+    ]
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "agile-chassis"
+    },
+    "sf2e": {
+      "rulesSelections": {
+        "chassisSize": null
+      }
+    }
+  },
+  "_id": "665ae48461a79f96"
+}

@@ -1,0 +1,52 @@
+{
+  "_id": "8eccfc45d2151e3a",
+  "name": "Dragon",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "dragon",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Your familiar has the dragon trait instead of the animal trait.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/4-dragon\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [
+      {
+        "add": [
+          "dragon"
+        ],
+        "key": "ActorTraits",
+        "remove": [
+          "animal"
+        ]
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.8eccfc45d2151e3a"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "dragon",
+      "abilityCategory": "familiar",
+      "automation": "rules"
+    }
+  },
+  "effects": []
+}

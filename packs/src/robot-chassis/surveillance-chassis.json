@@ -1,0 +1,160 @@
+{
+  "name": "Surveillance Chassis",
+  "type": "ancestry",
+  "img": "icons/commodities/tech/circuit-board.webp",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "surveillance-chassis",
+    "description": {
+      "value": "<p>Surveillance Chassis</p><p><strong>Support Benefit:</strong> Until the end of your next turn, creatures adjacent to the robot can’t flank you or make you @UUID[Compendium.sf2e.conditions.Item.AJh5ex99aV6VTggg]{off-guard}.</p><p><strong>Advanced Maneuver:</strong> Blinding Spotlight</p><p>Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.</p><p><a href=\"https://2e.aonsrd.com/companions/all#surveillance-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "construct",
+        "robot",
+        "tech"
+      ],
+      "otherTags": []
+    },
+    "hp": 4,
+    "size": "sm",
+    "speed": 25,
+    "reach": 5,
+    "vision": "darkvision",
+    "boosts": {
+      "0": {
+        "value": []
+      },
+      "1": {
+        "value": []
+      },
+      "2": {
+        "value": []
+      }
+    },
+    "flaws": {
+      "0": {
+        "value": []
+      }
+    },
+    "languages": {
+      "value": [],
+      "custom": ""
+    },
+    "additionalLanguages": {
+      "count": 0,
+      "value": [],
+      "custom": ""
+    },
+    "items": {},
+    "rules": [
+      {
+        "key": "GrantItem",
+        "uuid": "Compendium.pf2e-animal-companions.sf-AC-Features.Item.KKOgokqHa7RjVDN6",
+        "flag": "techPetCompanionClass",
+        "allowDuplicate": false
+      },
+      {
+        "key": "ActorTraits",
+        "add": [
+          "construct",
+          "robot",
+          "tech"
+        ],
+        "remove": [
+          "animal"
+        ]
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.str.mod",
+        "value": 0
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.dex.mod",
+        "value": 3
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.con.mod",
+        "value": 1
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.int.mod",
+        "value": -4
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.wis.mod",
+        "value": 3
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.cha.mod",
+        "value": 0
+      },
+      {
+        "key": "BaseSpeed",
+        "selector": "fly",
+        "value": 20
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "upgrade",
+        "path": "system.skills.stealth.rank",
+        "value": 1
+      },
+      {
+        "key": "Strike",
+        "slug": "spark",
+        "category": "unarmed",
+        "label": "Spark",
+        "group": "brawling",
+        "replaceBasicUnarmed": true,
+        "traits": [
+          "unarmed"
+        ],
+        "range": {
+          "increment": 30
+        },
+        "damage": {
+          "base": {
+            "dice": 1,
+            "die": "d4",
+            "damageType": "electricity"
+          }
+        }
+      }
+    ]
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "surveillance-chassis"
+    },
+    "sf2e": {
+      "rulesSelections": {
+        "chassisSize": null
+      }
+    }
+  },
+  "_id": "7b04d902728ef7d1"
+}

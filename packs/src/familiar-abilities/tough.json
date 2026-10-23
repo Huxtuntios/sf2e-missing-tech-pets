@@ -1,0 +1,49 @@
+{
+  "_id": "6224554119f28d2a",
+  "name": "Tough",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "tough",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Your pet&#39;s max HP increase by 2 per level.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/37-tough\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [
+      {
+        "key": "FlatModifier",
+        "selector": "hp",
+        "type": "untyped",
+        "value": "2 * @actor.level"
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.6224554119f28d2a"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "tough",
+      "abilityCategory": "pet",
+      "automation": "rules"
+    }
+  },
+  "effects": []
+}

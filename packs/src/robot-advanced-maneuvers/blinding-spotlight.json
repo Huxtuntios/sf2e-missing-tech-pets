@@ -1,0 +1,44 @@
+{
+  "name": "Blinding Spotlight",
+  "type": "action",
+  "img": "icons/svg/target.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "blinding-spotlight",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 2
+    },
+    "category": "offensive",
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>The robot companion shines a powerful spotlight on a creature it can see within 60 feet. The target becomes @UUID[Compendium.sf2e.conditions.Item.TkIyaNPgTZFBCCuh]{dazzled} until the end of your next turn or until it uses the Avert Gaze action, whichever comes first. This Points Out the creature if it was undetected by you or one or more of your allies.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#surveillance-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "rules": [],
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "light"
+      ],
+      "otherTags": []
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "surveillance-chassis",
+      "itemKind": "robot-maneuver"
+    }
+  },
+  "_id": "4eaed25b6e3955a7"
+}

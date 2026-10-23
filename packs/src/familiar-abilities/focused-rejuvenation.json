@@ -1,0 +1,42 @@
+{
+  "_id": "24db5bd486e47de0",
+  "name": "Focused Rejuvenation",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "focused-rejuvenation",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>When you Refocus, you generate magical energy that heals your familiar. Your familiar regains 1 Hit Point per level whenever you Refocus.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/6-focused-rejuvenation\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.24db5bd486e47de0"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "focused-rejuvenation",
+      "abilityCategory": "familiar",
+      "automation": "manual"
+    }
+  },
+  "effects": []
+}

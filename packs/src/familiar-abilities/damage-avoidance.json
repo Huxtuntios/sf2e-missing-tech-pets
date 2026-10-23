@@ -1,0 +1,42 @@
+{
+  "_id": "7ccd86aa03469d32",
+  "name": "Damage Avoidance",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "damage-avoidance",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Choose one type of save. Your familiar takes no damage when it rolls a success on that type of save; this doesn&#39;t prevent effects other than damage.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/3-damage-avoidance\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.7ccd86aa03469d32"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "damage-avoidance",
+      "abilityCategory": "familiar",
+      "automation": "manual"
+    }
+  },
+  "effects": []
+}

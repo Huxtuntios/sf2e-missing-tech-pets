@@ -1,0 +1,22 @@
+.sfmtp-pack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
+.sfmtp-pack { min-height: 2rem; text-align: left; }
+.sfmtp-entry-list { max-height: 460px; overflow: auto; display: flex; flex-direction: column; gap: 0.2rem; margin-top: 0.5rem; }
+.sfmtp-entry, .sfmtp-familiar-entry { display: flex; align-items: center; justify-content: space-between; gap: 1rem; text-align: left; padding: 0.35rem 0.5rem; }
+.sfmtp-entry small, .sfmtp-familiar-entry small { opacity: 0.7; }
+.sfmtp-mod-row { display: flex; justify-content: space-between; align-items: center; padding: 0.25rem 0; border-bottom: 1px solid var(--color-border-light-2); }
+.sfmtp-description { max-height: 360px; overflow: auto; }
+
+.sfmtp-action-row { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.5rem 0; }
+.sfmtp-catalog-list { max-height: 520px; overflow: auto; margin-top: 0.5rem; }
+.sfmtp-catalog-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.35rem; border-bottom: 1px solid var(--color-border-light-2); }
+.sfmtp-catalog-row > div:first-child { display: flex; flex-direction: column; }
+.sfmtp-catalog-row small { opacity: 0.7; }
+.sfmtp-catalog-row button { margin-left: 0.25rem; }
+
+/* Панель фамильяра: список прокручивается, описания не загружают основной лист. */
+.sfmtp-familiar-list { max-height: 390px; overflow-y: auto; }
+.sfmtp-familiars .sfmtp-familiar-entry { display: block; text-align: left; padding: 6px; border-bottom: 1px solid var(--color-border-light-primary, #888); }
+.sfmtp-familiar-entry summary { cursor: pointer; }
+.sfmtp-familiar-entry p { line-height: 1.45; }
+.sfmtp-familiars input[type="number"] { max-width: 90px; }
+.sfmtp-familiar-entry[hidden] { display: none; }

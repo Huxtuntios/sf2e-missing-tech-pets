@@ -1,0 +1,52 @@
+{
+  "_id": "fd0bb953eca78c52",
+  "name": "Fungus",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "fungus",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Your familiar has the fungus trait instead of the animal trait.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/7-fungus\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [
+      {
+        "add": [
+          "fungus"
+        ],
+        "key": "ActorTraits",
+        "remove": [
+          "animal"
+        ]
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.fd0bb953eca78c52"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "fungus",
+      "abilityCategory": "familiar",
+      "automation": "rules"
+    }
+  },
+  "effects": []
+}

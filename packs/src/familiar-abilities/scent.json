@@ -1,0 +1,49 @@
+{
+  "_id": "6aa74f0b9edd03c0",
+  "name": "Scent",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "scent",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Your pet gains scent as an imprecise sense within 30 feet.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/36-scent\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [
+      {
+        "acuity": "imprecise",
+        "key": "Sense",
+        "range": 30,
+        "selector": "scent"
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.6aa74f0b9edd03c0"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "scent",
+      "abilityCategory": "pet",
+      "automation": "rules"
+    }
+  },
+  "effects": []
+}

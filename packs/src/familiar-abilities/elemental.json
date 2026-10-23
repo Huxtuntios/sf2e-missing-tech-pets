@@ -1,0 +1,42 @@
+{
+  "_id": "6f9ca398f2e351c8",
+  "name": "Elemental",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "elemental",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Your familiar has the elemental trait instead of the animal trait. Choose air , earth , fire , metal , water , or wood . Your familiar gains that trait. The familiar is immune to bleed, paralyzed , poison , sleep , and the element matching its trait. Your familiar must have the resistance familiar ability to select this ability.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/5-elemental\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.6f9ca398f2e351c8"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "elemental",
+      "abilityCategory": "familiar",
+      "automation": "manual"
+    }
+  },
+  "effects": []
+}

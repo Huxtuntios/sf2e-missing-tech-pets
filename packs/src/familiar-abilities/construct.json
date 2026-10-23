@@ -1,0 +1,42 @@
+{
+  "_id": "38be3c70dc9e9049",
+  "name": "Construct",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "construct",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Your familiar has the construct trait instead of the animal trait. The familiar is immune to death effects, disease , doomed , drained , fatigued , healing , nonlethal attacks, paralyzed , poison , sickened , spirit , unconscious , vitality , and void . Your familiar must have the tough pet ability to select this.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/2-construct\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.38be3c70dc9e9049"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "construct",
+      "abilityCategory": "familiar",
+      "automation": "manual"
+    }
+  },
+  "effects": []
+}

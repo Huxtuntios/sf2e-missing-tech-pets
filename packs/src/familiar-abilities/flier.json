@@ -1,0 +1,48 @@
+{
+  "_id": "201b139aa03b9d91",
+  "name": "Flier",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "flier",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>It gains a fly Speed of 25 feet.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/34-flier\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [
+      {
+        "key": "BaseSpeed",
+        "selector": "fly",
+        "value": 25
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.201b139aa03b9d91"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "flier",
+      "abilityCategory": "pet",
+      "automation": "rules"
+    }
+  },
+  "effects": []
+}

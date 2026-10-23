@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "note": "Source index only. This file deliberately does not redistribute full rule text or artwork.",
+  "sources": [
+    {
+      "category": "robotCompanions",
+      "label": "Starfinder 2e Tech Core — Robot Companions / Robot Customization",
+      "url": "https://2e.aonsrd.com/",
+      "details": "Use Archives of Nethys search for the Robot Companion and Robot Customization sections."
+    },
+    {
+      "category": "modifications",
+      "label": "Starfinder 2e Tech Core — robot modifications",
+      "url": "https://2e.aonsrd.com/",
+      "details": "The exact modification entries and slot costs should be encoded from verified source entries."
+    },
+    {
+      "category": "familiarFeats",
+      "label": "Starfinder 2e Tech Core — familiar feats and abilities",
+      "url": "https://2e.aonsrd.com/",
+      "details": "This extension can search installed item packs and import compatible items."
+    },
+    {
+      "category": "pf2eFamiliarFeats",
+      "label": "PF2e system familiar feats / abilities",
+      "url": "https://2e.aonprd.com/",
+      "details": "Check every PF2e Rule Element and prerequisite before using it in SF2e."
+    }
+  ]
+}

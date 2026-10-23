@@ -1,0 +1,42 @@
+{
+  "_id": "ecd4e5dc97d0b8bb",
+  "name": "Innate Surge",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "innate-surge",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Once per day, you can draw upon your familiar&#39;s innate magic to replenish your own. You can cast one innate spell gained from an ancestry feat that you&#39;ve already cast today. You must still Cast the Spell and meet the spell&#39;s other requirements.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/23-innate-surge\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.ecd4e5dc97d0b8bb"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "innate-surge",
+      "abilityCategory": "master",
+      "automation": "manual"
+    }
+  },
+  "effects": []
+}

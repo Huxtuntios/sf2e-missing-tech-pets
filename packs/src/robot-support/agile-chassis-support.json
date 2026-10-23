@@ -1,0 +1,42 @@
+{
+  "name": "Agile Chassis: Support",
+  "type": "action",
+  "img": "icons/svg/target.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "agile-chassis-support",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 1
+    },
+    "category": "offensive",
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>An item or weapon carried by the robot is launched up to 20 feet into the air; you Interact to catch it.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#agile-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "rules": [],
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "agile-chassis",
+      "itemKind": "robot-support"
+    }
+  },
+  "_id": "30258d039511f199"
+}

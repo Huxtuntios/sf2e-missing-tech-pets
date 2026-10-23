@@ -1,0 +1,373 @@
+{
+  "id": "pf2e-animal-companions",
+  "title": "PF2e Companion Compendia",
+  "description": "Compendia containing everything you need to support PF2e companions",
+  "url": "https://github.com/TikaelSol/PF2e-Animal-Companions",
+  "version": "7.7.3",
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json",
+      "flags": {}
+    }
+  ],
+  "packs": [
+    {
+      "label": "Animal Companion Ancestries",
+      "name": "AC-Ancestries-and-Class",
+      "path": "packs/ac-ancestries-and-class",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Animal Companion Feats",
+      "name": "AC-Feats",
+      "path": "packs/ac-feats",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Advanced Maneuvers",
+      "name": "AC-Advanced-Maneuvers",
+      "path": "packs/ac-advanced-maneuvers",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Effects",
+      "name": "AC-effects",
+      "path": "packs/ac-effects",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Features",
+      "name": "AC-Features",
+      "path": "packs/ac-features",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Support Benefits",
+      "name": "AC-Support",
+      "path": "packs/ac-support-benefits",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Construct Companions",
+      "name": "AC-Construct-Companions",
+      "path": "packs/ac-construct-companions",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Construct Breakthroughs",
+      "name": "AC-Construct-Breakthroughs",
+      "path": "packs/ac-construct-breakthroughs",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Eidolons",
+      "name": "AC-Eidolons",
+      "path": "packs/ac-eidolons",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Evolution Feats",
+      "name": "AC-Evolution-Feats",
+      "path": "packs/ac-evolution-feats",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "name": "AC-Followers",
+      "label": "Followers",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "path": "packs/ac-followers",
+      "type": "Item",
+      "system": "pf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "label": "Animal Companion Ancestries",
+      "name": "sf-AC-Ancestries-and-Class",
+      "path": "packs/sf-ac-ancestries-and-class",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Animal Companion Feats",
+      "name": "sf-AC-Feats",
+      "path": "packs/sf-ac-feats",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Advanced Maneuvers",
+      "name": "sf-AC-Advanced-Maneuvers",
+      "path": "packs/sf-ac-advanced-maneuvers",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Effects",
+      "name": "sf-AC-effects",
+      "path": "packs/sf-ac-effects",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Features",
+      "name": "sf-AC-Features",
+      "path": "packs/sf-ac-features",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Support Benefits",
+      "name": "sf-AC-Support",
+      "path": "packs/sf-ac-support-benefits",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Construct Companions",
+      "name": "sf-AC-Construct-Companions",
+      "path": "packs/sf-ac-construct-companions",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Construct Breakthroughs",
+      "name": "sf-AC-Construct-Breakthroughs",
+      "path": "packs/sf-ac-construct-breakthroughs",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Eidolons",
+      "name": "sf-AC-Eidolons",
+      "path": "packs/sf-ac-eidolons",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "label": "Evolution Feats",
+      "name": "sf-AC-Evolution-Feats",
+      "path": "packs/sf-ac-evolution-feats",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      },
+      "type": "Item",
+      "flags": {}
+    },
+    {
+      "name": "sf-AC-Followers",
+      "label": "Followers",
+      "banner": "systems/pf2e/assets/compendium-banner/red.webp",
+      "path": "packs/sf-ac-followers",
+      "type": "Item",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "Companion Compendia",
+      "sorting": "m",
+      "packs": [
+        "AC-Ancestries-and-Class",
+        "AC-Feats",
+        "AC-Advanced-Maneuvers",
+        "AC-effects",
+        "AC-Features",
+        "AC-Evolution-Feats",
+        "AC-Eidolons",
+        "AC-Construct-Breakthroughs",
+        "AC-Construct-Companions",
+        "AC-Support",
+        "AC-Followers",
+        "sf-AC-Ancestries-and-Class",
+        "sf-AC-Feats",
+        "sf-AC-Advanced-Maneuvers",
+        "sf-AC-effects",
+        "sf-AC-Features",
+        "sf-AC-Evolution-Feats",
+        "sf-AC-Eidolons",
+        "sf-AC-Construct-Breakthroughs",
+        "sf-AC-Construct-Companions",
+        "sf-AC-Support",
+        "sf-AC-Followers"
+      ]
+    }
+  ],
+  "media": [
+    {
+      "type": "setup",
+      "caption": "Pathfinder 2e Companion Compendia",
+      "thumbnail": "modules/pf2e-animal-companions/art/preview.webp"
+    }
+  ],
+  "manifest": "https://github.com/TikaelSol/PF2e-Animal-Companions/releases/latest/download/module.json",
+  "download": "https://github.com/TikaelSol/PF2e-Animal-Companions/releases/download/v7.7.3/module.zip",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "14"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "pf2e",
+        "type": "system",
+        "manifest": "https://github.com/foundryvtt/pf2e/releases/latest/download/system.json",
+        "compatibility": {
+          "minimum": "7.7"
+        }
+      },
+      {
+        "id": "sf2e",
+        "type": "system",
+        "manifest": "https://github.com/foundryvtt/pf2e/releases/latest/download/system.json",
+        "compatibility": {
+          "minimum": "0.0.8"
+        }
+      }
+    ]
+  },
+  "esmodules": [
+    "scripts/warnings.js"
+  ],
+  "authors": [
+    {
+      "name": "Tikael",
+      "flags": {}
+    }
+  ]
+}

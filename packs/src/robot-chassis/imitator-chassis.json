@@ -1,0 +1,134 @@
+{
+  "name": "Imitator Chassis",
+  "type": "ancestry",
+  "img": "icons/commodities/tech/circuit-board.webp",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "imitator-chassis",
+    "description": {
+      "value": "<p>Choose one ancestry or animal. The robot has that species’ size and Speeds and looks like it. Choose one unarmed attack from that species; the robot uses agile and finesse and deals 1d4 damage.</p><p><strong>Support Benefit:</strong> Focuses on a target within the first range increment or reach; your damaging Strikes against it make it @UUID[Compendium.sf2e.conditions.Item.AJh5ex99aV6VTggg]{off-guard} until the start of your next turn.</p><p><strong>Advanced Maneuver:</strong> Disturbing Display</p><p>Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.</p><p><a href=\"https://2e.aonsrd.com/companions/all#imitator-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "construct",
+        "robot",
+        "tech"
+      ],
+      "otherTags": []
+    },
+    "hp": 4,
+    "size": "med",
+    "speed": 25,
+    "reach": 5,
+    "vision": "low-light-vision",
+    "boosts": {
+      "0": {
+        "value": []
+      },
+      "1": {
+        "value": []
+      },
+      "2": {
+        "value": []
+      }
+    },
+    "flaws": {
+      "0": {
+        "value": []
+      }
+    },
+    "languages": {
+      "value": [],
+      "custom": ""
+    },
+    "additionalLanguages": {
+      "count": 0,
+      "value": [],
+      "custom": ""
+    },
+    "items": {},
+    "rules": [
+      {
+        "key": "GrantItem",
+        "uuid": "Compendium.pf2e-animal-companions.sf-AC-Features.Item.KKOgokqHa7RjVDN6",
+        "flag": "techPetCompanionClass",
+        "allowDuplicate": false
+      },
+      {
+        "key": "ActorTraits",
+        "add": [
+          "construct",
+          "robot",
+          "tech"
+        ],
+        "remove": [
+          "animal"
+        ]
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.str.mod",
+        "value": 2
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.dex.mod",
+        "value": 2
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.con.mod",
+        "value": 2
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.int.mod",
+        "value": -4
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.wis.mod",
+        "value": 2
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.cha.mod",
+        "value": 1
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "upgrade",
+        "path": "system.skills.deception.rank",
+        "value": 1
+      }
+    ]
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "imitator-chassis"
+    },
+    "sf2e": {
+      "rulesSelections": {
+        "chassisSize": null
+      }
+    }
+  },
+  "_id": "ffbec81b0ad2c821"
+}

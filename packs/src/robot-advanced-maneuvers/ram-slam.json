@@ -1,0 +1,44 @@
+{
+  "name": "Ram Slam",
+  "type": "action",
+  "img": "icons/svg/target.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "ram-slam",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 2
+    },
+    "category": "offensive",
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>The robot companion Strides in a straight line and makes a battering ram Strike. If it moved at least 20 feet and the Strike hits, the target is pushed back 10 feet.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#tank-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "rules": [],
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "traversal"
+      ],
+      "otherTags": []
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "tank-chassis",
+      "itemKind": "robot-maneuver"
+    }
+  },
+  "_id": "63fd30aef2073017"
+}

@@ -1,0 +1,134 @@
+{
+  "_id": "KKOgokqHa7RjVDN6",
+  "name": "Animal Companion",
+  "type": "class",
+  "system": {
+    "rules": [
+      {
+        "key": "ActiveEffectLike",
+        "mode": "override",
+        "path": "flags.system.disableABP",
+        "value": true,
+        "priority": 10
+      },
+      {
+        "key": "ActorTraits",
+        "add": [
+          "minion"
+        ]
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "upgrade",
+        "path": "system.proficiencies.defenses.light-barding.rank",
+        "priority": 41,
+        "value": 1
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "upgrade",
+        "path": "system.proficiencies.defenses.heavy-barding.rank",
+        "priority": 41,
+        "value": 1
+      },
+      {
+        "key": "AdjustModifier",
+        "predicate": [
+          "bonus:type:item"
+        ],
+        "selectors": [
+          "attack",
+          "damage",
+          "skill-check",
+          "saving-throw"
+        ],
+        "suppress": true
+      },
+      {
+        "key": "AdjustModifier",
+        "predicate": [
+          "bonus:type:item"
+        ],
+        "selectors": [
+          "ac"
+        ],
+        "mode": "downgrade",
+        "value": 3
+      }
+    ],
+    "slug": "animal-companion",
+    "_migration": {
+      "version": 0.952,
+      "previous": {
+        "schema": 0.935,
+        "foundry": "13.350",
+        "system": "7.7.1"
+      }
+    },
+    "traits": {
+      "otherTags": [],
+      "rarity": "common"
+    },
+    "publication": {
+      "title": "Pathfinder Player Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "keyAbility": {
+      "value": [],
+      "selected": null
+    },
+    "items": {},
+    "hp": 6,
+    "trainedSkills": {
+      "value": [
+        "acrobatics",
+        "athletics"
+      ],
+      "additional": 0
+    },
+    "perception": 1,
+    "savingThrows": {
+      "fortitude": 1,
+      "reflex": 1,
+      "will": 1
+    },
+    "attacks": {
+      "simple": 0,
+      "martial": 0,
+      "advanced": 0,
+      "unarmed": 1,
+      "other": {
+        "name": "",
+        "rank": 0
+      }
+    },
+    "defenses": {
+      "unarmored": 1,
+      "light": 0,
+      "medium": 0,
+      "heavy": 0
+    },
+    "spellcasting": 0,
+    "ancestryFeatLevels": {
+      "value": []
+    },
+    "classFeatLevels": {
+      "value": []
+    },
+    "generalFeatLevels": {
+      "value": []
+    },
+    "skillFeatLevels": {
+      "value": []
+    },
+    "skillIncreaseLevels": {
+      "value": []
+    }
+  },
+  "_stats": {
+    "systemId": "sf2e",
+    "compendiumSource": "Compendium.pf2e-animal-companions.sf-AC-Ancestries-and-Class.Item.h6Ybhv5URar01WPk"
+  }
+}

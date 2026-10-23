@@ -1,0 +1,47 @@
+{
+  "_id": "97b7312362cc953e",
+  "name": "Darkvision",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "darkvision",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>It gains darkvision .</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/31-darkvision\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [
+      {
+        "key": "Sense",
+        "selector": "darkvision"
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.97b7312362cc953e"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "darkvision",
+      "abilityCategory": "pet",
+      "automation": "rules"
+    }
+  },
+  "effects": []
+}

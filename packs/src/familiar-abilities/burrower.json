@@ -1,0 +1,48 @@
+{
+  "_id": "f62f1817be5dfd9d",
+  "name": "Burrower",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "burrower",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>It gains a burrow Speed of 5 feet, allowing it to dig Tiny holes.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/29-burrower\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": [
+      {
+        "key": "BaseSpeed",
+        "selector": "burrow",
+        "value": 5
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.f62f1817be5dfd9d"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "burrower",
+      "abilityCategory": "pet",
+      "automation": "rules"
+    }
+  },
+  "effects": []
+}

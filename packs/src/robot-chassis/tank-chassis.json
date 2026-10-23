@@ -1,0 +1,174 @@
+{
+  "name": "Tank Chassis",
+  "type": "ancestry",
+  "img": "icons/commodities/tech/circuit-board.webp",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "tank-chassis",
+    "description": {
+      "value": "<p>Tank Chassis</p><p><strong>Support Benefit:</strong> Gain a +1 circumstance bonus to your next Strike against a foe within the robot’s melee reach; it ends after the Strike or at the start of your next turn.</p><p><strong>Advanced Maneuver:</strong> Ram Slam</p><p>Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.</p><p><a href=\"https://2e.aonsrd.com/companions/all#tank-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "construct",
+        "robot",
+        "tech"
+      ],
+      "otherTags": []
+    },
+    "hp": 10,
+    "size": "med",
+    "speed": 20,
+    "reach": 5,
+    "vision": "low-light-vision",
+    "boosts": {
+      "0": {
+        "value": []
+      },
+      "1": {
+        "value": []
+      },
+      "2": {
+        "value": []
+      }
+    },
+    "flaws": {
+      "0": {
+        "value": []
+      }
+    },
+    "languages": {
+      "value": [],
+      "custom": ""
+    },
+    "additionalLanguages": {
+      "count": 0,
+      "value": [],
+      "custom": ""
+    },
+    "items": {},
+    "rules": [
+      {
+        "key": "GrantItem",
+        "uuid": "Compendium.pf2e-animal-companions.sf-AC-Features.Item.KKOgokqHa7RjVDN6",
+        "flag": "techPetCompanionClass",
+        "allowDuplicate": false
+      },
+      {
+        "key": "ActorTraits",
+        "add": [
+          "construct",
+          "robot",
+          "tech"
+        ],
+        "remove": [
+          "animal"
+        ]
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.str.mod",
+        "value": 2
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.dex.mod",
+        "value": 1
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.con.mod",
+        "value": 3
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.int.mod",
+        "value": -4
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.wis.mod",
+        "value": 2
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.abilities.cha.mod",
+        "value": -1
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "upgrade",
+        "path": "system.skills.intimidation.rank",
+        "value": 1
+      },
+      {
+        "key": "ChoiceSet",
+        "flag": "chassisSize",
+        "adjustName": false,
+        "prompt": "SFMTP.ChooseSize",
+        "choices": [
+          {
+            "value": "med",
+            "label": "SFMTP.Size.med"
+          },
+          {
+            "value": "lg",
+            "label": "SFMTP.Size.lg"
+          }
+        ]
+      },
+      {
+        "key": "CreatureSize",
+        "value": "{item|flags.sf2e.rulesSelections.chassisSize}"
+      },
+      {
+        "key": "Strike",
+        "slug": "battering-ram",
+        "category": "unarmed",
+        "label": "Battering ram",
+        "group": "brawling",
+        "replaceBasicUnarmed": true,
+        "traits": [
+          "unarmed",
+          "shove"
+        ],
+        "range": null,
+        "damage": {
+          "base": {
+            "dice": 1,
+            "die": "d6",
+            "damageType": "bludgeoning"
+          }
+        }
+      }
+    ]
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "tank-chassis"
+    },
+    "sf2e": {
+      "rulesSelections": {
+        "chassisSize": null
+      }
+    }
+  },
+  "_id": "2b1b2bfd08e957b2"
+}

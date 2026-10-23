@@ -1,0 +1,42 @@
+{
+  "name": "Hydraulic Flipper",
+  "type": "action",
+  "img": "icons/svg/target.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "hydraulic-flipper",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 2
+    },
+    "category": "offensive",
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>The robot companion makes a melee Strike. On a successful hit, it knocks the target @UUID[Compendium.sf2e.conditions.Item.j91X7x0XSomq8d60]{prone}.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#powerful-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "rules": [],
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "powerful-chassis",
+      "itemKind": "robot-maneuver"
+    }
+  },
+  "_id": "dd283e061d740077"
+}

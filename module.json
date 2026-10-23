@@ -1,0 +1,118 @@
+{
+  "id": "sf2e-missing-tech-pets",
+  "title": "SF2e Missing Tech Pets",
+  "description": "SF2e robot companions and native familiar management, with Tech Core chassis, maneuvers, support benefits and familiar abilities. Requires PF2e Companion Compendia.",
+  "version": "0.12.0",
+  "authors": [
+    {
+      "name": "Community module"
+    }
+  ],
+  "esmodules": [
+    "scripts/main.mjs"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    },
+    {
+      "lang": "ru",
+      "name": "Русский",
+      "path": "lang/ru.json"
+    }
+  ],
+  "compatibility": {
+    "minimum": "14.361",
+    "verified": "14",
+    "maximum": "14"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "sf2e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "1.6.0"
+        }
+      }
+    ],
+    "requires": [
+      {
+        "id": "pf2e-animal-companions",
+        "type": "module",
+        "manifest": "https://github.com/TikaelSol/PF2e-Animal-Companions/releases/latest/download/module.json",
+        "compatibility": {
+          "minimum": "7.6.3"
+        }
+      }
+    ]
+  },
+  "socket": false,
+  "styles": [
+    "module.css"
+  ],
+  "type": "module",
+  "packs": [
+    {
+      "name": "robot-chassis",
+      "label": "Robot Chassis — Шасси роботов",
+      "path": "packs/robot-chassis",
+      "type": "Item",
+      "system": "sf2e",
+      "private": false,
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "robot-advanced-maneuvers",
+      "label": "SF2e Missing Tech Pets: Robot Advanced Maneuvers",
+      "path": "packs/robot-advanced-maneuvers",
+      "type": "Item",
+      "system": "sf2e",
+      "private": false,
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "robot-support",
+      "label": "Robot Support Benefits / Поддержка роботов",
+      "path": "packs/robot-support",
+      "type": "Item",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    },
+    {
+      "name": "familiar-abilities",
+      "label": "Tech Core Familiar Abilities / Способности фамильяров",
+      "path": "packs/familiar-abilities",
+      "type": "Item",
+      "system": "sf2e",
+      "ownership": {
+        "PLAYER": "OBSERVER",
+        "ASSISTANT": "OWNER"
+      }
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "SF2e Missing Tech Pets",
+      "sorting": "m",
+      "packs": [
+        "robot-chassis",
+        "robot-advanced-maneuvers",
+        "robot-support"
+      ]
+    }
+  ],
+  "license": "LICENSE.txt",
+  "readme": "README.md"
+}

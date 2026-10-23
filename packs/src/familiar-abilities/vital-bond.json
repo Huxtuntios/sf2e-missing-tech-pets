@@ -1,0 +1,42 @@
+{
+  "_id": "385ff7808af3b153",
+  "name": "Vital Bond",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "vital-bond",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Your familiar in your mystic bond can use Transfer Vitality once per minute to heal itself or a bonded creature.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/27-spell-delivery\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.385ff7808af3b153"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "vital-bond",
+      "abilityCategory": "master",
+      "automation": "manual"
+    }
+  },
+  "effects": []
+}

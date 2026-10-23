@@ -1,0 +1,5 @@
+{
+  "schemaVersion": 1,
+  "rules": {},
+  "note": "Only explicitly configured feat slugs or items flagged with sf2e-missing-tech-pets.modificationSlots grant extra customization slots. A generic customization slug is not treated as a slot-granting feat."
+}

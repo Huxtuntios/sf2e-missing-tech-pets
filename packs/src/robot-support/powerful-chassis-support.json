@@ -1,0 +1,42 @@
+{
+  "name": "Powerful Chassis: Support",
+  "type": "action",
+  "img": "icons/svg/target.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "powerful-chassis-support",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 1
+    },
+    "category": "offensive",
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>Until the start of your next turn, your Strikes that damage creatures within the robot companion&#39;s melee reach also deal 1d6 persistent bleed damage (2d6 if burly or deft).</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#powerful-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "rules": [],
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "powerful-chassis",
+      "itemKind": "robot-support"
+    }
+  },
+  "_id": "87bc6d0235fa5929"
+}

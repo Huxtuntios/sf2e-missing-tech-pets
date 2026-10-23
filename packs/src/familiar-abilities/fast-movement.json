@@ -1,0 +1,42 @@
+{
+  "_id": "c3da6736c93494d3",
+  "name": "Fast Movement",
+  "type": "action",
+  "img": "systems/sf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "fast-movement",
+    "actionType": {
+      "value": "passive"
+    },
+    "actions": {
+      "value": null
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Increase one of the pet&#39;s Speeds from 25 feet to 40 feet.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/33-fast-movement\">Tech Core — Archives of Nethys</a></p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.familiar-abilities.Item.c3da6736c93494d3"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "fast-movement",
+      "abilityCategory": "pet",
+      "automation": "manual"
+    }
+  },
+  "effects": []
+}

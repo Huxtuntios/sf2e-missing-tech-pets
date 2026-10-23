@@ -1,0 +1,42 @@
+{
+  "name": "Disturbing Display",
+  "type": "action",
+  "img": "icons/svg/target.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "disturbing-display",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 1
+    },
+    "category": "offensive",
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p>The robot companion morphs its features to reveal the machinery writhing beneath its synthetic skin. It attempts to Demoralize a creature using Deception instead of Intimidation. This display gains the visual trait and does not require a language. While frightened by this ability, the target is @UUID[Compendium.sf2e.conditions.Item.AJh5ex99aV6VTggg]{off-guard} to your robot companion.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#imitator-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+    },
+    "rules": [],
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "chassisId": "imitator-chassis",
+      "itemKind": "robot-maneuver"
+    }
+  },
+  "_id": "0cfd3213c32db950"
+}

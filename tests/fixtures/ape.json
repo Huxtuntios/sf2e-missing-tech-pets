@@ -1,0 +1,146 @@
+{
+  "_id": "qLvwY3aKGHVrbgfk",
+  "name": "Ape",
+  "type": "ancestry",
+  "system": {
+    "rules": [
+      {
+        "key": "GrantItem",
+        "uuid": "Compendium.pf2e-animal-companions.sf-AC-Features.Item.KKOgokqHa7RjVDN6",
+        "allowDuplicate": false
+      },
+      {
+        "key": "ActiveEffectLike",
+        "value": 3,
+        "mode": "add",
+        "path": "system.abilities.str.mod"
+      },
+      {
+        "key": "ActiveEffectLike",
+        "value": 1,
+        "mode": "add",
+        "path": "system.abilities.dex.mod"
+      },
+      {
+        "key": "ActiveEffectLike",
+        "value": 2,
+        "mode": "add",
+        "path": "system.abilities.con.mod"
+      },
+      {
+        "key": "ActiveEffectLike",
+        "value": -4,
+        "mode": "add",
+        "path": "system.abilities.int.mod"
+      },
+      {
+        "key": "ActiveEffectLike",
+        "value": 2,
+        "mode": "add",
+        "path": "system.abilities.wis.mod"
+      },
+      {
+        "key": "ActiveEffectLike",
+        "value": 1,
+        "mode": "add",
+        "path": "system.skills.intimidation.rank"
+      },
+      {
+        "key": "BaseSpeed",
+        "selector": "climb",
+        "value": 25
+      },
+      {
+        "category": "unarmed",
+        "damage": {
+          "base": {
+            "damageType": "bludgeoning",
+            "dice": 1,
+            "die": "d8"
+          }
+        },
+        "group": "brawling",
+        "key": "Strike",
+        "range": null,
+        "traits": [
+          "unarmed"
+        ],
+        "img": "systems/sf2e/icons/unarmed-attacks/fist.webp",
+        "replaceBasicUnarmed": true,
+        "label": "PF2E.Weapon.Base.fist"
+      },
+      {
+        "key": "GrantItem",
+        "uuid": "Compendium.pf2e-animal-companions.sf-AC-Support.Item.Qm0iwIYyy2gbnYXe"
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "override",
+        "path": "flags.system.companionCompendia.advancedManeuver",
+        "value": "Compendium.pf2e-animal-companions.sf-AC-Advanced-Maneuvers.Item.0WtqP7Wei3AxHh5M"
+      }
+    ],
+    "slug": "ape",
+    "_migration": {
+      "version": 0.952,
+      "lastMigration": null,
+      "previous": {
+        "schema": 0.935,
+        "foundry": "13.350",
+        "system": "7.7.1"
+      }
+    },
+    "traits": {
+      "otherTags": [],
+      "value": [
+        "animal"
+      ],
+      "rarity": "common"
+    },
+    "publication": {
+      "title": "Pathfinder Player Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "hp": 8,
+    "size": "sm",
+    "hands": 2,
+    "reach": 5,
+    "speed": 25,
+    "boosts": {
+      "0": {
+        "value": []
+      },
+      "1": {
+        "value": []
+      },
+      "2": {
+        "value": []
+      }
+    },
+    "flaws": {
+      "0": {
+        "value": []
+      }
+    },
+    "languages": {
+      "value": [],
+      "custom": ""
+    },
+    "additionalLanguages": {
+      "count": 0,
+      "value": [],
+      "custom": ""
+    },
+    "items": {},
+    "vision": "low-light-vision",
+    "rarity": {
+      "value": "common"
+    }
+  },
+  "_stats": {
+    "systemId": "sf2e",
+    "compendiumSource": "Compendium.pf2e-animal-companions.sf-AC-Ancestries-and-Class.Item.qLvwY3aKGHVrbgfk"
+  }
+}
