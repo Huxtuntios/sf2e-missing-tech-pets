@@ -1,7 +1,5 @@
 # SF2e Missing Tech Pets
 
-**Version 0.12.0.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition. This continues the existing 0.10.2 project rather than replacing it with a new module.
-
 
 ## Compatibility and Required Dependency
 
