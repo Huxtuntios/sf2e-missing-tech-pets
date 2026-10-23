@@ -309,7 +309,7 @@ test("Ключи локализации разрешаются по пути Fou
           : leaves(entry, fullKey);
       });
     const entries = leaves(translations.SFMTP);
-    assert.equal(entries.length, 273);
+    assert.equal(entries.length, 355);
     for (const [key, value] of entries) {
       assert.equal(typeof value, "string");
       assert.ok(lookup(translations, `SFMTP.${key}`));

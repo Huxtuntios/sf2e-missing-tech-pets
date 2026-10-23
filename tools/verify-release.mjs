@@ -65,7 +65,7 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
   assert pack['system']=='sf2e' and pack['type']=='Item','Некорректный пак'
   assert pack['path']+'/CURRENT' in names,'Отсутствует готовый LevelDB'
  for script in manifest['esmodules']:assert script in names,'Отсутствует entrypoint'
- for script in ['exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
+ for script in ['dailies.mjs','sheet-integration.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
  for language in manifest['languages']:assert language['path'] in names,'Отсутствует язык'
  for name in names:
   if name.endswith('.json'):json.loads(archive.read(name))

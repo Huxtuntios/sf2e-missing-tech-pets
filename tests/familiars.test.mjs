@@ -12,6 +12,7 @@ import {
   createFamiliar,
   linkedFamiliars,
   familiarAllowance,
+  savePetProfile,
   syncFamiliarAbilities,
   setInnateFamiliarItems,
   familiarFingerprint,
@@ -391,4 +392,42 @@ test("Невалидная отметка врождённой способно�
     setInnateFamiliarItems(familiar, ["unknown"]),
     "FamiliarSelectionInvalid",
   );
+});
+
+test("Pet-профиль принимает только две Pet-способности, не создаёт Items и сохраняет неизвестные поля", async () => {
+  const { owner, familiar } = setup();
+  familiar.system.master.id = null;
+  await owner.setFlag(ID, "petProfile", { customNote: "keep" });
+  await savePetProfile(owner, {
+    enabled: true,
+    name: "Pet",
+    abilities: ["flier", "darkvision"],
+  });
+  assert.equal(owner.getFlag(ID, "petProfile").customNote, "keep");
+  assert.equal(owner.items.size, 0);
+  await assert.rejects(
+    savePetProfile(owner, { enabled: true, abilities: ["flier", "flier"] }),
+  );
+  await assert.rejects(
+    savePetProfile(owner, {
+      enabled: true,
+      abilities: ["flier", "accompanist"],
+    }),
+  );
+  assert.deepEqual(owner.getFlag(ID, "petProfile").abilities, [
+    "flier",
+    "darkvision",
+  ]);
+  familiar.system.master.id = owner.id;
+  await assert.rejects(
+    savePetProfile(owner, {
+      enabled: true,
+      abilities: ["flier", "darkvision"],
+    }),
+  );
+  await savePetProfile(owner, {
+    enabled: false,
+    abilities: ["flier", "darkvision"],
+  });
+  assert.equal(owner.getFlag(ID, "petProfile").enabled, false);
 });

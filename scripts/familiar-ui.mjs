@@ -1,4 +1,11 @@
 import { t } from "./i18n.mjs";
+import {
+  dailiesState,
+  dailiesControls,
+  bindDailiesControls,
+} from "./dailies.mjs";
+import { openCompanionSources } from "./companion-sources-ui.mjs";
+import { sourceWarnings } from "./companion-sources.mjs";
 // Панель не заменяет системный лист: все броски и подготовка характеристик остаются в SF2e.
 import { TechPetsDialog } from "./dialog.mjs";
 import { MODULE_ID, escapeHTML as esc } from "./item-sources.mjs";
@@ -30,6 +37,7 @@ export async function openFamiliarManager(actor, chosenId = "") {
       ? actor
       : (linked.find((a) => a.id === chosenId) ??
         (linked.length === 1 ? linked[0] : null));
+  const usingDailies = familiar && dailiesState(owner, familiar).delegated;
   const catalog = await familiarCatalog();
   const all = familiar ? familiarAbilityItems(familiar) : [];
   const innate = familiar?.getFlag(MODULE_ID, "innateFamiliarItems") ?? [];
@@ -58,31 +66,49 @@ export async function openFamiliarManager(actor, chosenId = "") {
       return `<details data-familiar-row="${esc(entry.name.toLowerCase())}" class="sfmtp-familiar-entry"><summary><label><input type="checkbox" name="familiar-selection" value="${esc(entry.id)}" ${matches.length ? "checked" : ""} ${protectedItem || !familiar ? "disabled" : ""}> ${esc(entry.name)}</label> <small>${esc(t(`Category.${entry.category}`))} · ${esc(t(entry.automation === "rules" ? "FamiliarRulesShort" : "FamiliarManualShort"))}${protectedItem ? ` · ${esc(t("FamiliarProtected"))}` : ""}</small></summary><p>${esc(entry.description)}</p><p>${esc(t(entry.automation === "rules" ? "FamiliarRules" : "FamiliarManual"))}</p>${entry.prerequisites.length ? `<p>${esc(t("FamiliarRequires"))}: ${entry.prerequisites.map((id) => esc(catalog.find((e) => e.id === id)?.name ?? id)).join(", ")}</p>` : ""}<a href="${esc(entry.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(t("Source"))}</a></details>`;
     })
     .join("");
-  const content = `<div class="sfmtp-familiars"><h3>${esc(owner.name)}</h3><p>${esc(t("FamiliarNativeHint"))}</p>${linked.length > 1 && !familiar ? `<p>${esc(t("FamiliarAmbiguous"))}</p>` : ""}<div class="form-group"><label>${esc(t("FamiliarActor"))}</label><select name="native-familiar"><option value="">—</option>${candidates.map((a) => `<option value="${esc(a.id)}" ${a.id === familiar?.id ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select></div><div class="form-group"><label>${esc(t("FamiliarAttribute"))}</label><select name="familiar-attribute">${attributes.map((key) => `<option value="${key}" ${key === ability ? "selected" : ""}>${esc(t(`FamiliarAttributes.${key}`))}</option>`).join("")}</select></div><div class="sfmtp-action-row"><button type="button" data-familiar-link>${esc(t("FamiliarLink"))}</button><button type="button" data-familiar-create ${linked.length ? "disabled" : ""}>${esc(t("FamiliarCreate"))}</button>${familiar ? `<button type="button" data-familiar-sheet>${esc(t("FamiliarOpenSheet"))}</button>` : ""}</div>${familiar ? `<p>${esc(t("FamiliarSlots"))}: ${all.length} / ${familiarAllowance(owner, familiar)}</p><label>${esc(t("FamiliarOverride"))} <input name="familiar-allowance" type="number" min="0" max="50" value="${esc(familiar.getFlag(MODULE_ID, "familiarAllowance") ?? "")}" placeholder="${familiarAllowance(owner, familiar)}"></label><button type="button" data-familiar-allowance>${esc(t("FamiliarSaveAllowance"))}</button><p class="hint">${esc(t("FamiliarAllowanceHint"))}</p>${installed}<button type="button" data-save-innate>${esc(t("FamiliarSaveInnate"))}</button><p class="hint">${esc(t("FamiliarInnateHint"))}</p><button type="button" data-familiar-legacy>${esc(t("FamiliarLegacy"))}</button>` : ""}<hr><label>${esc(t("Search"))} <input type="search" name="familiar-query"></label><div class="sfmtp-familiar-list">${rows}</div><p class="hint">${esc(t("FamiliarSelectionHint"))}</p></div>`;
+  const content = `<div class="sfmtp-familiars"><h3>${esc(owner.name)}</h3><p>${esc(t("FamiliarNativeHint"))}</p><button type="button" data-companion-sources>${esc(t("SourceTitle"))}</button>${sourceWarnings(
+    owner,
+  )
+    .map((key) => `<p class="hint">${esc(t(key))}</p>`)
+    .join(
+      "",
+    )}${linked.length > 1 && !familiar ? `<p>${esc(t("FamiliarAmbiguous"))}</p>` : ""}<div class="form-group"><label>${esc(t("FamiliarActor"))}</label><select name="native-familiar"><option value="">—</option>${candidates.map((a) => `<option value="${esc(a.id)}" ${a.id === familiar?.id ? "selected" : ""}>${esc(a.name)}</option>`).join("")}</select></div><div class="form-group"><label>${esc(t("FamiliarAttribute"))}</label><select name="familiar-attribute">${attributes.map((key) => `<option value="${key}" ${key === ability ? "selected" : ""}>${esc(t(`FamiliarAttributes.${key}`))}</option>`).join("")}</select></div><div class="sfmtp-action-row"><button type="button" data-familiar-link>${esc(t("FamiliarLink"))}</button><button type="button" data-familiar-create ${linked.length ? "disabled" : ""}>${esc(t("FamiliarCreate"))}</button>${familiar ? `<button type="button" data-familiar-sheet>${esc(t("FamiliarOpenSheet"))}</button>` : ""}</div>${familiar ? `<p>${esc(t("FamiliarSlots"))}: ${all.length} / ${familiarAllowance(owner, familiar)}</p><label>${esc(t("FamiliarOverride"))} <input name="familiar-allowance" type="number" min="0" max="50" value="${esc(familiar.getFlag(MODULE_ID, "familiarAllowance") ?? "")}" placeholder="${familiarAllowance(owner, familiar)}"></label><button type="button" data-familiar-allowance>${esc(t("FamiliarSaveAllowance"))}</button><p class="hint">${esc(t("FamiliarAllowanceHint"))}</p>${installed}<button type="button" data-save-innate>${esc(t("FamiliarSaveInnate"))}</button><p class="hint">${esc(t("FamiliarInnateHint"))}</p><button type="button" data-familiar-legacy>${esc(t("FamiliarLegacy"))}</button>` : ""}<hr><label>${esc(t("Search"))} <input type="search" name="familiar-query"></label><div class="sfmtp-familiar-list">${rows}</div><p class="hint">${esc(t("FamiliarSelectionHint"))}</p></div>`;
   new TechPetsDialog(
     {
       title: t("FamiliarTitle"),
       content,
       buttons: {
-        save: {
-          label: t("FamiliarSaveDaily"),
-          callback: async (html) => {
-            if (!familiar) return ui.notifications.warn(t("FamiliarNoMaster"));
-            const root = html.nodes[0];
-            const selected = [
-              ...root.querySelectorAll('[name="familiar-selection"]:checked'),
-            ].map((e) => e.value);
-            try {
-              await syncFamiliarAbilities(owner, familiar, selected);
-              ui.notifications.info(t("FamiliarSaved"));
-            } catch (error) {
-              ui.notifications.error(error.message);
+        ...(!usingDailies
+          ? {
+              save: {
+                label: t("FamiliarSaveDaily"),
+                callback: async (html) => {
+                  if (!familiar)
+                    return ui.notifications.warn(t("FamiliarNoMaster"));
+                  if (dailiesState(owner, familiar).delegated)
+                    return ui.notifications.warn(t("DailiesConnected"));
+                  const root = html.nodes[0];
+                  const selected = [
+                    ...root.querySelectorAll(
+                      '[name="familiar-selection"]:checked',
+                    ),
+                  ].map((e) => e.value);
+                  try {
+                    await syncFamiliarAbilities(owner, familiar, selected);
+                    ui.notifications.info(t("FamiliarSaved"));
+                  } catch (error) {
+                    ui.notifications.error(error.message);
+                  }
+                },
+              },
             }
-          },
-        },
+          : {}),
         close: { label: t("Close") },
       },
       render: (html) => {
+        html
+          .find("[data-companion-sources]")
+          .on("click", () => openCompanionSources(owner));
         const root = html.nodes[0];
         const run = async (fn) => {
           try {
@@ -92,6 +118,26 @@ export async function openFamiliarManager(actor, chosenId = "") {
           }
         };
         const reopen = () => openFamiliarManager(owner, familiar?.id);
+        if (familiar) {
+          const container = root.querySelector(".sfmtp-familiars") ?? root;
+          container.insertAdjacentHTML(
+            "afterbegin",
+            dailiesControls(owner, familiar),
+          );
+          bindDailiesControls(root, owner, familiar, reopen);
+          if (usingDailies) {
+            root
+              .querySelector('[name="familiar-query"]')
+              ?.closest("label")
+              ?.remove();
+            root.querySelector(".sfmtp-familiar-list")?.remove();
+            root.querySelector("[data-familiar-legacy]")?.remove();
+            const hint = [...root.querySelectorAll(".hint")].find(
+              (element) => element.textContent === t("FamiliarSelectionHint"),
+            );
+            if (hint) hint.textContent = t("DailiesConnected");
+          }
+        }
         html.find('[name="native-familiar"]').on("change", (event) => {
           const next = game.actors.get(event.currentTarget.value);
           if (next?.system.master.id === owner.id)

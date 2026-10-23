@@ -1,8 +1,32 @@
 # SF2e Missing Tech Pets
 
-## Header buttons and language
+## Optional PF2e Dailies integration
 
-The module loads its EN/RU dictionary before opening its managers. After an update, reload the world page. In **Configure Settings → Module Settings → SF2e Missing Tech Pets**, use **Show Tech Pets button on actor sheets** and **Show Familiars button on actor sheets** independently. These are world settings; reopen actor sheets after changing them. Hiding buttons does not disable the API or modify actor data.
+**PF2e Dailies (`pf2e-dailies`) 4.23.1+ is optional. PF2e Companion Compendia 7.6.3+ remains required.** Integration uses the public `game.dailies.api.registerCustomDailies` API, without replacing methods or modifying the Dailies API. The API contract was checked against Dailies 4.23.1.
+
+1. Enable Dailies and reload the world. Link one native `familiar` actor to its `character` owner; you must own both actors.
+2. Close existing daily-preparation windows. On the familiar sheet, expand **Choose familiar abilities** and click **Prepare in Dailies**. The same controls are available in the familiar management tool.
+3. Connecting disables **only the standard familiar daily set on this owner** and registers **Tech Core familiar abilities** in Dailies. Other preparations and owners are unaffected. Do not re-enable the standard familiar set while this integration is connected.
+4. Click **Open Dailies**, or use Dailies' own preparation entry on the owner's sheet. Choose the daily abilities and complete preparation there. The local daily editor is hidden while integration is connected; no new character-header buttons are added.
+5. Use Dailies' normal rest workflow before the next preparation. Only this module's unchanged managed daily abilities are removed by its rest callback; innate, manual, third-party and edited Items remain protected and count against the limit.
+6. **Disconnect Dailies integration** restores the previous standard-set setting unless you have changed that setting manually. The familiar's Items are retained; the local editor becomes available again. If Dailies is absent or its API is incompatible, the local editor remains available.
+
+The set offers the module's 38 Tech Core abilities, checks capacity and known prerequisites, avoids duplicates, and retains stable source UUIDs. Protected abilities are listed separately and subtract from the available choices. Dailies remembers the last choices. Empty choices are allowed. If the familiar already has temporary abilities created by the standard Dailies set, rest through Dailies before connecting; this module never adopts or deletes those foreign Items.
+
+This integration does **not** automate the active effects described by every ability, grant a familiar feat, implement repeatable Skilled variants, or replace the system's familiar statistics. Existing manual-resolution and Rule Element boundaries still apply. Other third-party custom daily sets that also modify familiar abilities must be disabled separately. An error in this set does not roll back unrelated Dailies preparations. Configuration changes should be followed by closing and reopening Dailies, not using an old preparation window.
+
+Reference: [PF2e Dailies](https://github.com/reonZ/pf2e-dailies), [public API](https://github.com/reonZ/pf2e-dailies/blob/master/src/main.ts), [standard familiar set](https://github.com/reonZ/pf2e-dailies/blob/master/src/data/familiar.ts).
+
+
+## Abilities on the pet sheet
+
+Character-sheet header buttons have been removed. Open **Configure Settings → Module Settings → SF2e Missing Tech Pets → Open tools** for initial creation, links, source references and advanced tools. Select the actor there; the public API remains available.
+
+- **Robot companion:** open the companion's **Feats/Abilities** tab and expand **Robot customizations**. Current selections, all 36 catalog entries, grades and repeatable counts are shown together. Change the choices and click **Save selection**. Slot and grade checks apply. Manual and unknown legacy records are preserved; automation still requires a compatible source Item.
+- **Native familiar:** expand **Choose familiar abilities** in its existing **Abilities** section. Inspect the 38 available abilities, change the daily set and save. Innate, manually added and edited Items cannot be removed here. Native ability Items remain visible in the system's list.
+- The inline editors are shown on the companion/familiar, not every owner character. Only owners of both linked actors can save. If actor data changes while editing, reopen the sheet rather than overwrite the newer data.
+- Robot chassis are hidden from the native character ancestry picker, including world copies with retained source metadata. Drag them from **Robot Chassis (Tech Core)** onto a separate companion actor of type `character`, as with Companion Compendia. The catalog is reference-only; it no longer assigns chassis through a selection button. Existing chassis and user data are retained.
+- Remaining tool windows are bounded by the viewport and their contents scroll. Catalogs have their own scroll area and search.
 
 After updating, reload the world page to refresh translations. Existing imported chassis retain their saved image: choose the matching SVG in `modules/sf2e-missing-tech-pets/assets/icons/` in the Item image picker. Custom images are not overwritten.
 
@@ -11,9 +35,28 @@ After updating, reload the world page to refresh translations. Existing imported
 ![Foundry VTT 14](https://img.shields.io/badge/Foundry_VTT-14-informational)
 ![Starfinder 2e](https://img.shields.io/badge/System-Starfinder_2e-orange)
 
-**Version 0.13.0.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition.
+**Version 0.16.0.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition.
 
 > Action descriptions and automated mechanics are different. See the automation notes below for effects that require manual resolution.
+
+
+## Companion sources and Pet (0.14)
+
+Open **Tech Pets → Companion sources and Pet**, or use the same button in **Familiars**. The new reference distinguishes grants from improvements and care feats. It recognizes 13 curated SF2e sources: Familiar, Enhanced Familiar, Incredible Familiar, Pet, Drone, Tactical/Advanced/Superior Drone, the four graded Customization feats, and Devoted Pet Owner. Existing native items are opened on the owner; absent native items can be opened from their exact system UUID when available. Nothing is granted or retrained automatically.
+
+- Familiar capacity uses the highest recognized **2/4/6** limit or positive native capacity, not their sum. A manually entered capacity still takes priority. A technomancer class alone does not grant a familiar. Missing prerequisite sources produce reminders, not invented Items.
+- For a reciprocally linked Drone, each owned Tactical/Advanced/Superior Drone feat supplies one customization from advancement and one additional customization from the feat, restricted to that grade. Each owned graded Customization feat supplies one slot of its own grade. The existing two extra commercial Drone slots remain. Imported duplicates do not increase these counts.
+- Repeatable Customization feats count once by default. Use **Confirmed selections** (1–3) only for genuinely repeated feat selections. Superior Drone repeats never grant additional customization slots. Existing explicit slot rules/item flags retain priority instead of being added a second time. Reopen Tech Pets and synchronize after saving counts.
+- The recognized Drone grade is informational. **Grade limit**, actual advancement Items, burly/deft/specialization choices and their statistics remain under player/GM control. Grade-specific slots cannot pay for manual notes or a different grade. Existing records and unrelated Items are preserved.
+- **Pet** has a separate manual profile: name, active state and exactly two distinct abilities from the Pet category. The profile persists on its owner and creates no actor, feat, HP/AC, actions or Rule Elements. Its rule reference includes the Pet's statistics and prohibition on Strikes. Natural abilities and replacement/retraining are checked manually; other familiar abilities are not offered without a GM-approved workflow.
+- An active Pet profile prevents linking/creating a familiar through this module; a linked familiar prevents activating a Pet profile. Existing conflicting data is warned about, never deleted. A familiar grant that requires retraining Pet is not silently resolved.
+- Animal companions remain supported through the dependency's SF2e packs and existing linking/import tools. The module does not infer an animal-companion grant from a class, ancestry or matching name. Animal and robot companions are mutually exclusive under the rules, but either can coexist with a familiar or Pet. This broader cross-module restriction is a reminder, not an automatic scanner of every actor.
+- Purchased minibots, delivery drones and turrets are not treated as companion/familiar grants. Devoted Pet Owner is a healing benefit, not a creature grant; healing and robot immunity remain manual.
+
+The source list is a curated SF2e integration, **not an exhaustive importer of PF2e classes, archetypes or ancestry feats**. Pet has an AON reference but no invented native system UUID. Full Pet sheet automation, general animal-companion grant discovery, creature prerequisite enforcement and automatic advancement-stat application are not implemented.
+
+See [source guide](docs/COMPANION-SOURCES.md) for provenance and boundaries.
+
 
 ## Compatibility and Required Dependency
 
@@ -49,7 +92,7 @@ For the release asset **module.zip**, create `Data/modules/sf2e-missing-tech-pet
 2. With Foundry shut down, extract the installation archive using the appropriate path described above. The resulting manifest path must be `Data/modules/sf2e-missing-tech-pets/module.json`, without an extra nested folder.
 3. When updating, replace the old module folder completely. Do not mix files from different versions.
 4. Install or update the required dependency, then enable both modules in your SF2e world.
-5. Open the character sheet's header menu and choose **Tech Pets**. A world setting can hide this entry.
+5. In module settings, click **Open tools**, select the actor and open **Tech Pets** or **Familiars**. No buttons are added to actor-sheet headers.
 
 The archive includes ready-to-use **LevelDB compendiums**. Node.js and a build step are not required for manual installation.
 
@@ -57,7 +100,7 @@ The archive includes ready-to-use **LevelDB compendiums**. Node.js and a build s
 
 SF2e 1.6.0 already includes the native `familiar` actor type, its system sheet, `system.master.id` / `system.master.ability`, inherited master statistics, and Rule Element processing. The familiar panel adds convenient entry points and Tech Core content. It does not copy PF2e's actor engine or duplicate the system's calculations.
 
-1. Choose **Familiars** from the **character** sheet's header menu. The same entry is available on the native familiar sheet. The familiar ability catalog in Tech Pets also opens this panel.
+1. For initial setup, open **Module Settings → SF2e Missing Tech Pets → Open tools**, select the owner and choose **Familiars**. After linking, change the daily set directly in the familiar sheet's **Abilities** section. The advanced manager remains available from settings.
 2. Create a native familiar, or select an existing `familiar` actor that is not assigned to another master. Select the master's attribute and click **Link / save attribute**. A newly created familiar copies the master's ownership permissions. Foundry still enforces permission to create actors; if you cannot create one, ask your GM to do so.
 3. Open the familiar's native sheet and check its statistics. The module does not grant a familiar feat, determine whether the character is entitled to a familiar, or replace system methods.
 4. Select and save a daily ability set. A positive `system.attributes.familiarAbilities.value` on the master is used as the allowance; otherwise, the panel defaults to the **2 abilities** specified by the familiar rules. An explicit allowance can be entered for house rules or feats that are not automated. Leave the field blank to restore automatic handling. **This is the panel's allowance:** it does not create feats or the master's native counter. If that counter is 0, the native sheet may continue to show 0 until an appropriate system item is added.
@@ -106,9 +149,9 @@ At the time of review, AON appended Vital Bond's text to the end of Spell Delive
 ## Master and Robot Companion
 
 1. Create the master and a **separate actor of type `character`** for the robot, not an NPC.
-2. Open Tech Pets on the master's sheet and select the companion. You must be able to edit both actors.
-3. Choose a chassis from the catalog. If the chassis allows two sizes, select the desired size.
-4. Apply the selected rules and inspect the result on the companion's sheet.
+2. Open **Module Settings → SF2e Missing Tech Pets → Open tools**, select the master, open Tech Pets and link the companion. You must be able to edit both actors.
+3. Drag the chassis from the **Robot Chassis** compendium onto the companion sheet. If two sizes are allowed, configure the size through the Item choice or the advanced tools in module settings.
+4. Inspect the result on the companion sheet. Select and replace customizations in its **Feats/Abilities → Robot customizations** panel.
 5. Set the robot's actual grade. **Advanced/Superior** allows the advanced maneuver to be granted, but the selector **does not grant grade feats or improve statistics**.
 
 The link is stored in both directions. Self-links, cycles, companion chains, and assigning a companion that is already linked to another master are blocked. Opening Tech Pets from a linked companion uses the master's profile.
@@ -134,7 +177,7 @@ Compendium.pf2e-animal-companions.sf-AC-Features.Item.KKOgokqHa7RjVDN6
 
 If the class is unavailable, the module does not create an incomplete new chassis. Existing Items are retained and a warning is shown.
 
-The Support Benefit is granted with the chassis. The advanced maneuver is granted at Advanced/Superior grade. Actions can be opened on the sheet and sent to chat using the Tech Pets buttons.
+The Support Benefit is granted with the chassis. The advanced maneuver is granted at Advanced/Superior grade. Actions can be opened on the native sheet and sent to chat. Additional tools remain available from module settings.
 
 **Maneuvers and Support Benefits are resolved manually.** The module does not perform their Strikes, Demoralize checks, saving throws, movement, durations, or conditional application of conditions. Condition links in descriptions do not mean those conditions are applied automatically.
 
@@ -169,7 +212,7 @@ Synchronization is serialized for each controller/companion. Running it again do
 
 Only module-generated Items belonging to the relevant `controllerActorId` and matching their unchanged control snapshot can be deleted or replaced. Manually added Items, Items belonging to other controllers, and user-edited copies are retained.
 
-**Older Items may not have a snapshot.** They are protected from automatic replacement even if they have an old module marker. After making a backup, compare them against the new compendiums. To migrate, manually remove only confirmed old chassis copies and their related old actions, then select and synchronize again. Do not delete unrelated Items or clear flags in bulk.
+**Older Items may not have a snapshot.** They are protected from automatic replacement even if they have an old module marker. After making a backup, compare them against the new compendiums. To migrate, manually remove only confirmed old chassis copies and their related old actions, then drag the new chassis from its compendium and synchronize again. Do not delete unrelated Items or clear flags in bulk.
 
 Legacy entries without a `controllerActorId` are recognized only when the previous companion is confirmed through `lastAutomationSync`. A missing snapshot still prevents automatic deletion.
 
@@ -181,7 +224,7 @@ The integration uses the existing **SF2e 1.6.0** feature and action UUIDs rather
 
 ### Drone
 
-- Link the mechanic and a separate **character** companion in Tech Pets; select its chassis normally. The link must be reciprocal.
+- Link the mechanic and a separate **character** companion in Tech Pets; drag its chassis from the Robot Chassis compendium. The link must be reciprocal.
 - The Drone feature adds **two restricted commercial customization slots** to that linked companion's profile. These are separate from ordinary slots: higher-grade customizations and manual notes cannot use them. Their removal does not erase profile selections.
 - Save whether Command costs **one or two actions**, as a reminder of the normal two or three drone actions. The module does not spend actions or command tokens.
 - Confirm completion of repair/daily preparations to restore the linked drone's HP, or completion of its one-minute emergency reboot to restore **1 HP from 0**. These buttons update only HP; they do not advance time, remove conditions or apply shutdown immunity.

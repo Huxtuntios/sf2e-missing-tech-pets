@@ -1,29 +1,210 @@
-.sfmtp-pack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
-.sfmtp-pack { min-height: 2rem; text-align: left; }
-.sfmtp-entry-list { max-height: 460px; overflow: auto; display: flex; flex-direction: column; gap: 0.2rem; margin-top: 0.5rem; }
-.sfmtp-entry, .sfmtp-familiar-entry { display: flex; align-items: center; justify-content: space-between; gap: 1rem; text-align: left; padding: 0.35rem 0.5rem; }
-.sfmtp-entry small, .sfmtp-familiar-entry small { opacity: 0.7; }
-.sfmtp-mod-row { display: flex; justify-content: space-between; align-items: center; padding: 0.25rem 0; border-bottom: 1px solid var(--color-border-light-2); }
-.sfmtp-description { max-height: 360px; overflow: auto; }
+.sfmtp-pack-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+}
+.sfmtp-pack {
+  min-height: 2rem;
+  text-align: left;
+}
+.sfmtp-entry-list {
+  max-height: 460px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.5rem;
+}
+.sfmtp-entry,
+.sfmtp-familiar-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  text-align: left;
+  padding: 0.35rem 0.5rem;
+}
+.sfmtp-entry small,
+.sfmtp-familiar-entry small {
+  opacity: 0.7;
+}
+.sfmtp-mod-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid var(--color-border-light-2);
+}
+.sfmtp-description {
+  max-height: 360px;
+  overflow: auto;
+}
 
-.sfmtp-action-row { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.5rem 0; }
-.sfmtp-catalog-list { max-height: 520px; overflow: auto; margin-top: 0.5rem; }
-.sfmtp-catalog-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.35rem; border-bottom: 1px solid var(--color-border-light-2); }
-.sfmtp-catalog-row > div:first-child { display: flex; flex-direction: column; }
-.sfmtp-catalog-row small { opacity: 0.7; }
-.sfmtp-catalog-row button { margin-left: 0.25rem; }
+.sfmtp-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.5rem 0;
+}
+.sfmtp-catalog-list {
+  max-height: 520px;
+  overflow: auto;
+  margin-top: 0.5rem;
+}
+.sfmtp-catalog-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem;
+  border-bottom: 1px solid var(--color-border-light-2);
+}
+.sfmtp-catalog-row > div:first-child {
+  display: flex;
+  flex-direction: column;
+}
+.sfmtp-catalog-row small {
+  opacity: 0.7;
+}
+.sfmtp-catalog-row button {
+  margin-left: 0.25rem;
+}
 
 /* Панель фамильяра: список прокручивается, описания не загружают основной лист. */
-.sfmtp-familiar-list { max-height: 390px; overflow-y: auto; }
-.sfmtp-familiars .sfmtp-familiar-entry { display: block; text-align: left; padding: 6px; border-bottom: 1px solid var(--color-border-light-primary, #888); }
-.sfmtp-familiar-entry summary { cursor: pointer; }
-.sfmtp-familiar-entry p { line-height: 1.45; }
-.sfmtp-familiars input[type="number"] { max-width: 90px; }
-.sfmtp-familiar-entry[hidden] { display: none; }
+.sfmtp-familiar-list {
+  max-height: 390px;
+  overflow-y: auto;
+}
+.sfmtp-familiars .sfmtp-familiar-entry {
+  display: block;
+  text-align: left;
+  padding: 6px;
+  border-bottom: 1px solid var(--color-border-light-primary, #888);
+}
+.sfmtp-familiar-entry summary {
+  cursor: pointer;
+}
+.sfmtp-familiar-entry p {
+  line-height: 1.45;
+}
+.sfmtp-familiars input[type="number"] {
+  max-width: 90px;
+}
+.sfmtp-familiar-entry[hidden] {
+  display: none;
+}
 
 /* Панель экзокортекса использует цвета активной темы Foundry. */
-.sfmtp-exocortex section { border-top: 1px solid var(--color-border-light-primary, #888); padding: 0.75rem 0; }
-.sfmtp-exocortex p { line-height: 1.45; }
-.sfmtp-exocortex label { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0.5rem 0; }
-.sfmtp-exocortex input[type="number"] { max-width: 100px; }
-.sfmtp-exocortex button { margin: 0.2rem 0.25rem 0.2rem 0; white-space: normal; height: auto; min-height: 1.8rem; }
+.sfmtp-exocortex section {
+  border-top: 1px solid var(--color-border-light-primary, #888);
+  padding: 0.75rem 0;
+}
+.sfmtp-exocortex p {
+  line-height: 1.45;
+}
+.sfmtp-exocortex label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+.sfmtp-exocortex input[type="number"] {
+  max-width: 100px;
+}
+.sfmtp-exocortex button {
+  margin: 0.2rem 0.25rem 0.2rem 0;
+  white-space: normal;
+  height: auto;
+  min-height: 1.8rem;
+}
+
+.sfmtp-sources table {
+  width: 100%;
+  table-layout: fixed;
+}
+.sfmtp-sources th,
+.sfmtp-sources td {
+  overflow-wrap: anywhere;
+  padding: 0.35rem;
+  vertical-align: top;
+}
+.sfmtp-sources td input[type="number"] {
+  width: 3.5rem;
+}
+.sfmtp-sources .sfmtp-pet-ability {
+  display: block;
+  padding: 0.2rem 0;
+}
+
+/* Только список родословных: компендиум и штатный drag-and-drop не скрываются. */
+.abc-picker li[data-uuid^="Compendium.sf2e-missing-tech-pets.robot-chassis."] {
+  display: none !important;
+}
+.abc-picker li[hidden] {
+  display: none !important;
+}
+/* Небольшая сворачиваемая панель в разделе способностей самого питомца. */
+.sfmtp-inline {
+  border: 1px solid var(--color-border-light-primary, #888);
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  width: 100%;
+  min-width: 0;
+}
+.sfmtp-inline > summary {
+  cursor: pointer;
+  font-weight: bold;
+}
+.sfmtp-inline p {
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.sfmtp-inline-catalog {
+  max-height: min(350px, 45dvh);
+  overflow-y: auto;
+  margin: 0.5rem 0;
+}
+.sfmtp-inline-entry {
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--color-border-light-primary, #888);
+}
+.sfmtp-inline-entry summary {
+  cursor: pointer;
+}
+.sfmtp-inline-entry label {
+  display: inline;
+  font-weight: normal;
+}
+.sfmtp-inline-entry small {
+  display: block;
+  opacity: 0.8;
+}
+.sfmtp-inline input[type="number"] {
+  width: 4rem;
+}
+.sfmtp-inline [hidden] {
+  display: none !important;
+}
+.sfmtp-inline button {
+  height: auto;
+  min-height: 2rem;
+  white-space: normal;
+}
+/* Прокручивается содержимое, а не скрытая за границей экрана нижняя часть окна. */
+.sfmtp-dialog {
+  max-height: calc(100dvh - 32px);
+  max-width: calc(100vw - 24px);
+}
+.sfmtp-dialog .sfmtp-window {
+  max-height: max(120px, calc(100dvh - 180px));
+  overflow: auto;
+  min-height: 0;
+  overflow-wrap: anywhere;
+}
+.sfmtp-dialog .dialog-buttons {
+  flex-wrap: wrap;
+}
+
+.sfmtp-dialog .window-content { min-height: 0; overflow: auto; }

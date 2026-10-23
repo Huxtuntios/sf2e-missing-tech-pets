@@ -1,4 +1,5 @@
 import { t } from "./i18n.mjs";
+import { sourceFamiliarAllowance } from "./companion-sources.mjs";
 // Нативный familiar SF2e отвечает за характеристики. Здесь только связь и выбор Items.
 import { MODULE_ID } from "./item-sources.mjs";
 import { buildFamiliarSource } from "./familiar-sources.mjs";
@@ -34,6 +35,8 @@ export function linkedFamiliars(owner) {
 }
 export async function linkFamiliar(owner, familiar, ability = "int") {
   assertFamiliarAccess(owner);
+  if (owner.getFlag(MODULE_ID, "petProfile")?.enabled)
+    fail("SourcePetConflict");
   assertFamiliarAccess(familiar);
   if (
     owner.type !== "character" ||
@@ -53,6 +56,8 @@ export async function linkFamiliar(owner, familiar, ability = "int") {
 }
 export async function createFamiliar(owner, ability = "int") {
   assertFamiliarAccess(owner);
+  if (owner.getFlag(MODULE_ID, "petProfile")?.enabled)
+    fail("SourcePetConflict");
   if (owner.type !== "character" || linkedFamiliars(owner).length)
     fail("FamiliarAmbiguous");
   if (!["str", "dex", "con", "int", "wis", "cha"].includes(ability))
@@ -64,12 +69,45 @@ export async function createFamiliar(owner, ability = "int") {
     system: { master: { id: owner.id, ability } },
   });
 }
+// Отдельный ручной профиль: не создаём familiar-актора и не выдаём черту Pet.
+export async function savePetProfile(owner, profile) {
+  assertFamiliarAccess(owner);
+  if (owner.type !== "character") fail("FamiliarAccess");
+  const abilities = Array.isArray(profile.abilities)
+    ? [...profile.abilities]
+    : [];
+  if (profile.enabled) {
+    if (linkedFamiliars(owner).length) fail("SourcePetConflict");
+    const petAbilities = new Set(
+      (await familiarCatalog())
+        .filter((entry) => entry.category === "pet")
+        .map((entry) => entry.id),
+    );
+    if (
+      abilities.length !== 2 ||
+      new Set(abilities).size !== 2 ||
+      abilities.some((id) => !petAbilities.has(id))
+    )
+      fail("PetSelectionInvalid");
+  }
+  const saved = owner.getFlag(MODULE_ID, "petProfile") ?? {};
+  await owner.setFlag(MODULE_ID, "petProfile", {
+    ...saved,
+    enabled: Boolean(profile.enabled),
+    name: String(profile.name ?? saved.name ?? "").trim(),
+    abilities,
+  });
+}
+
 export function familiarAllowance(owner, familiar) {
   const override = familiar.getFlag(MODULE_ID, "familiarAllowance");
   if (Number.isInteger(override) && override >= 0 && override <= 50)
     return override;
   const native = Number(owner?.system?.attributes?.familiarAbilities?.value);
-  return Number.isFinite(native) && native > 0 ? Math.floor(native) : 2;
+  return Math.max(
+    sourceFamiliarAllowance(owner),
+    Number.isFinite(native) && native > 0 ? Math.floor(native) : 0,
+  );
 }
 export function familiarAbilityItems(familiar) {
   return itemsOf(familiar).filter(

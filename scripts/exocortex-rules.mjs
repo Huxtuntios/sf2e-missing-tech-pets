@@ -134,26 +134,36 @@ export function eligibleExocortexActions(actor) {
     result.push("reposition");
   return result;
 }
-// Два слота дрона разрешают только коммерческие кастомизации; это не два общих слота.
+// Ограниченные слоты оплачивают только записи каталога своей ступени; ручные записи — общими слотами.
 export function customizationCapacity(
   modifications,
   generalSlots,
   commercialSlots = 0,
+  gradedSlots = {},
 ) {
-  let remainingGeneral = Math.max(0, Number(generalSlots) || 0),
-    remainingCommercial = Math.max(0, Number(commercialSlots) || 0);
+  let remainingGeneral = Math.max(0, Number(generalSlots) || 0);
+  const remainingByGrade = Object.fromEntries(
+    ["commercial", "tactical", "advanced", "superior"].map((grade) => [
+      grade,
+      Math.max(0, Number(gradedSlots[grade]) || 0) +
+        (grade === "commercial"
+          ? Math.max(0, Number(commercialSlots) || 0)
+          : 0),
+    ]),
+  );
   const accepted = [],
     rejected = [];
   for (const entry of modifications) {
     const cost = Math.max(1, Number(entry.cost) || 1);
-    const commercial =
-      !entry.manual && !!entry.catalogId && entry.grade === "commercial";
-    const restricted = commercial ? Math.min(cost, remainingCommercial) : 0;
+    const restricted =
+      !entry.manual && !!entry.catalogId
+        ? Math.min(cost, remainingByGrade[entry.grade] ?? 0)
+        : 0;
     if (cost - restricted > remainingGeneral) {
       rejected.push(entry);
       continue;
     }
-    remainingCommercial -= restricted;
+    if (restricted) remainingByGrade[entry.grade] -= restricted;
     remainingGeneral -= cost - restricted;
     accepted.push(entry);
   }
@@ -161,7 +171,10 @@ export function customizationCapacity(
     accepted,
     rejected,
     remainingGeneral,
-    remainingCommercial,
-    free: remainingGeneral + remainingCommercial,
+    remainingCommercial: remainingByGrade.commercial,
+    remainingByGrade,
+    free:
+      remainingGeneral +
+      Object.values(remainingByGrade).reduce((sum, value) => sum + value, 0),
   };
 }

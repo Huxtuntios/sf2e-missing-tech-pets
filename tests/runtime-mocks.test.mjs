@@ -175,6 +175,7 @@ async function harness({
   );
   const settings = new Map();
   const settingsConfigs = new Map();
+  const settingsMenus = new Map();
   const dialogs = [];
   const game = {
     system: { id: system },
@@ -197,6 +198,7 @@ async function harness({
       },
     },
     settings: {
+      registerMenu: (_scope, key, config) => settingsMenus.set(key, config),
       register: (_scope, key, config) => {
         settingsConfigs.set(key, config);
         settings.set(key, config.default);
@@ -272,18 +274,19 @@ async function harness({
     let code = await readFile(filename, "utf8");
     if (filename.endsWith("/main.mjs"))
       code +=
-        "\nglobalThis.subject={isCompatibleItemPack,missingCompanionPacks,handleCompanionBuildItem,syncAutomation,generatedItemsForController,cleanupPreviousCompanion,findSourceItem,itemFingerprint,canReplaceManagedItem,validLink,getRobotData};";
+        "\nglobalThis.subject={isCompatibleItemPack,missingCompanionPacks,handleCompanionBuildItem,syncAutomation,generatedItemsForController,cleanupPreviousCompanion,findSourceItem,itemFingerprint,canReplaceManagedItem,validLink,getRobotData,openCompanionSources};";
     const module = new SourceTextModule(code, {
       context,
       identifier: filename,
     });
     modules.set(filename, module);
-    await module.link((specifier, ref) =>
-      load(path.resolve(path.dirname(ref.identifier), specifier)),
-    );
     return module;
   }
   const module = await load(path.join(root, "scripts/main.mjs"));
+  // Граф связывает сам vm: вложенный link ломает общие зависимости при новом окне.
+  await module.link((specifier, ref) =>
+    load(path.resolve(path.dirname(ref.identifier), specifier)),
+  );
   await module.evaluate();
   once.get("init")();
   await once.get("ready")();
@@ -294,6 +297,7 @@ async function harness({
     notifications,
     settings,
     settingsConfigs,
+    settingsMenus,
     dialogs,
     subject: context.subject,
     api: game.modules.get(ID).api,
@@ -791,15 +795,16 @@ test("API setRobotData поддерживает обратную связь и �
   });
   assert.equal(h.api.getRobotData(robot).ownerActorId, owner.id);
 });
-test("Кнопка Foundry v14 зарегистрирована и использует локализованную подпись", async () => {
+test("Инструменты зарегистрированы в настройках, хедеры листов не расширяются", async () => {
   const h = await harness();
-  const actor = new Actor("player");
-  const controls = [];
-  h.hooks.get("getHeaderControlsActorSheetV2")({ actor }, controls);
-  assert.equal(controls.length, 2);
-  assert.equal(controls[0].label, "Familiars");
-  assert.equal(controls[1].label, "Tech Pets");
-  assert.equal(typeof controls[0].onClick, "function");
+  assert.equal(h.hooks.has("getActorSheetHeaderButtons"), false);
+  assert.equal(h.hooks.has("getHeaderControlsActorSheetV2"), false);
+  const menu = h.settingsMenus.get("tools");
+  assert.equal(menu.restricted, false);
+  assert.equal(h.game.i18n.localize(menu.name), "Tech Pets tools");
+  assert.equal(typeof menu.type, "function");
+  assert.equal(typeof h.hooks.get("renderActorSheetPF2e"), "function");
+  assert.equal(typeof h.hooks.get("renderABCPicker"), "function");
 });
 test("Недоступный базовый класс не создаёт неполное шасси и сохраняет прежние Items", async () => {
   const h = await harness(),
@@ -892,12 +897,10 @@ test("RU: заголовки листов и оба менеджера пока�
   const h = await harness({ language: "ru" });
   const owner = new Actor("owner");
   h.game.actors.set(owner.id, owner);
-  const controls = [];
-  h.hooks.get("getHeaderControlsActorSheetV2")({ actor: owner }, controls);
-  assert.deepEqual(
-    controls.map((button) => button.label),
-    ["Фамильяры", "Техно-питомцы"],
-  );
+  assert.equal(h.hooks.has("getHeaderControlsActorSheetV2"), false);
+  const menu = new (h.settingsMenus.get("tools").type)();
+  assert.equal(h.dialogs.at(-1).window.title, "Инструменты техно-питомцев");
+  assert.doesNotMatch(h.dialogs.at(-1).content, /SFMTP\.[A-Za-z]/);
   await h.api.open(owner);
   assert.equal(h.dialogs.at(-1).window.title, "Техно-питомцы");
   assert.doesNotMatch(h.dialogs.at(-1).content, /SFMTP\.[A-Za-z]/);
@@ -911,50 +914,18 @@ test("RU: заголовки листов и оба менеджера пока�
     h.game.i18n.translations.SFMTP.ManualActionHint,
   );
 });
-test("Собственный словарь переводит кнопки, даже если native localize возвращает ключ", async () => {
+test("Собственный словарь переводит настройки при недоступном native localize", async () => {
   const h = await harness({ language: "ru", nativeLocalization: false });
-  const controls = [];
-  h.hooks.get("getHeaderControlsActorSheetV2")(
-    { actor: new Actor("owner") },
-    controls,
-  );
-  assert.deepEqual(
-    controls.map((button) => button.label),
-    ["Фамильяры", "Техно-питомцы"],
-  );
+  new (h.settingsMenus.get("tools").type)();
+  assert.equal(h.dialogs.at(-1).window.title, "Инструменты техно-питомцев");
+  assert.doesNotMatch(h.dialogs.at(-1).content, /SFMTP\.[A-Za-z]/);
 });
-test("Кнопки Tech Pets и Familiars скрываются независимо в V1 и V2", async () => {
-  const h = await harness({ language: "ru" });
-  const actor = new Actor("owner");
-  for (const [robot, familiar, expected] of [
-    [true, true, 2],
-    [false, true, 1],
-    [true, false, 1],
-    [false, false, 0],
-  ]) {
-    h.settings.set("addActorButton", robot);
-    h.settings.set("addFamiliarButton", familiar);
-    for (const hook of [
-      "getActorSheetHeaderButtons",
-      "getHeaderControlsActorSheetV2",
-    ]) {
-      const controls = [];
-      h.hooks.get(hook)({ actor }, controls);
-      assert.equal(controls.length, expected);
-      if (expected === 1)
-        assert.equal(controls[0].label, robot ? "Техно-питомцы" : "Фамильяры");
-    }
-    assert.equal(typeof h.api.open, "function");
-    assert.equal(typeof h.api.openFamiliar, "function");
-  }
-  for (const key of ["addActorButton", "addFamiliarButton"]) {
-    const config = h.settingsConfigs.get(key);
-    assert.equal(config.config, true);
-    assert.equal(config.type.name, "Boolean");
-    assert.equal(config.scope, "world");
-    assert.doesNotMatch(h.game.i18n.localize(config.name), /^SFMTP\./);
-    assert.doesNotMatch(h.game.i18n.localize(config.hint), /^SFMTP\./);
-  }
+test("Прежние настройки кнопок больше не отображаются, API остаётся доступным", async () => {
+  const h = await harness();
+  for (const key of ["addActorButton", "addFamiliarButton"])
+    assert.equal(h.settingsConfigs.has(key), false);
+  for (const key of ["open", "openFamiliar", "openExocortex"])
+    assert.equal(typeof h.api[key], "function");
 });
 
 test("Экзокортекс: все варианты доступны через Tech Pets, EN/RU без утечек ключей", async () => {
@@ -1000,12 +971,10 @@ test("Экзокортекс: все варианты доступны чере�
     assert.equal(typeof h.api.getExocortexData, "function");
     assert.equal(typeof h.api.updateExocortex, "function");
     assert.equal(typeof h.api.installExocortexActions, "function");
-    const controls = [];
-    h.hooks.get("getHeaderControlsActorSheetV2")({ actor: owner }, controls);
     assert.equal(
-      controls.length,
-      2,
-      "Новая панель не создаёт неподконтрольную третью кнопку хедера",
+      h.hooks.has("getHeaderControlsActorSheetV2"),
+      false,
+      "Панель не создаёт кнопки в хедере",
     );
   }
 });
@@ -1080,4 +1049,62 @@ test("Синхронизация дрона применяет +2 только �
     4,
     "Превышающая лимит запись сохранена",
   );
+});
+
+test("Новое окно источников: EN/RU, 13 источников, Pet без familiar/master-способностей", async () => {
+  for (const language of ["en", "ru"]) {
+    const h = await harness({ language });
+    const owner = new Actor("source-owner");
+    h.game.actors.set(owner.id, owner);
+    const dialog = await h.subject.openCompanionSources(owner);
+    assert.ok(dialog);
+    const config = h.dialogs.at(-1);
+    assert.doesNotMatch(config.content, /SFMTP\.[A-Za-z]/);
+    assert.equal((config.content.match(/<tr>/g) ?? []).length, 14);
+    assert.match(config.content, /name="pet-ability" value="flier"/);
+    assert.doesNotMatch(
+      config.content,
+      /name="pet-ability" value="accompanist"/,
+    );
+    assert.match(config.content, /2e.aonsrd.com\/feats\/2692-pet/);
+    assert.equal(owner.items.size, 0);
+    const handlers = new Map();
+    dialog.legacyConfiguration.render({
+      find: (selector) => ({
+        on: (_event, callback) => handlers.set(selector, callback),
+      }),
+    });
+    assert.ok(handlers.has("[data-source-open]"));
+    assert.ok(handlers.has("[data-source-save]"));
+    assert.ok(handlers.has("[data-pet-save]"));
+  }
+});
+test("Сводка linked-дрона добавляет целевые слоты и не меняет прежние профили", async () => {
+  const h = await harness(),
+    { owner } = await pair(h, { baseSlots: 0 });
+  const fixture = JSON.parse(
+    await readFile(
+      path.join(root, "tests/fixtures/native-companion-sources.json"),
+      "utf8",
+    ),
+  );
+  const sources = fixture.items
+    .filter((row) =>
+      ["drone", "tactical-drone", "tactical-customization"].includes(
+        row.item.system.slug,
+      ),
+    )
+    .map((row) => ({
+      ...row.item,
+      flags: { ...row.item.flags, core: { sourceId: row.uuid } },
+    }));
+  await owner.createEmbeddedDocuments("Item", sources);
+  const summary = h.api.getModificationSlots(owner);
+  assert.equal(summary.total, 5);
+  assert.equal(summary.commercialSlots, 2);
+  assert.equal(summary.gradedSlots.tactical, 3);
+  assert.equal(summary.sourceGrade, "tactical");
+  assert.equal(h.api.getRobotData(owner).gradeLimit, "commercial");
+  await owner.setFlag(ID, "sourceCounts", { "tactical-customization": 3 });
+  assert.equal(h.api.getModificationSlots(owner).total, 7);
 });

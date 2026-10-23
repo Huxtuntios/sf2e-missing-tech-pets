@@ -49,13 +49,23 @@ export class TechPetsDialog extends foundry.applications.api.DialogV2 {
   static openWindows = new Map();
   constructor(configuration, options = {}) {
     super({
+      classes: ["sfmtp-dialog"],
       window: {
         title: configuration.title,
         resizable: options.resizable ?? true,
       },
       position: {
-        width: options.width ?? 700,
-        height: options.height ?? "auto",
+        width: Math.min(
+          options.width ?? 700,
+          Math.max(240, (globalThis.innerWidth ?? 1200) - 32),
+        ),
+        height:
+          typeof options.height === "number"
+            ? Math.min(
+                options.height,
+                Math.max(180, (globalThis.innerHeight ?? 900) - 48),
+              )
+            : "auto",
       },
       content: `<div class="sfmtp-window">${configuration.content}</div>`,
       buttons: Object.entries(configuration.buttons ?? {}).map(

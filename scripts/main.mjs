@@ -1,6 +1,10 @@
+import { initializeDailiesIntegration } from "./dailies.mjs";
+import { registerSheetIntegration } from "./sheet-integration.mjs";
 import { t, initializeLocalization } from "./i18n.mjs";
 import { openFamiliarManager } from "./familiar-ui.mjs";
 import { openExocortexManager } from "./exocortex-ui.mjs";
+import { sourceCustomizationSlots } from "./companion-sources.mjs";
+import { openCompanionSources } from "./companion-sources-ui.mjs";
 import { isMechanic, customizationCapacity } from "./exocortex-rules.mjs";
 import {
   droneCommercialSlots,
@@ -474,10 +478,13 @@ function robotSummary(actor) {
   );
   const generalTotal = Math.max(0, Number(data.baseSlots) || 0) + bonus;
   const commercialSlots = droneCommercialSlots(actor);
+  const sourceSlots = sourceCustomizationSlots(actor, parseSlotRules());
+  const gradedSlots = commercialSlots ? sourceSlots.slots : {};
   const capacity = customizationCapacity(
     data.modifications,
     generalTotal,
     commercialSlots,
+    gradedSlots,
   );
   return {
     data,
@@ -485,7 +492,12 @@ function robotSummary(actor) {
     used,
     generalTotal,
     commercialSlots,
-    total: generalTotal + commercialSlots,
+    gradedSlots,
+    sourceGrade: sourceSlots.grade,
+    total:
+      generalTotal +
+      commercialSlots +
+      Object.values(gradedSlots).reduce((sum, value) => sum + value, 0),
     free: capacity.free,
   };
 }
@@ -534,6 +546,7 @@ async function openHome(actor = activeActor()) {
   const content = `<div class="sfmtp-home">
     <p>${esc(actor.name)} — ${esc(missingPacks.length ? t("CompendiaPacksMissing") : t("UsesCompendia"))}</p>
     ${isMechanic(actor) ? `<button type="button" data-open-exocortex>${esc(t("ExoTitle"))}</button>` : ""}
+    <button type="button" data-companion-sources>${esc(t("SourceTitle"))}</button>
     <h3>${esc(t("Packs"))}</h3><div class="sfmtp-pack-grid">${packButtons}</div>
     <hr><h3>${esc(t("RobotTools"))}</h3>
     <div class="sfmtp-action-row"><button type="button" data-open-catalog="robot-customizations">${esc(t("RobotCatalog"))}</button><button type="button" data-open-catalog="robot-chassis">${esc(t("ChassisCatalog"))}</button><button type="button" data-open-catalog="familiar-abilities">${esc(t("FamiliarCatalog"))}</button><button type="button" data-search-familiar>${esc(t("FamiliarSearch"))}</button></div>
@@ -558,7 +571,15 @@ async function openHome(actor = activeActor()) {
       )}</select><p class="hint">${esc(t("CompanionActorHint"))}</p></div>
     <div class="sfmtp-action-row"><button type="button" data-sync-automation>${esc(t("ApplyAutomation"))}</button><span class="hint">${esc(t("AutomationHint"))}</span></div>
     <p>${esc(t("BaseSlots"))}: <strong>${summary.data.baseSlots}</strong> · ${esc(t("ExtraSlots"))}: <strong>${summary.bonus}</strong> · ${esc(t("UsedSlots"))}: <strong>${summary.used}/${summary.total}</strong></p>
-    ${summary.commercialSlots ? `<p class="hint">${esc(t("ExoDroneSlots"))}</p>` : ""}
+    ${
+      summary.commercialSlots
+        ? `<p class="hint">${esc(t("ExoDroneSlots"))}</p><p>${esc(t("SourceGrade"))}: ${esc(t(`Grade.${summary.sourceGrade}`))} · ${Object.entries(
+            summary.gradedSlots,
+          )
+            .map(([grade, count]) => `${esc(t(`Grade.${grade}`))}: ${count}`)
+            .join(" · ")}</p><p class="hint">${esc(t("SourceGradeHint"))}</p>`
+        : ""
+    }
     <div class="form-group"><label>${esc(t("BaseSlots"))}</label><input name="sfmtp-base-slots" type="number" min="0" value="${esc(summary.data.baseSlots)}"></div>
     <div class="form-group"><label>${esc(t("GradeLimit"))}</label><select name="sfmtp-grade-limit">${["commercial", "tactical", "advanced", "superior"].map((g) => `<option value="${g}" ${summary.data.gradeLimit === g ? "selected" : ""}>${esc(t(`Grade.${g}`))}</option>`).join("")}</select></div>
     <div class="sfmtp-mod-list">${summary.data.modifications.map((m, i) => `<div class="sfmtp-mod-row"><span>${esc(m.name)} <small>(${esc(m.grade ? t(`Grade.${m.grade}`) : t("ManualEntry"))}; ${esc(m.cost || 1)} ${esc(t("SlotsUnit"))})</small></span><button type="button" data-remove-mod="${i}">${esc(t("Remove"))}</button></div>`).join("") || `<p>${esc(t("NoEntries"))}</p>`}</div>
@@ -577,6 +598,9 @@ async function openHome(actor = activeActor()) {
       content,
       buttons: { close: { label: t("Close") } },
       render: (html) => {
+        html
+          .find("[data-companion-sources]")
+          .on("click", () => openCompanionSources(actor));
         html.find(".sfmtp-pack").on("click", (event) => {
           const key = event.currentTarget.dataset.pack;
           openPackBrowser(packId(key), actor);
@@ -672,6 +696,7 @@ async function openHome(actor = activeActor()) {
               [...current.modifications, candidate],
               summary.generalTotal,
               summary.commercialSlots,
+              summary.gradedSlots,
             ).accepted.includes(candidate)
           )
             return ui.notifications.warn(t("NoSlots"));
@@ -946,12 +971,12 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
           config.type === "chassis"
             ? `${entry.special ? `<small>${esc(entry.special)}</small>` : ""}<small>${esc(entry.supportBenefit ?? "")}</small><small>${esc(entry.rulesNote ?? "")}</small>`
             : "";
-        return `<div class="sfmtp-catalog-row"><div><strong>${esc(entry.name)}</strong><small>${esc(detail)}</small>${extra}</div><div><button type="button" data-source-index="${esc(entry.id)}">${esc(t("SourcePage"))}</button><button type="button" data-select-index="${esc(entry.id)}">${esc(t("AddSelection"))}</button></div></div>`;
+        return `<div class="sfmtp-catalog-row"><div><strong>${esc(entry.name)}</strong><small>${esc(detail)}</small>${extra}</div><div><button type="button" data-source-index="${esc(entry.id)}">${esc(t("SourcePage"))}</button>${config.type === "chassis" ? "" : `<button type="button" data-select-index="${esc(entry.id)}">${esc(t("AddSelection"))}</button>`}</div></div>`;
       })
       .join("");
     return rows || `<p>${esc(t("NoEntries"))}</p>`;
   };
-  const content = `<div class="sfmtp-catalog"><input type="search" name="sfmtp-catalog-query" placeholder="${esc(t("Search"))}" value="${esc(query)}"><div class="sfmtp-catalog-list">${draw(query)}</div><p class="hint">${esc(catalog.note ?? "")}</p></div>`;
+  const content = `<div class="sfmtp-catalog">${config.type === "chassis" ? `<p>${esc(t("ChassisDragHint"))}</p><button type="button" data-open-chassis-pack>${esc(t("ChassisCatalog"))}</button>` : ""}<input type="search" name="sfmtp-catalog-query" placeholder="${esc(t("Search"))}" value="${esc(query)}"><div class="sfmtp-catalog-list">${draw(query)}</div><p class="hint">${esc(catalog.note ?? "")}</p></div>`;
   new Dialog(
     {
       title: config.title,
@@ -970,6 +995,9 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
               ),
             );
         html.find('[name="sfmtp-catalog-query"]').on("input", redraw);
+        html.on("click", "[data-open-chassis-pack]", () =>
+          game.packs.get(`${MODULE_ID}.robot-chassis`)?.render(true),
+        );
         html.on("click", "[data-source-index]", (event) => {
           const id = event.currentTarget.dataset.sourceIndex;
           const entry = catalog.entries.find((item) => item.id === id);
@@ -989,6 +1017,7 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
                 [...data.modifications, candidate],
                 summary.generalTotal,
                 summary.commercialSlots,
+                summary.gradedSlots,
               ).accepted.includes(candidate)
             )
               return ui.notifications.warn(t("NoSlots"));
@@ -1027,14 +1056,6 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
             await actor.setFlag(FLAG, "robot", data);
             await syncAutomation(actor);
             ui.notifications.info(t("AbilityAdded"));
-          } else if (config.type === "chassis") {
-            data.chassis = entry.name;
-            data.chassisCatalogId = entry.id;
-            data.chassisSource = entry.sourceUrl;
-            data.chassisStats = chassisStatLine(entry);
-            await actor.setFlag(FLAG, "robot", data);
-            await syncAutomation(actor);
-            ui.notifications.info(t("ChassisSelected"));
           }
           openHome(actor);
         });
@@ -1512,6 +1533,7 @@ async function syncAutomationNow(ownerActor) {
       data.modifications,
       slotSummary.generalTotal,
       slotSummary.commercialSlots,
+      slotSummary.gradedSlots,
     ).accepted,
   );
   const wanted = [];
@@ -2078,22 +2100,62 @@ async function searchFamiliarItems(actor = activeActor(), query = "familiar") {
   ).render(true);
 }
 
+// Единственная точка входа для настройки вместо кнопок на каждом листе.
+class TechPetsSettingsMenu extends Dialog {
+  constructor() {
+    const actors = Array.from(game.actors ?? []).filter(
+      (actor) =>
+        ["character", "familiar"].includes(actor.type) &&
+        actor.isOwner !== false,
+    );
+    const selected = activeActor()?.id;
+    const options = actors
+      .map(
+        (actor) =>
+          `<option value="${esc(actor.id)}" ${actor.id === selected ? "selected" : ""}>${esc(actor.name)}</option>`,
+      )
+      .join("");
+    const pick = (html) =>
+      game.actors.get(html.find("[data-sfmtp-actor]").val());
+    super(
+      {
+        title: t("ToolsMenu"),
+        content: `<p>${esc(t("ToolsMenuHint"))}</p><label>${esc(t("InlineActor"))}<select data-sfmtp-actor>${options}</select></label>`,
+        buttons: {
+          robot: {
+            label: t("Title"),
+            callback: (html) => {
+              const actor = pick(html);
+              return actor
+                ? openHome(actor)
+                : ui.notifications.warn(t("ActorMissing"));
+            },
+          },
+          familiar: {
+            label: t("FamiliarTitle"),
+            callback: (html) => {
+              const actor = pick(html);
+              return actor
+                ? openFamiliarManager(actor)
+                : ui.notifications.warn(t("ActorMissing"));
+            },
+          },
+          close: { label: t("Close") },
+        },
+      },
+      { width: 560 },
+    );
+  }
+}
+
 Hooks.once("init", () => {
-  game.settings.register(MODULE_ID, "addActorButton", {
-    name: "SFMTP.ShowActorButton",
-    hint: "SFMTP.ShowActorButtonHint",
-    scope: "world",
-    config: true,
-    type: Boolean,
-    default: true,
-  });
-  game.settings.register(MODULE_ID, "addFamiliarButton", {
-    name: "SFMTP.ShowFamiliarButton",
-    hint: "SFMTP.ShowFamiliarButtonHint",
-    scope: "world",
-    config: true,
-    type: Boolean,
-    default: game.settings.get(MODULE_ID, "addActorButton") !== false,
+  game.settings.registerMenu(MODULE_ID, "tools", {
+    name: "SFMTP.ToolsMenu",
+    label: "SFMTP.ToolsMenuOpen",
+    hint: "SFMTP.ToolsMenuHint",
+    icon: "fas fa-paw",
+    type: TechPetsSettingsMenu,
+    restricted: false,
   });
   game.settings.register(MODULE_ID, "slotGrantRules", {
     name: "SFMTP.SlotConfig",
@@ -2131,6 +2193,7 @@ Hooks.once("ready", async () => {
     ui.notifications.error(t("DependencyMissing"));
     return;
   }
+  initializeDailiesIntegration();
   const missingPacks = missingCompanionPacks();
   if (missingPacks.length) {
     console.warn(
@@ -2176,48 +2239,33 @@ Hooks.once("ready", async () => {
     openPack: (key, actor = activeActor()) =>
       openPackBrowser(packId(key), actor),
   };
-  Hooks.on("getActorSheetHeaderButtons", (app, buttons) => {
-    if (!app.actor || app.actor.type === "loot") return;
-    if (
-      game.settings.get(MODULE_ID, "addFamiliarButton") &&
-      ["character", "familiar"].includes(app.actor.type)
-    )
-      buttons.unshift({
-        label: t("FamiliarTitle"),
-        class: "sfmtp-familiar",
-        icon: "fas fa-paw",
-        onclick: () => openFamiliarManager(app.actor),
-      });
-    if (game.settings.get(MODULE_ID, "addActorButton"))
-      buttons.unshift({
-        label: t("Title"),
-        class: "sfmtp-open",
-        icon: "fas fa-robot",
-        onclick: () => openHome(app.actor),
-      });
-  });
-  Hooks.on("getHeaderControlsActorSheetV2", (app, controls) => {
-    if (
-      !app.actor ||
-      !["character", "familiar"].includes(app.actor.type) ||
-      app.actor.isOwner === false
-    )
-      return;
-    if (game.settings.get(MODULE_ID, "addFamiliarButton"))
-      controls.push({
-        label: t("FamiliarTitle"),
-        icon: "fas fa-paw",
-        onClick: () => openFamiliarManager(app.actor),
-      });
-    if (
-      game.settings.get(MODULE_ID, "addActorButton") &&
-      app.actor.type === "character"
-    )
-      controls.push({
-        label: t("Title"),
-        icon: "fas fa-robot",
-        onClick: () => openHome(app.actor),
-      });
+  registerSheetIntegration({
+    getRobotData,
+    robotSummary,
+    loadCatalog,
+    saveModifications: async (controller, companion, modifications) => {
+      if (controller.isOwner === false || companion.isOwner === false)
+        throw new Error(t("FamiliarAccess"));
+      const data = getRobotData(controller);
+      if (
+        controller.id !== companion.id &&
+        (data.companionActorId !== companion.id ||
+          getRobotData(companion).ownerActorId !== controller.id)
+      )
+        throw new Error(t("InvalidActorLink"));
+      const summary = robotSummary(controller);
+      if (
+        customizationCapacity(
+          modifications,
+          summary.generalTotal,
+          summary.commercialSlots,
+          summary.gradedSlots,
+        ).rejected.length
+      )
+        throw new Error(t("NoSlots"));
+      await controller.setFlag(FLAG, "robot", { ...data, modifications });
+      await syncAutomation(controller);
+    },
   });
   console.info(
     `${MODULE_ID} | Ready. Required Companion Compendia dependency verified; missing SF2e packs: ${missingPacks.join(", ") || "none"}.`,

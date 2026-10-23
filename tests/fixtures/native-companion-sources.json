@@ -1,0 +1,746 @@
+{
+  "system": "sf2e",
+  "version": "1.6.0",
+  "items": [
+    {
+      "uuid": "Compendium.sf2e.feats.Item.97BcEtnPdUk2HzXS",
+      "item": {
+        "_id": "97BcEtnPdUk2HzXS",
+        "folder": "JONX7AEqXIvl7AgE",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Superior Customization",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "class",
+          "description": {
+            "value": "<p>You've further modified your drone, granting it a new ability. Your drone gains one additional superior customization.</p><hr /><p><strong>Special</strong> You can select this feat up to three times.</p>"
+          },
+          "level": {
+            "value": 16
+          },
+          "maxTakable": 3,
+          "prerequisites": {
+            "value": [
+              {
+                "value": "Superior Drone"
+              }
+            ]
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "mechanic"
+            ]
+          },
+          "slug": "superior-customization",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.97BcEtnPdUk2HzXS"
+        },
+        "effects": [],
+        "_key": "!items!97BcEtnPdUk2HzXS"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.feats.Item.AtFbqTGqXKGLhFki",
+      "item": {
+        "_id": "AtFbqTGqXKGLhFki",
+        "folder": "alXR5Igz2yDJzX4A",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Advanced Drone",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "class",
+          "description": {
+            "value": "<p>You've further upgraded your drone, which becomes either a burly or deft companion and gains additional capabilities determined by its type. In addition to the one advanced customization it automatically gains from becoming a burly or deft robot companion, your drone gains one additional advanced customization.</p>"
+          },
+          "level": {
+            "value": 8
+          },
+          "prerequisites": {
+            "value": [
+              {
+                "value": "Tactical Drone"
+              }
+            ]
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "mechanic"
+            ]
+          },
+          "slug": "advanced-drone",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.AtFbqTGqXKGLhFki"
+        },
+        "effects": [],
+        "_key": "!items!AtFbqTGqXKGLhFki"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.feats.Item.Gs7y92CMsQNVcdtK",
+      "item": {
+        "_id": "Gs7y92CMsQNVcdtK",
+        "folder": "AEKpwnfWUP4X1zOs",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Devoted Pet Owner",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "ancestry",
+          "description": {
+            "value": "<p>You love your pets and you take excellent care of them. When you restore Hit Points to a pet, animal companion, or other creature with the minion trait under your control, you increase the Hit Points restored by 2. At 12th level, you instead increase the Hit Points restored by 5.</p>"
+          },
+          "level": {
+            "value": 5
+          },
+          "prerequisites": {
+            "value": []
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Secrets of the Swarm Adventure Path"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "binnaquid"
+            ]
+          },
+          "slug": "devoted-pet-owner",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.Gs7y92CMsQNVcdtK"
+        },
+        "effects": [],
+        "_key": "!items!Gs7y92CMsQNVcdtK"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.feats.Item.Lxp9qwru0FVWmoE7",
+      "item": {
+        "_id": "Lxp9qwru0FVWmoE7",
+        "folder": "cSzPwQNwRNaODroo",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Familiar",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "class",
+          "description": {
+            "value": "<p>You've programmed a clever little mascot, uploaded into a body of pure magic. The resulting creature is a loyal companion and assists you in your day-to-day life. You gain a familiar.</p>"
+          },
+          "level": {
+            "value": 1
+          },
+          "prerequisites": {
+            "value": []
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "technomancer"
+            ]
+          },
+          "slug": "familiar",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.Lxp9qwru0FVWmoE7"
+        },
+        "effects": [],
+        "_key": "!items!Lxp9qwru0FVWmoE7"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.feats.Item.M4zxIqUevFPOepd2",
+      "item": {
+        "_id": "M4zxIqUevFPOepd2",
+        "folder": "cMvtq5y2xfAuYybT",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Commercial Customization",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "class",
+          "description": {
+            "value": "<p>You've modified your drone, granting it a new ability. Your drone gains one additional commercial customization.</p><hr /><p><strong>Special</strong> You can select this feat up to three times.</p>"
+          },
+          "level": {
+            "value": 1
+          },
+          "maxTakable": 3,
+          "prerequisites": {
+            "value": [
+              {
+                "value": "drone exocortex"
+              }
+            ]
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "mechanic"
+            ]
+          },
+          "slug": "commercial-customization",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.M4zxIqUevFPOepd2"
+        },
+        "effects": [],
+        "_key": "!items!M4zxIqUevFPOepd2"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.feats.Item.MR7HChNvESbbCRQS",
+      "item": {
+        "_id": "MR7HChNvESbbCRQS",
+        "folder": "H4wbk2yXJ2wmpg29",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Tactical Drone",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "class",
+          "description": {
+            "value": "<p>You've improved your drone, making it a tactical robot companion and granting it additional capabilities. In addition to the one tactical customization it automatically gains from becoming a tactical robot companion, your drone gains one additional tactical customization.</p>\n<p>During an encounter, even if you don't Command your robot companion, it can still use 1 action that round on your turn to Stride or Strike. It can do this at any point during your turn, as long as you aren't currently taking an action. If it does, that's all the actions it gets that round—you can't Command it later.</p>"
+          },
+          "level": {
+            "value": 4
+          },
+          "prerequisites": {
+            "value": [
+              {
+                "value": "drone exocortex"
+              }
+            ]
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "mechanic"
+            ]
+          },
+          "slug": "tactical-drone",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.MR7HChNvESbbCRQS"
+        },
+        "effects": [],
+        "_key": "!items!MR7HChNvESbbCRQS"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.feats.Item.QmXQb52CrxLdnnDd",
+      "item": {
+        "_id": "QmXQb52CrxLdnnDd",
+        "folder": "hKziwM5wIxZegbb8",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Tactical Customization",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "class",
+          "description": {
+            "value": "<p>You've further modified your drone, granting it a new ability. Your drone gains one additional tactical customization.</p><hr /><p><strong>Special</strong> You can select this feat up to three times.</p>"
+          },
+          "level": {
+            "value": 6
+          },
+          "maxTakable": 3,
+          "prerequisites": {
+            "value": [
+              {
+                "value": "Tactical Drone"
+              }
+            ]
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "mechanic"
+            ]
+          },
+          "slug": "tactical-customization",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.QmXQb52CrxLdnnDd"
+        },
+        "effects": [],
+        "_key": "!items!QmXQb52CrxLdnnDd"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.feats.Item.RSrfmzN2iO3pJ1EI",
+      "item": {
+        "_id": "RSrfmzN2iO3pJ1EI",
+        "folder": "AalzExS31arSVHXl",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Superior Drone",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "class",
+          "description": {
+            "value": "<p>You further customize your drone. It becomes a specialized companion and gains one specialization of your choice. In addition to the one superior customization it automatically gains from becoming a specialized robot companion, your drone gains one additional superior customization.</p><hr /><p><strong>Special</strong> You can select this feat up to three times. Each time, add a different specialization to your companion, but it doesn't gain the additional superior customization.</p>"
+          },
+          "level": {
+            "value": 14
+          },
+          "maxTakable": 3,
+          "prerequisites": {
+            "value": [
+              {
+                "value": "Advanced Drone"
+              }
+            ]
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "mechanic"
+            ]
+          },
+          "slug": "superior-drone",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.RSrfmzN2iO3pJ1EI"
+        },
+        "effects": [],
+        "_key": "!items!RSrfmzN2iO3pJ1EI"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.feats.Item.RyTau718PpsZplK8",
+      "item": {
+        "_id": "RyTau718PpsZplK8",
+        "folder": "kJMZciNSRGAgiTiz",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Enhanced Familiar",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "class",
+          "description": {
+            "value": "<p>You infuse your familiar with additional magical energy, increasing its abilities. You can select four familiar or master abilities each day, instead of two.</p>"
+          },
+          "level": {
+            "value": 2
+          },
+          "prerequisites": {
+            "value": [
+              {
+                "value": "a familiar"
+              }
+            ]
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "technomancer"
+            ]
+          },
+          "slug": "enhanced-familiar",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.RyTau718PpsZplK8"
+        },
+        "effects": [],
+        "_key": "!items!RyTau718PpsZplK8"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.feats.Item.SzG4u0KXnQBFQsra",
+      "item": {
+        "_id": "SzG4u0KXnQBFQsra",
+        "folder": "AArUhHgHsT6mWY7r",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Incredible Familiar",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "class",
+          "description": {
+            "value": "<p>Your familiar is imbued with even more magic. You can select six familiar or master abilities each day, instead of four.</p>"
+          },
+          "level": {
+            "value": 8
+          },
+          "prerequisites": {
+            "value": [
+              {
+                "value": "Enhanced Familiar"
+              }
+            ]
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "technomancer"
+            ]
+          },
+          "slug": "incredible-familiar",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.SzG4u0KXnQBFQsra"
+        },
+        "effects": [],
+        "_key": "!items!SzG4u0KXnQBFQsra"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.feats.Item.goQ3sUgedWI9BeLo",
+      "item": {
+        "_id": "goQ3sUgedWI9BeLo",
+        "folder": "aRxGM7efOkdsaa87",
+        "img": "systems/sf2e/icons/default-icons/feats-sf2e.webp",
+        "name": "Advanced Customization",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "class",
+          "description": {
+            "value": "<p>You've further modified your drone, granting it a new ability. Your drone gains one additional advanced customization.</p><hr /><p><strong>Special</strong> You can select this feat up to three times.</p>"
+          },
+          "level": {
+            "value": 10
+          },
+          "maxTakable": 3,
+          "prerequisites": {
+            "value": [
+              {
+                "value": "Advanced Drone"
+              }
+            ]
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "rarity": "common",
+            "value": [
+              "mechanic"
+            ]
+          },
+          "slug": "advanced-customization",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.feats.Item.goQ3sUgedWI9BeLo"
+        },
+        "effects": [],
+        "_key": "!items!goQ3sUgedWI9BeLo"
+      }
+    },
+    {
+      "uuid": "Compendium.sf2e.class-features.Item.UCilslXlrd7ihsgY",
+      "item": {
+        "_id": "UCilslXlrd7ihsgY",
+        "folder": "7V7EkoWvWVhdI9rs",
+        "img": "systems/sf2e/icons/abilities/mechanical-claw.webp",
+        "name": "Drone",
+        "system": {
+          "actionType": {
+            "value": "passive"
+          },
+          "actions": {
+            "value": null
+          },
+          "category": "classfeature",
+          "description": {
+            "value": "<p>Your exocortex connects to a commercial robot companion called a drone that accompanies you on your adventures and follows your neural commands to the best of its abilities. (See Robot Companions for more information.) In addition to the commercial customization all robot companions receive, your drone gains two additional commercial customizations. You control your drone with your thoughts at a range of up to 150 feet; only you can operate, control, and Repair your drone. If your drone is ever beyond your range of control, it can't perform any actions. During your daily preparations, you automatically Repair your drone, restoring it to its maximum Hit Points. You can also restore your drone to maximum Hit Points by spending 1 hour to Repair your drone (or 10 minutes if you have Quick Repair). You can further customize and advance your drone by taking feats.</p>\n<p>If your drone is reduced to 0 Hit Points, rather than being destroyed, it collapses and initiates an emergency reboot, shutting down until repaired. While shut down, it becomes immune to damage, can't be harmed, and can't take any actions. At the end of 1 minute, it's restored to 1 Hit Point.</p>\n<p>By spending a little extra time, you can direct your drone to enact a more complex plan. You can spend 2 actions to Command instead of 1 when commanding your drone; your drone can then use an additional action (normally 3 actions, rather than 2).</p>\n<p>You can Modify your adjacent drone, its unarmed attacks, and any weapons it wields. The drone counts as armor for the purposes of Modify. The drone's unarmed attacks count as weapons for the purposes of Modify. You gain the following new mods.</p><ul><li><p><strong>Desperate Repair (drone exocortex):</strong> Your drone gains temporary Hit Points equal to your level plus your Intelligence modifier until the end of your next turn.</p></li><li><p><strong>Killbot (drone exocortex):</strong> Your drone gains a +2 status bonus to damage rolls. If your drone's Strikes deal more than one weapon damage die, the status bonus increases to 2 per weapon damage die, to a maximum +8 status bonus to damage rolls with four weapon damage dice.</p>\n</li></ul>"
+          },
+          "level": {
+            "value": 1
+          },
+          "prerequisites": {
+            "value": []
+          },
+          "publication": {
+            "license": "ORC",
+            "remaster": true,
+            "title": "Starfinder Tech Core"
+          },
+          "rules": [],
+          "subfeatures": {
+            "proficiencies": {},
+            "senses": {},
+            "suppressedFeatures": []
+          },
+          "traits": {
+            "otherTags": [
+              "mechanic-exocortex"
+            ],
+            "rarity": "common",
+            "value": [
+              "mechanic"
+            ]
+          },
+          "slug": "drone",
+          "_migration": {
+            "version": 0.959,
+            "previous": null
+          }
+        },
+        "type": "feat",
+        "_stats": {
+          "coreVersion": "14.361",
+          "systemId": "sf2e",
+          "systemVersion": "1.6.0",
+          "compendiumSource": "Compendium.sf2e.class-features.Item.UCilslXlrd7ihsgY"
+        },
+        "effects": [],
+        "_key": "!items!UCilslXlrd7ihsgY"
+      }
+    }
+  ]
+}

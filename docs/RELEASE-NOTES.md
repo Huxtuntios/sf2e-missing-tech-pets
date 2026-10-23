@@ -1,15 +1,12 @@
-# 0.13.0 — Mechanic Exocortex
+# 0.16.0 — PF2e Dailies integration
 
-- New **Tech Pets → Mechanic: Exocortex** manager recognizes the native Drone, Mine and Turret features, including multiple legitimately owned variants.
-- Imports missing native SF2e actions without replacing or duplicating existing Items. Opens rules and sends them to chat.
-- Drone: two additional commercial-only customization slots, saved Command cost, and confirmed repair / emergency-reboot HP updates for the linked character companion.
-- Mines: carried supply and named deployed-mine ledger, daily replacement, crafting and collection. Detonation rolls native typed fire or piercing damage and spends only the selected mine.
-- Turret: level-scaled HP, broken threshold, Hardness, mechanic-DC AC, base saves, six arrays, stored/deployed state and once-per-turn confirmed stored recovery.
-- Class progression and archetype differences are shown without granting feats or silently applying mods.
-- Existing robot/familiar data, compendiums, localization fixes, button settings and public API are preserved.
+- Optional PF2e Dailies 4.23.1+ integration: prepare the 38 Tech Core familiar abilities in its normal daily workflow.
+- Explicit per-owner/familiar connection in the existing familiar abilities section; no new character-header buttons.
+- Only the owner's standard familiar set is disabled, with safe restoration on disconnect. The local editor is hidden while connected.
+- Capacity, known prerequisites, duplicate prevention, stable UUIDs and protected Items are handled by the existing synchronizer.
+- Rest removes only this module's unchanged managed daily Items; innate, manual, edited and third-party Items remain protected.
+- Local selection remains available without a compatible Dailies API. Companion Compendia 7.6.3+ remains required.
 
-**Automation boundaries:** no scene placement, distance enforcement, automatic reactions, target selection, save rolls or damage application. Turret Strikes/upgrades/shared MAP and mod effects/durations remain manual. State operations are queued within one client, not transaction-locked across clients.
+Close existing preparation windows before switching modes. If temporary abilities from the standard Dailies set are present, rest through Dailies first. This integration does not automate all active ability effects or repeatable Skilled variants.
 
-Requires Foundry VTT v14, Starfinder 2e 1.6.0+ and active PF2e Companion Compendia 7.6.3+.
-
-Reload the world page after updating. Choose the exocortex through the native class feature before opening its manager. For a drone, create a reciprocal character-companion link in Tech Pets.
+GitHub release tag: `v0.16.0`.
