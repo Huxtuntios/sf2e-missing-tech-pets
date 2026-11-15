@@ -1351,6 +1351,7 @@ function choiceVariants(source) {
   const selections = source.flags?.[systemId()]?.rulesSelections ?? {};
   const valid = (rule, value) =>
     value === undefined ||
+    value === null ||
     rule.choices.some((choice) => choice?.value === value);
   if (
     rules.some(
@@ -1360,6 +1361,7 @@ function choiceVariants(source) {
     return [];
   const options = rules.map((rule) => [
     undefined,
+    null,
     ...rule.choices.map((choice) => choice.value),
   ]);
   if (options.reduce((total, list) => total * list.length, 1) > 256) return [];
@@ -1377,14 +1379,13 @@ function choiceVariants(source) {
         Array.isArray(rule.choices) &&
         rule.choices.length,
     );
-    // Постоянный выбор хранится в rule.selection; флаг система заполняет при подготовке,
-    // поэтому в источнике он подставляется, только если уже был записан.
+    // Сохранённый null-флаг остаётся пустым даже при выбранном rule.selection.
     const flags = variant.flags?.[systemId()]?.rulesSelections;
     variantRules.forEach((rule, index) => {
       const value = values[index];
       if (value === undefined) delete rule.selection;
       else rule.selection = value;
-      if (flags && Object.hasOwn(flags, rule.flag)) {
+      if (flags && Object.hasOwn(flags, rule.flag) && flags[rule.flag] !== null) {
         if (value === undefined) delete flags[rule.flag];
         else flags[rule.flag] = value;
       }
@@ -1808,6 +1809,9 @@ async function syncAutomationNow(ownerActor) {
             selection.catalogId,
       );
       const nativeChoice =
+        currentChassis?.toObject().system?.rules?.find(
+          (rule) => rule.key === "ChoiceSet" && rule.flag === "chassisSize",
+        )?.selection ??
         currentChassis?.flags?.[systemId()]?.rulesSelections?.chassisSize;
       const choiceData = foundry.utils.deepClone(data);
       const nativeChanged =

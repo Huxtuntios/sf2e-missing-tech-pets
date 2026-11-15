@@ -37,9 +37,11 @@ export function localizeCatalog(catalog, category, options = {}) {
 }
 function preserveConditionLinks(original, translated) {
   const names = { "off-guard": "застигнут врасплох", prone: "ничком", dazzled: "ослеплён" };
-  for (const match of original.matchAll(/@UUID\[([^\]]+)\]\{(off-guard|prone|dazzled)\}/g)) {
-    const name = names[match[2]];
-    translated = translated.replace(name, `@UUID[${match[1]}]{${name}}`);
+  for (const match of original.matchAll(/@UUID\[([^\]]+)\]\{([^}]+)\}/g)) {
+    const name = Object.entries(names).find(
+      ([english, russian]) => match[2] === english || match[2] === russian,
+    )?.[1];
+    if (name) translated = translated.replace(name, `@UUID[${match[1]}]{${name}}`);
   }
   return translated;
 }

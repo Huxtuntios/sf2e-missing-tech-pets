@@ -1386,6 +1386,35 @@ test("Недопустимый выбор или правка текста по-
     assert.equal(robot.items.has(item.id), true);
   }
 });
+test("SF2e/PF2e: selection-only смена размера со stored flag null не защищает шасси", async () => {
+  for (const system of ["sf2e", "pf2e"]) {
+    const h = await harness({ system });
+    const { owner, robot } = await pair(h, { chassisCatalogId: "tank-chassis" });
+    await h.api.syncAutomation(owner);
+    const chassis = robot.items.find((item) => item.type === "ancestry");
+    const rule = chassis.system.rules.find((item) => item.flag === "chassisSize");
+    assert.equal(chassis.toObject().flags[system].rulesSelections.chassisSize, null);
+    rule.selection = "lg";
+    chassis.getFlag(ID, "automationSource").fingerprint = h.subject.itemFingerprint(chassis.toObject());
+    rule.selection = "med";
+    const before = chassis.toObject();
+    assert.equal(before.flags[system].rulesSelections.chassisSize, null);
+    assert.equal(h.subject.canReplaceManagedItem(chassis), true);
+    assert.deepEqual(chassis.toObject(), before);
+    await h.api.syncAutomation(owner);
+    assert.equal(h.api.getRobotData(owner).chassisSizes["tank-chassis"], "med");
+    assert.equal(robot.items.find((item) => item.type === "ancestry").id, chassis.id);
+    const writes = clone(robot.writes);
+    await h.api.syncAutomation(owner);
+    assert.deepEqual(robot.writes, writes);
+    const data = h.api.getRobotData(owner);
+    data.chassisCatalogId = "";
+    data.chassis = "";
+    await owner.setFlag(ID, "robot", data);
+    await h.api.syncAutomation(owner);
+    assert.equal(robot.items.has(chassis.id), false);
+  }
+});
 test("Размер, выбранный ChoiceSet на шасси, записывается в профиль и не откатывается", async () => {
   const h = await harness(),
     { owner, robot } = await pair(h, {

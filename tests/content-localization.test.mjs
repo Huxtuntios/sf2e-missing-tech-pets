@@ -59,6 +59,28 @@ for (const system of ["sf2e", "pf2e"]) {
     assert.equal(count, 89);
   });
 }
+for (const system of ["sf2e", "pf2e"]) {
+  test(`${system}: localization of an already-translated pack preserves condition links`, async () => {
+    for (const [category, builder, family] of definitions) {
+      const pack = system === "pf2e" ? `pf2e-${category}` : category;
+      const payload = await json(`lang/babele/ru/sf2e-missing-tech-pets.${pack}.json`);
+      const sources = (await readFile(new URL(`packs/${pack}.db`, root), "utf8")).trim().split("\n").map(JSON.parse);
+      for (const entry of catalogs[family].entries) {
+        const slug = builder(entry, system).system.slug;
+        const source = sources.find((item) => item.system.slug === slug);
+        const translated = payload.entries[source._id];
+        source.name = translated.name;
+        source.system.description.value = translated.description;
+        const before = structuredClone(source);
+        const localized = localizeItemSource(source, category, entry, { language: "ru", translations });
+        assert.deepEqual(uuids(localized.system.description.value), uuids(source.system.description.value), `${pack}/${entry.id}`);
+        assert.equal(localized.system.description.value, source.system.description.value, `${pack}/${entry.id}`);
+        assert.deepEqual(technical(localized), technical(source));
+        assert.deepEqual(source, before);
+      }
+    }
+  });
+}
 test("Ten Babele translation files use stable IDs and primitive display-only mappings", async () => {
   const manifest = await json("module.json");
   let count = 0;
