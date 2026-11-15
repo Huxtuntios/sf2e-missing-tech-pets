@@ -13,7 +13,7 @@
     },
     "category": "familiar",
     "description": {
-      "value": "<p>Your familiar helps you perform. Whenever you attempt a Performance check, if your familiar is nearby and can act, it accompanies you with chirps, claps, or its own miniature instrument. This grants you a +1 circumstance bonus to the check or +2 if you&#39;re a master in Performance.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/1-accompanist\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Your familiar helps you perform. Whenever you attempt a Performance check, if your familiar is nearby and can act, it accompanies you with chirps, claps, or its own miniature instrument. This grants you a +1 circumstance bonus to the check or +2 if you&#39;re a master in Performance.</p>"
     },
     "publication": {
       "title": "Tech Core",

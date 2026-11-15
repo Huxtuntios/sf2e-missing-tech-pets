@@ -22,7 +22,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Focuses on a target within the first range increment or reach; your damaging Strikes against it make it @UUID[Compendium.sf2e.conditions.Item.AJh5ex99aV6VTggg]{off-guard} until the start of your next turn.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#imitator-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+      "value": "<p>Focuses on a target within the first range increment or reach; your damaging Strikes against it make it @UUID[Compendium.sf2e.conditions.Item.AJh5ex99aV6VTggg]{off-guard} until the start of your next turn.</p><p>@Localize[SFMTP.ManualActionHint]</p>"
     },
     "rules": [],
     "traits": {

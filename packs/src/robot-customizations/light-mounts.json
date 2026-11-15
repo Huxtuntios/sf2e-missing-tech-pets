@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Shed bright light within 20 feet and dim light for 20 feet beyond that. Switch the light on or off with one action.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Shed bright light within 20 feet and dim light for 20 feet beyond that. Switch the light on or off with one action.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

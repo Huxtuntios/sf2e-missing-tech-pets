@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Cameras built into the robot companion transmit its view to the owner. Using a comm unit or a similar device, you can see what the robot sees.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Cameras built into the robot companion transmit its view to the owner. Using a comm unit or a similar device, you can see what the robot sees.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

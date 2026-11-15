@@ -1,7 +1,6 @@
-// Единый источник предметов: используется и сборкой, и резервной загрузкой в мире.
+import { companionClassUuid, systemId } from "./system-context.mjs";
 export const MODULE_ID = "sf2e-missing-tech-pets";
-export const COMPANION_CLASS_UUID =
-  "Compendium.pf2e-animal-companions.sf-AC-Features.Item.KKOgokqHa7RjVDN6";
+export const COMPANION_CLASS_UUID = companionClassUuid("sf2e");
 export const escapeHTML = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -29,11 +28,11 @@ const conditionIds = {
   dazzled: "TkIyaNPgTZFBCCuh",
 };
 // UUID состояний сверены с извлечённым паком conditions SF2e 1.6.0.
-export function ruleText(text) {
+export function ruleText(text, system = "sf2e") {
   return escapeHTML(text).replace(
     /\b(off-guard|prone|dazzled)\b/g,
     (word) =>
-      `@UUID[Compendium.sf2e.conditions.Item.${conditionIds[word]}]{${word}}`,
+      `@UUID[Compendium.${system}.${system === "pf2e" ? "conditionitems" : "conditions"}.Item.${conditionIds[word]}]{${word}}`,
   );
 }
 export function allowedSizes(entry) {
@@ -44,13 +43,13 @@ export function allowedSizes(entry) {
       ? ["med", "lg"]
       : ["sm"];
 }
-export function buildChassisSource(entry) {
+export function buildChassisSource(entry, system = "sf2e") {
   const sizes = allowedSizes(entry);
   const size = sizes.includes("med") ? "med" : (sizes[0] ?? "med");
   const rules = [
     {
       key: "GrantItem",
-      uuid: COMPANION_CLASS_UUID,
+      uuid: companionClassUuid(system),
       flag: "techPetCompanionClass",
       allowDuplicate: false,
     },
@@ -94,13 +93,18 @@ export function buildChassisSource(entry) {
       },
       {
         key: "CreatureSize",
-        value: "{item|flags.sf2e.rulesSelections.chassisSize}",
+        value: `{item|flags.${system}.rulesSelections.chassisSize}`,
       },
     );
   for (const attack of entry.id === "imitator-chassis"
     ? []
     : (entry.attacks ?? [])) {
     const match = attack.damage.match(/(\d+)d(\d+) (\w+)/);
+    const range = attack.range ? attack.range.match(/\d+/) : null;
+    if (!match || (attack.range && !range))
+      throw new Error(
+        `${MODULE_ID} | Invalid chassis attack data: ${entry.id} / ${attack.name}`,
+      );
     const traits = [
       ...new Set([
         "unarmed",
@@ -113,13 +117,11 @@ export function buildChassisSource(entry) {
       key: "Strike",
       slug: slugify(attack.name),
       category: "unarmed",
-      label: attack.name,
+      label: `SFMTP.AttackLabels.${slugify(attack.name)}`,
       group: "brawling",
       replaceBasicUnarmed: true,
       traits,
-      range: attack.range
-        ? { increment: Number(attack.range.match(/\d+/)[0]) }
-        : null,
+      range: range ? { increment: Number(range[0]) } : null,
       damage: {
         base: {
           dice: Number(match[1]),
@@ -129,7 +131,7 @@ export function buildChassisSource(entry) {
       },
     });
   }
-  const description = `<p>${escapeHTML(entry.special ?? entry.name)}</p><p><strong>Support Benefit:</strong> ${ruleText(entry.supportBenefit)}</p><p><strong>Advanced Maneuver:</strong> ${escapeHTML(entry.advancedManeuver)}</p><p>${escapeHTML(entry.rulesNote)}</p><p><a href="${escapeHTML(entry.sourceUrl)}">Archives of Nethys · Tech Core, p. 73</a></p>`;
+  const description = `<p>${escapeHTML(entry.special ?? entry.name)}</p><p><strong>Support Benefit:</strong> ${ruleText(entry.supportBenefit, system)}</p><p><strong>Advanced Maneuver:</strong> ${escapeHTML(entry.advancedManeuver)}</p><p>${escapeHTML(entry.rulesNote)}</p>`;
   return {
     name: entry.name,
     type: "ancestry",
@@ -161,11 +163,11 @@ export function buildChassisSource(entry) {
     },
     flags: {
       [MODULE_ID]: { moduleProvided: true, chassisId: entry.id },
-      sf2e: { rulesSelections: { chassisSize: null } },
+      [system]: { rulesSelections: { chassisSize: null } },
     },
   };
 }
-export function buildManeuverSource(entry) {
+export function buildManeuverSource(entry, system = "sf2e") {
   return buildAction(
     entry,
     entry.advancedManeuver,
@@ -174,9 +176,10 @@ export function buildManeuverSource(entry) {
     entry.advancedManeuverTraits,
     entry.advancedManeuverDescription,
     "robot-maneuver",
+    system,
   );
 }
-export function buildSupportSource(entry) {
+export function buildSupportSource(entry, system = "sf2e") {
   return buildAction(
     entry,
     `${entry.name}: Support`,
@@ -185,9 +188,10 @@ export function buildSupportSource(entry) {
     [],
     entry.supportBenefit,
     "robot-support",
+    system,
   );
 }
-function buildAction(entry, name, slug, actions, traits, description, kind) {
+function buildAction(entry, name, slug, actions, traits, description, kind, system) {
   return {
     name,
     type: "action",
@@ -201,7 +205,7 @@ function buildAction(entry, name, slug, actions, traits, description, kind) {
       category: "offensive",
       publication: { ...publication },
       description: {
-        value: `<p>${ruleText(description)}</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href="${escapeHTML(entry.sourceUrl)}">Archives of Nethys · Tech Core, p. 73</a></p>`,
+        value: `<p>${ruleText(description, system)}</p><p>@Localize[SFMTP.ManualActionHint]</p>`,
       },
       rules: [],
       traits: { rarity: "common", value: traits ?? [], otherTags: [] },
@@ -310,16 +314,18 @@ export function validImitationChoice(choice) {
 }
 export function applyChassisChoices(source, entry, data) {
   source = structuredClone(source);
+  const system = systemId();
   const sizes = allowedSizes(entry);
-  if (sizes.length > 1 && sizes.includes(data.chassisSizes?.[entry.id])) {
+  const sizeRule = source.system.rules.find(
+    (rule) => rule.key === "ChoiceSet" && rule.flag === "chassisSize",
+  );
+  if (sizeRule && sizes.length > 1 && sizes.includes(data.chassisSizes?.[entry.id])) {
     const value = data.chassisSizes[entry.id];
     source.system.size = value;
-    source.flags.sf2e ??= {};
-    source.flags.sf2e.rulesSelections ??= {};
-    source.flags.sf2e.rulesSelections.chassisSize = value;
-    source.system.rules.find(
-      (rule) => rule.key === "ChoiceSet" && rule.flag === "chassisSize",
-    ).selection = value;
+    source.flags[system] ??= {};
+    source.flags[system].rulesSelections ??= {};
+    source.flags[system].rulesSelections.chassisSize = value;
+    sizeRule.selection = value;
   }
   if (entry.id !== "imitator-chassis" || !data.imitation) return source;
   const choice = data.imitation;

@@ -13,7 +13,7 @@
     },
     "category": "familiar",
     "description": {
-      "value": "<p>Your familiar in your mystic bond can use Transfer Vitality once per minute to heal itself or a bonded creature.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/27-spell-delivery\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Your familiar in your mystic bond can use Transfer Vitality once per minute to heal itself or a bonded creature.</p>"
     },
     "publication": {
       "title": "Tech Core",

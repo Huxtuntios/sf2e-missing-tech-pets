@@ -13,7 +13,7 @@
     },
     "category": "familiar",
     "description": {
-      "value": "<p>Once per day, your familiar can use 2 actions with the concentrate trait to restore 1 Focus Point to your focus pool, up to your usual maximum. You must have a focus pool to select this ability.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/22-familiar-focus\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Once per day, your familiar can use 2 actions with the concentrate trait to restore 1 Focus Point to your focus pool, up to your usual maximum. You must have a focus pool to select this ability.</p>"
     },
     "publication": {
       "title": "Tech Core",

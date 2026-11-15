@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Choose a biome, such as plains or urban terrain. In that biome the robot companion can Sneak even while observed. Its Stealth proficiency becomes expert, or master if it was already expert.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Choose a biome, such as plains or urban terrain. In that biome the robot companion can Sneak even while observed. Its Stealth proficiency becomes expert, or master if it was already expert.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

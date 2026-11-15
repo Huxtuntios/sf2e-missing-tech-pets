@@ -7,6 +7,7 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { extractPack } from "@foundryvtt/foundryvtt-cli";
 import { buildFamiliarSource } from "../scripts/familiar-sources.mjs";
+import { initializeContentLocalization } from "../scripts/content-localization.mjs";
 import {
   linkFamiliar,
   createFamiliar,
@@ -16,6 +17,7 @@ import {
   syncFamiliarAbilities,
   setInnateFamiliarItems,
   familiarFingerprint,
+  familiarCatalog,
 } from "../scripts/familiars.mjs";
 const ID = "sf2e-missing-tech-pets";
 const root = path.resolve(import.meta.dirname, "..");
@@ -65,7 +67,7 @@ class MockActor {
     this.ownership = { default: 0, player: 3 };
     this.system = {
       master: { id: master, ability: "int" },
-      attributes: { familiarAbilities: { value: 0 } },
+      attributes: { familiarAbilities: { value: 2 } },
     };
     this.flags = {};
     this.items = new Collection();
@@ -127,9 +129,7 @@ test("38 полных SF2e Action Items с неизменяемыми уника
   assert.equal(new Set(catalog.entries.map((e) => e.itemId)).size, 38);
   for (const entry of catalog.entries) {
     assert.ok(entry.description.length > 20);
-    assert.ok(
-      entry.sourceUrl.startsWith("https://2e.aonsrd.com/familiars/abilities/"),
-    );
+    assert.equal(Object.hasOwn(entry, "sourceUrl"), false);
     const source = buildFamiliarSource(entry);
     assert.equal(
       source._id,
@@ -243,19 +243,16 @@ test("Нельзя создавать дубликат фамильяра или
   game.actors.set(other.id, other);
   await rejectsKey(linkFamiliar(owner, other), "FamiliarAmbiguous");
 });
-test("Обязательная зависимость, система и права проверяются при каждой операции", async () => {
+test("Фамильяры доступны без Companion Compendia в обеих системах; права проверяются", async () => {
   const { owner, familiar } = setup();
   game.modules.get("pf2e-animal-companions").active = false;
-  await rejectsKey(
-    syncFamiliarAbilities(owner, familiar, []),
-    "DependencyMissing",
-  );
-  game.modules.get("pf2e-animal-companions").active = true;
+  await syncFamiliarAbilities(owner, familiar, []);
   game.system.id = "pf2e";
-  await rejectsKey(
-    syncFamiliarAbilities(owner, familiar, []),
-    "DependencyMissing",
-  );
+  await syncFamiliarAbilities(owner, familiar, ["flier"]);
+  assert.match([...familiar.items][0].source.img, /^systems\/pf2e\//);
+  assert.match([...familiar.items][0].flags.core.sourceId, /\.pf2e-familiar-abilities\./);
+  game.system.id = "other";
+  await rejectsKey(syncFamiliarAbilities(owner, familiar, []), "SystemMismatch");
   game.system.id = "sf2e";
   familiar.isOwner = false;
   await rejectsKey(
@@ -271,21 +268,53 @@ test("Лимит 2, нативные дополнительные способн
   await familiar.setFlag(ID, "familiarAllowance", 3);
   assert.equal(familiarAllowance(owner, familiar), 3);
 });
+test("Без источника и нативного счётчика лимит нулевой, ручной override остаётся доступен", async () => {
+  const { owner, familiar } = setup();
+  owner.system.attributes.familiarAbilities.value = 0;
+  assert.equal(familiarAllowance(owner, familiar), 0);
+  await rejectsKey(syncFamiliarAbilities(owner, familiar, ["flier"]), "FamiliarLimit");
+  assert.equal(familiar.writes.created, 0);
+  const grant = new Item({
+    name: "Familiar", type: "feat", system: {},
+    flags: { core: { sourceId: "Compendium.sf2e.feats.Item.Lxp9qwru0FVWmoE7" } },
+  });
+  owner.items.set(grant.id, grant);
+  assert.equal(familiarAllowance(owner, familiar), 2);
+  await familiar.setFlag(ID, "familiarAllowance", 5);
+  assert.equal(familiarAllowance(owner, familiar), 5);
+  await familiar.setFlag(ID, "familiarAllowance", 0);
+  assert.equal(familiarAllowance(owner, familiar), 0);
+});
 test("Повторная синхронизация не создаёт копии даже после добавления системных полей", async () => {
   const { owner, familiar } = setup();
-  await syncFamiliarAbilities(owner, familiar, ["flier", "darkvision"]);
+  assert.deepEqual(
+    await syncFamiliarAbilities(owner, familiar, ["flier", "darkvision"]),
+    { created: 2, removed: 0, protected: 0 },
+  );
   const ids = [...familiar.items.keys()];
-  await syncFamiliarAbilities(owner, familiar, [
-    "flier",
-    "darkvision",
-    "flier",
-  ]);
+  assert.deepEqual(
+    await syncFamiliarAbilities(owner, familiar, [
+      "flier",
+      "darkvision",
+      "flier",
+    ]),
+    { created: 0, removed: 0, protected: 0 },
+  );
   assert.deepEqual([...familiar.items.keys()], ids);
   assert.equal(familiar.writes.created, 2);
-  await syncFamiliarAbilities(owner, familiar, ["climber", "darkvision"]);
+  assert.deepEqual(
+    await syncFamiliarAbilities(owner, familiar, ["climber", "darkvision"]),
+    { created: 1, removed: 1, protected: 0 },
+  );
   assert.equal(familiar.items.size, 2);
   assert.equal(familiar.writes.deleted, 1);
   assert.ok([...familiar.items].some((i) => i.system.slug === "climber"));
+  assert.deepEqual(await syncFamiliarAbilities(owner, familiar, []), {
+    created: 0,
+    removed: 2,
+    protected: 0,
+  });
+  assert.deepEqual(familiar.writes, { created: 3, deleted: 3 });
 });
 test("Две параллельные записи последовательно меняют набор без дубликатов", async () => {
   const { owner, familiar } = setup();
@@ -374,6 +403,137 @@ test("Ошибка создания нового набора не удаляе�
     syncFamiliarAbilities(owner, familiar, ["darkvision"]),
     /write failed/,
   );
+  assert.equal(familiar.items.size, 1);
+});
+for (const count of [0, 1]) {
+  test(`Отмена создания после ${count} новых Items сохраняет прежний набор`, async () => {
+    const { owner, familiar } = setup();
+    await syncFamiliarAbilities(owner, familiar, ["flier"]);
+    const original = [...familiar.items][0];
+    const snapshot = original.toObject();
+    const create = familiar.createEmbeddedDocuments.bind(familiar);
+    familiar.createEmbeddedDocuments = (type, sources) =>
+      create(type, sources.slice(0, count));
+    await rejectsKey(
+      syncFamiliarAbilities(owner, familiar, ["darkvision", "climber"]),
+      "FamiliarCreateIncomplete",
+    );
+    assert.deepEqual([...familiar.items.keys()], [original.id]);
+    assert.deepEqual(original.toObject(), snapshot);
+    familiar.createEmbeddedDocuments = create;
+    const result = await syncFamiliarAbilities(owner, familiar, ["darkvision"]);
+    assert.deepEqual(result, { created: 1, removed: 1, protected: 0 });
+  });
+}
+test("Ошибка сохранения снимка откатывает только новый набор", async () => {
+  const { owner, familiar } = setup();
+  await syncFamiliarAbilities(owner, familiar, ["flier"]);
+  const original = [...familiar.items][0];
+  const create = familiar.createEmbeddedDocuments.bind(familiar);
+  familiar.createEmbeddedDocuments = async (type, sources) => {
+    const items = await create(type, sources);
+    items.at(-1).setFlag = async () => {
+      throw new Error("fingerprint write failed");
+    };
+    return items;
+  };
+  await assert.rejects(
+    syncFamiliarAbilities(owner, familiar, ["darkvision", "climber"]),
+    /fingerprint write failed/,
+  );
+  assert.deepEqual([...familiar.items.keys()], [original.id]);
+});
+test("Откат сохраняет новый Item, если пользователь успел изменить его", async () => {
+  const { owner, familiar } = setup();
+  await syncFamiliarAbilities(owner, familiar, ["flier"]);
+  const original = [...familiar.items][0];
+  const create = familiar.createEmbeddedDocuments.bind(familiar);
+  let edited;
+  familiar.createEmbeddedDocuments = async (type, sources) => {
+    const items = await create(type, sources);
+    edited = items[0];
+    items.at(-1).setFlag = async () => {
+      edited.source.name = "Player edit during replacement";
+      throw new Error("fingerprint write failed");
+    };
+    return items;
+  };
+  await assert.rejects(
+    syncFamiliarAbilities(owner, familiar, ["darkvision", "climber"]),
+    /fingerprint write failed/,
+  );
+  assert.deepEqual([...familiar.items.keys()], [original.id, edited.id]);
+  assert.equal(edited.source.name, "Player edit during replacement");
+});
+test("Частичное создание не удаляет одновременно добавленный вручную Item", async () => {
+  const { owner, familiar } = setup();
+  await syncFamiliarAbilities(owner, familiar, ["flier"]);
+  const original = [...familiar.items][0];
+  const create = familiar.createEmbeddedDocuments.bind(familiar);
+  let manual;
+  familiar.createEmbeddedDocuments = async (type, sources) => {
+    const items = await create(type, sources.slice(0, 1));
+    [manual] = await create(type, [
+      buildFamiliarSource(catalog.entries.find((entry) => entry.id === "tough")),
+    ]);
+    return items;
+  };
+  await rejectsKey(
+    syncFamiliarAbilities(owner, familiar, ["darkvision", "climber"]),
+    "FamiliarCreateIncomplete",
+  );
+  assert.deepEqual([...familiar.items.keys()], [original.id, manual.id]);
+});
+test("Ошибка отката сообщает обе причины и не удаляет прежний набор", async () => {
+  const { owner, familiar } = setup();
+  await syncFamiliarAbilities(owner, familiar, ["flier"]);
+  const original = [...familiar.items][0];
+  const create = familiar.createEmbeddedDocuments.bind(familiar);
+  familiar.createEmbeddedDocuments = (type, sources) =>
+    create(type, sources.slice(0, 1));
+  familiar.deleteEmbeddedDocuments = async () => {
+    throw new Error("rollback delete failed");
+  };
+  await assert.rejects(
+    syncFamiliarAbilities(owner, familiar, ["darkvision", "climber"]),
+    (error) => {
+      assert.ok(error instanceof AggregateError);
+      assert.match(error.message, /FamiliarRollbackFailed/);
+      assert.match(error.errors[0].message, /FamiliarCreateIncomplete/);
+      assert.match(error.errors[1].message, /rollback delete failed/);
+      return true;
+    },
+  );
+  assert.ok(familiar.items.has(original.id));
+  assert.equal(familiar.items.size, 2);
+});
+test("Каталог фамильяра загружается из фактического пути модуля", async () => {
+  setup();
+  game.modules.set(ID, { path: "custom/modules/tech-pets" });
+  let requested;
+  globalThis.fetch = async (url) => {
+    requested = url;
+    return { ok: true, json: async () => structuredClone(catalog) };
+  };
+  assert.deepEqual(await familiarCatalog(), catalog.entries);
+  assert.equal(requested, "custom/modules/tech-pets/data/familiar-abilities.json");
+});
+test("RU создаёт переведённый Item без Babele, сохраняя slug, UUID и ручные правки", async () => {
+  const { owner, familiar } = setup();
+  game.i18n.lang = "ru";
+  const translations = JSON.parse(await readFile(path.join(root, "data/ru-content.json"), "utf8"));
+  globalThis.fetch = async (url) => ({ ok: true, json: async () => structuredClone(url.endsWith("ru-content.json") ? translations : catalog) });
+  await initializeContentLocalization();
+  await syncFamiliarAbilities(owner, familiar, ["flier"]);
+  const item = [...familiar.items][0];
+  assert.equal(item.source.name, "Летун");
+  assert.match(item.system.description.value, /Скорость полёта 25 футов/);
+  assert.equal(item.system.slug, "flier");
+  assert.equal(item.flags[ID].catalogId, "flier");
+  assert.match(item.flags.core.sourceId, /\.familiar-abilities\.Item\.201b139aa03b9d91$/);
+  item.source.name = "Player edited name";
+  await syncFamiliarAbilities(owner, familiar, ["flier"]);
+  assert.equal(item.source.name, "Player edited name");
   assert.equal(familiar.items.size, 1);
 });
 test("Старая роботизированная конфигурация не переписывается новой панелью", async () => {

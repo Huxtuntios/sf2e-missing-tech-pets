@@ -90,7 +90,7 @@ test("Класс техноманта и Devoted Pet Owner сами не даю�
     ownedCompanionSources(owner).map((row) => row.kind),
     ["care"],
   );
-  assert.equal(sourceFamiliarAllowance(owner), 2);
+  assert.equal(sourceFamiliarAllowance(owner), 0);
 });
 test("Источники с нарушенными требованиями дают предупреждение, не выдачу предметов", () => {
   assert.deepEqual(

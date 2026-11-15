@@ -24,6 +24,8 @@ import {
 
 import { buildCustomizationSource } from "./customization-sources.mjs";
 import { buildFamiliarSource } from "./familiar-sources.mjs";
+import { ownPackName } from "./system-context.mjs";
+import { localizeItemSource } from "./content-localization.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const catalog = JSON.parse(
@@ -35,6 +37,9 @@ const familiars = JSON.parse(
 const customizations = JSON.parse(
   await readFile(path.join(root, "data/robot-customizations.json"), "utf8"),
 );
+const translations = JSON.parse(await readFile(path.join(root, "data/ru-content.json"), "utf8"));
+const translationDir = path.join(root, "lang/babele/ru");
+await mkdir(translationDir, { recursive: true });
 const temporary = await mkdtemp(path.join(tmpdir(), "sfmtp-build-"));
 const definitions = [
   {
@@ -59,12 +64,11 @@ const definitions = [
 ];
 if (catalog.entries.length !== 5)
   throw new Error("В каталоге должно быть пять шасси");
-for (const {
-  name,
-  prefix,
-  builder,
-  entries = catalog.entries,
-} of definitions) {
+for (const { system, definition } of ["sf2e", "pf2e"].flatMap((system) =>
+  definitions.map((definition) => ({ system, definition })),
+)) {
+  const { prefix, builder, entries = catalog.entries } = definition;
+  const name = ownPackName(definition.name, system);
   const sourceDir = path.join(root, "packs/src", name);
   await mkdir(sourceDir, { recursive: true });
   const items = entries.map((entry) => {
@@ -73,7 +77,7 @@ for (const {
       (!entry.advancedManeuverId || !entry.advancedManeuverDescription)
     )
       throw new Error(`Не описан манёвр: ${entry.id}`);
-    const source = builder(entry);
+    const source = builder(entry, system);
     const stableKey =
       prefix === "maneuver" ? entry.advancedManeuverId : entry.id;
     source._id = createHash("sha256")
@@ -84,6 +88,16 @@ for (const {
   });
   if (new Set(items.map((item) => item._id)).size !== entries.length)
     throw new Error(`Повторяющиеся ID: ${name}`);
+  const family = ["robot-support", "robot-advanced-maneuvers"].includes(definition.name) ? "robot-chassis" : definition.name;
+  const label = definition.name === "robot-support" ? translations[family].supportLabel
+    : definition.name === "robot-advanced-maneuvers" ? translations[family].maneuverLabel : translations[family].label;
+  const translatedItems = Object.fromEntries(items.map((item, index) => {
+    const translated = localizeItemSource(item, definition.name, entries[index], { language: "ru", translations });
+    return [item._id, { name: translated.name, description: translated.system.description.value }];
+  }));
+  await writeFile(path.join(translationDir, `sf2e-missing-tech-pets.${name}.json`), JSON.stringify({
+    label, mapping: { name: "name", description: "system.description.value" }, entries: translatedItems,
+  }, null, 2) + "\n");
   for (const item of items)
     await writeFile(
       path.join(sourceDir, `${item.system.slug}.json`),

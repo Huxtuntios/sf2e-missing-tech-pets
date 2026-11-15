@@ -1,6 +1,7 @@
 // Учёт устройств экзокортекса. Положение/цели/действия персонажа не изменяются автоматически.
 import { t } from "./i18n.mjs";
 import { MODULE_ID } from "./item-sources.mjs";
+import { supportedSystem, systemId, hasAnachronism, matchesNativeUuid } from "./system-context.mjs";
 import {
   NATIVE_EXOCORTEX,
   TURRET_ARRAYS,
@@ -14,11 +15,8 @@ const fail = (key) => {
   throw new Error(t(key));
 };
 export function assertExocortexAccess(owner) {
-  if (
-    game.system.id !== "sf2e" ||
-    !game.modules.get("pf2e-animal-companions")?.active
-  )
-    fail("DependencyMissing");
+  if (!supportedSystem()) fail("SystemMismatch");
+  if (systemId() === "pf2e" && !hasAnachronism()) fail("AnachronismMissing");
   if (!isMechanic(owner) || owner.isOwner === false) fail("ExoAccess");
 }
 function serialized(owner, task) {
@@ -179,7 +177,7 @@ export async function rollMineDamage(owner, damageType = "fire") {
     speaker: ChatMessage.getSpeaker({ actor: owner }),
     // SF2e читает area-damage из контекста сообщения при ручном применении IWR.
     flags: {
-      sf2e: {
+      [systemId()]: {
         context: {
           type: "damage-roll",
           sourceType: "save",
@@ -213,7 +211,7 @@ export function installExocortexActions(owner) {
     const created = [];
     for (const key of eligibleExocortexActions(owner)) {
       const uuid = NATIVE_EXOCORTEX[key];
-      if (Array.from(owner.items).some((item) => itemSource(item) === uuid))
+      if (Array.from(owner.items).some((item) => matchesNativeUuid(itemSource(item), uuid)))
         continue;
       const document = await fromUuid(uuid);
       if (!document || document.type !== "action") fail("ExoSourceMissing");
@@ -251,7 +249,7 @@ export async function showExocortexSource(owner, key, { chat = false } = {}) {
     fail("ExoVariantMissing");
   const document =
     Array.from(owner.items).find(
-      (item) => itemSource(item) === NATIVE_EXOCORTEX[key],
+      (item) => matchesNativeUuid(itemSource(item), NATIVE_EXOCORTEX[key]),
     ) ?? (await fromUuid(NATIVE_EXOCORTEX[key]));
   if (!document) fail("ExoSourceMissing");
   if (chat) return document.toMessage();

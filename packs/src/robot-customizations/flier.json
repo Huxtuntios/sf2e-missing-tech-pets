@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Your robot gains a fly Speed of 20 feet.</p><p>@Localize[SFMTP.CustomRulesHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Your robot gains a fly Speed of 20 feet.</p><p>@Localize[SFMTP.CustomRulesHint]</p>"
     },
     "traits": {
       "rarity": "common",

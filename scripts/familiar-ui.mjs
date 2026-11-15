@@ -1,4 +1,5 @@
 import { t } from "./i18n.mjs";
+import { openCatalogSource } from "./catalog-sources.mjs";
 import {
   dailiesState,
   dailiesControls,
@@ -57,13 +58,14 @@ export async function openFamiliarManager(actor, chosenId = "") {
         `<div class="sfmtp-mod-row"><label><input type="checkbox" data-innate="${esc(item.id)}" ${innate.includes(item.id) ? "checked" : ""}> ${esc(t("FamiliarInnate"))}</label><span>${esc(item.name)}</span><button type="button" data-familiar-item="${esc(item.id)}">${esc(t("FamiliarOpenItem"))}</button><button type="button" data-familiar-chat="${esc(item.id)}">${esc(t("SendToChat"))}</button></div>`,
     )
     .join("");
-  const rows = catalog
+  const visibleCatalog = catalog.map((entry) => ({ ...entry, ...entry.display }));
+  const rows = visibleCatalog
     .map((entry) => {
       const matches = all.filter((item) => item.system?.slug === entry.id);
       const protectedItem = matches.some(
         (item) => !familiarCanRemove(item, owner, familiar),
       );
-      return `<details data-familiar-row="${esc(entry.name.toLowerCase())}" class="sfmtp-familiar-entry"><summary><label><input type="checkbox" name="familiar-selection" value="${esc(entry.id)}" ${matches.length ? "checked" : ""} ${protectedItem || !familiar ? "disabled" : ""}> ${esc(entry.name)}</label> <small>${esc(t(`Category.${entry.category}`))} · ${esc(t(entry.automation === "rules" ? "FamiliarRulesShort" : "FamiliarManualShort"))}${protectedItem ? ` · ${esc(t("FamiliarProtected"))}` : ""}</small></summary><p>${esc(entry.description)}</p><p>${esc(t(entry.automation === "rules" ? "FamiliarRules" : "FamiliarManual"))}</p>${entry.prerequisites.length ? `<p>${esc(t("FamiliarRequires"))}: ${entry.prerequisites.map((id) => esc(catalog.find((e) => e.id === id)?.name ?? id)).join(", ")}</p>` : ""}<a href="${esc(entry.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(t("Source"))}</a></details>`;
+      return `<details data-familiar-row="${esc(entry.name.toLowerCase())}" class="sfmtp-familiar-entry"><summary><label><input type="checkbox" name="familiar-selection" value="${esc(entry.id)}" ${matches.length ? "checked" : ""} ${protectedItem || !familiar ? "disabled" : ""}> ${esc(entry.name)}</label> <small>${esc(t(`Category.${entry.category}`))} · ${esc(t(entry.automation === "rules" ? "FamiliarRulesShort" : "FamiliarManualShort"))}${protectedItem ? ` · ${esc(t("FamiliarProtected"))}` : ""}</small></summary><p>${esc(entry.description)}</p><p>${esc(t(entry.automation === "rules" ? "FamiliarRules" : "FamiliarManual"))}</p>${entry.prerequisites.length ? `<p>${esc(t("FamiliarRequires"))}: ${entry.prerequisites.map((id) => esc(visibleCatalog.find((e) => e.id === id)?.name ?? id)).join(", ")}</p>` : ""}<button type="button" data-familiar-source="${esc(entry.id)}">${esc(t("SourcePage"))}</button></details>`;
     })
     .join("");
   const content = `<div class="sfmtp-familiars"><h3>${esc(owner.name)}</h3><p>${esc(t("FamiliarNativeHint"))}</p><button type="button" data-companion-sources>${esc(t("SourceTitle"))}</button>${sourceWarnings(
@@ -94,8 +96,14 @@ export async function openFamiliarManager(actor, chosenId = "") {
                     ),
                   ].map((e) => e.value);
                   try {
-                    await syncFamiliarAbilities(owner, familiar, selected);
-                    ui.notifications.info(t("FamiliarSaved"));
+                    const result = await syncFamiliarAbilities(
+                      owner,
+                      familiar,
+                      selected,
+                    );
+                    ui.notifications.info(
+                      `${t("FamiliarSaved")} (+${result.created} / −${result.removed})`,
+                    );
                   } catch (error) {
                     ui.notifications.error(error.message);
                   }
@@ -109,6 +117,13 @@ export async function openFamiliarManager(actor, chosenId = "") {
         html
           .find("[data-companion-sources]")
           .on("click", () => openCompanionSources(owner));
+        html.find("[data-familiar-source]").on("click", (event) => {
+          const entry = catalog.find((item) => item.id === event.currentTarget.dataset.familiarSource);
+          if (entry)
+            void openCatalogSource("familiar-abilities", entry).catch((error) =>
+              ui.notifications.error(error.message),
+            );
+        });
         const root = html.nodes[0];
         const run = async (fn) => {
           try {

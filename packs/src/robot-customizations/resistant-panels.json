@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Choose acid, bludgeoning, cold, fire, piercing, slashing or sonic. Gain resistance to that damage equal to half the robot’s level, rounded up. This customization can be selected more than once.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Choose acid, bludgeoning, cold, fire, piercing, slashing or sonic. Gain resistance to that damage equal to half the robot’s level, rounded up. This customization can be selected more than once.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

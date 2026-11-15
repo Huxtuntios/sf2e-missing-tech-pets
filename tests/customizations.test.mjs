@@ -3,6 +3,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile, readdir, mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { extractPack } from "@foundryvtt/foundryvtt-cli";
 import { buildCustomizationSource } from "../scripts/customization-sources.mjs";
@@ -23,7 +24,7 @@ test("36 кастомизаций: фабрика, JSON, JSONL и LevelDB сов
     .map(JSON.parse);
   const destination = await mkdtemp(tmpdir() + "/sfmtp-customizations-");
   await extractPack(
-    new URL("../packs/robot-customizations", import.meta.url).pathname,
+    fileURLToPath(new URL("../packs/robot-customizations", import.meta.url)),
     destination,
     { log: false },
   );

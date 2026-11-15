@@ -1,4 +1,6 @@
 import { t } from "./i18n.mjs";
+import { supportedSystem, systemId } from "./system-context.mjs";
+import { localizeCatalog, localizeItemSource } from "./content-localization.mjs";
 import { sourceFamiliarAllowance } from "./companion-sources.mjs";
 // Нативный familiar SF2e отвечает за характеристики. Здесь только связь и выбор Items.
 import { MODULE_ID } from "./item-sources.mjs";
@@ -10,11 +12,7 @@ const fail = (key) => {
 };
 const itemsOf = (actor) => Array.from(actor.items ?? []);
 export function assertFamiliarAccess(actor) {
-  if (
-    game.system.id !== "sf2e" ||
-    !game.modules.get("pf2e-animal-companions")?.active
-  )
-    fail("DependencyMissing");
+  if (!supportedSystem()) fail("SystemMismatch");
   if (
     !actor ||
     actor.isOwner === false ||
@@ -158,11 +156,10 @@ export function familiarCanRemove(item, owner, familiar) {
   );
 }
 export async function familiarCatalog() {
-  const response = await fetch(
-    `modules/${MODULE_ID}/data/familiar-abilities.json`,
-  );
+  const base = game.modules.get(MODULE_ID)?.path ?? `modules/${MODULE_ID}`;
+  const response = await fetch(`${base}/data/familiar-abilities.json`);
   if (!response.ok) fail("FamiliarCatalogMissing");
-  return (await response.json()).entries;
+  return localizeCatalog(await response.json(), "familiar-abilities").entries;
 }
 export function validateFamiliarSelection(
   entries,
@@ -241,7 +238,7 @@ async function syncNow(owner, familiar, selectedIds) {
   const toCreate = entries
     .filter((entry) => !all.some((item) => item.system?.slug === entry.id))
     .map((entry) => {
-      const source = buildFamiliarSource(entry);
+      const source = localizeItemSource(buildFamiliarSource(entry, systemId()), "familiar-abilities", entry);
       delete source._id;
       source.flags[MODULE_ID].familiarManaged = {
         controllerActorId: owner.id,
@@ -249,14 +246,53 @@ async function syncNow(owner, familiar, selectedIds) {
       };
       return source;
     });
+  let created = [];
   if (toCreate.length) {
-    const created = await familiar.createEmbeddedDocuments("Item", toCreate);
-    // Система добавляет значения по умолчанию при создании. Снимок снимаем после неё.
-    for (const item of created)
-      await item.setFlag(MODULE_ID, "familiarManaged", {
-        controllerActorId: owner.id,
-        fingerprint: familiarFingerprint(item),
-      });
+    created = await familiar.createEmbeddedDocuments("Item", toCreate);
+    const snapshots = new Map(
+      created.map((item) => [item.id, familiarFingerprint(item)]),
+    );
+    try {
+      if (
+        created.length !== toCreate.length ||
+        toCreate.some(
+          (source) =>
+            !created.some(
+              (item) =>
+                item.system.slug === source.system.slug &&
+                item.flags?.[MODULE_ID]?.catalogId ===
+                  source.flags[MODULE_ID].catalogId,
+            ),
+        )
+      )
+        fail("FamiliarCreateIncomplete");
+      for (const item of created)
+        await item.setFlag(MODULE_ID, "familiarManaged", {
+          controllerActorId: owner.id,
+          fingerprint: snapshots.get(item.id),
+        });
+    } catch (error) {
+      const rollback = created.filter(
+        (item) =>
+          managed(item, owner) &&
+          !all.some((previous) => previous.id === item.id) &&
+          snapshots.get(item.id) === familiarFingerprint(item),
+      );
+      if (rollback.length) {
+        try {
+          await familiar.deleteEmbeddedDocuments(
+            "Item",
+            rollback.map((item) => item.id),
+          );
+        } catch (rollbackError) {
+          throw new AggregateError(
+            [error, rollbackError],
+            t("FamiliarRollbackFailed"),
+          );
+        }
+      }
+      throw error;
+    }
   }
   const obsolete = all.filter(
     (item) =>
@@ -269,7 +305,7 @@ async function syncNow(owner, familiar, selectedIds) {
       obsolete.map((item) => item.id),
     );
   return {
-    created: toCreate.length,
+    created: created.length,
     removed: obsolete.length,
     protected: protectedItems.length,
   };

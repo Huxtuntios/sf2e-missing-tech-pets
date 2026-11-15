@@ -9,7 +9,7 @@
   "system": {
     "slug": "powerful-chassis",
     "description": {
-      "value": "<p>Powerful Chassis</p><p><strong>Support Benefit:</strong> Until the start of your next turn, your Strikes that damage creatures within the robot companion&#39;s melee reach also deal 1d6 persistent bleed damage (2d6 if burly or deft).</p><p><strong>Advanced Maneuver:</strong> Hydraulic Flipper</p><p>Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.</p><p><a href=\"https://2e.aonsrd.com/companions/all#powerful-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+      "value": "<p>Powerful Chassis</p><p><strong>Support Benefit:</strong> Until the start of your next turn, your Strikes that damage creatures within the robot companion&#39;s melee reach also deal 1d6 persistent bleed damage (2d6 if burly or deft).</p><p><strong>Advanced Maneuver:</strong> Hydraulic Flipper</p><p>Chassis statistics use native fields and Rule Elements. Support benefits and advanced maneuver effects require manual resolution.</p>"
     },
     "publication": {
       "title": "Tech Core",
@@ -141,7 +141,7 @@
         "key": "Strike",
         "slug": "hydraulic-fist",
         "category": "unarmed",
-        "label": "Hydraulic fist",
+        "label": "SFMTP.AttackLabels.hydraulic-fist",
         "group": "brawling",
         "replaceBasicUnarmed": true,
         "traits": [
@@ -160,7 +160,7 @@
         "key": "Strike",
         "slug": "serrated-blade",
         "category": "unarmed",
-        "label": "Serrated blade",
+        "label": "SFMTP.AttackLabels.serrated-blade",
         "group": "brawling",
         "replaceBasicUnarmed": true,
         "traits": [

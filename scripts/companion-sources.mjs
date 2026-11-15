@@ -1,37 +1,29 @@
-// Проверенные источники SF2e: владение чертой не подменяем классом или совпадением имени.
+import { systemId, hasAnachronism, matchesNativeUuid } from "./system-context.mjs";
 export const SOURCE_FLAG = "sf2e-missing-tech-pets";
 export const GRADES = ["commercial", "tactical", "advanced", "superior"];
-const rules = "https://2e.aonsrd.com/rules/1311-companions";
-const techno = "https://2e.aonsrd.com/classes/8-technomancer";
-const mechanic = "https://2e.aonsrd.com/classes/7-mechanic/exocortex";
 const source = (slug, id, kind, extra = {}) => ({
   slug,
   kind,
   type: "feat",
   trait: "mechanic",
-  url: mechanic,
   uuid: id ? `Compendium.sf2e.feats.Item.${id}` : null,
   ...extra,
 });
 export const COMPANION_SOURCES = [
   source("familiar", "Lxp9qwru0FVWmoE7", "familiar", {
     trait: "technomancer",
-    url: techno,
     allowance: 2,
   }),
   source("enhanced-familiar", "RyTau718PpsZplK8", "familiarUpgrade", {
     trait: "technomancer",
-    url: techno,
     allowance: 4,
   }),
   source("incredible-familiar", "SzG4u0KXnQBFQsra", "familiarUpgrade", {
     trait: "technomancer",
-    url: techno,
     allowance: 6,
   }),
   source("pet", null, "pet", {
     trait: "general",
-    url: "https://2e.aonsrd.com/feats/2692-pet",
   }),
   source("drone", null, "robot", {
     uuid: "Compendium.sf2e.class-features.Item.UCilslXlrd7ihsgY",
@@ -63,7 +55,6 @@ export const COMPANION_SOURCES = [
   }),
   source("devoted-pet-owner", "Gs7y92CMsQNVcdtK", "care", {
     trait: "general",
-    url: rules,
   }),
 ];
 export function matchesCompanionSource(item, entry) {
@@ -71,12 +62,14 @@ export function matchesCompanionSource(item, entry) {
   const origin =
     item.flags?.core?.sourceId || item._stats?.compendiumSource || "";
   // Даже совпавший slug из PF2e или PF2e-пака зависимости не является SF2e-источником.
-  if (origin && entry.uuid && origin === entry.uuid) return true;
-  if (
-    origin &&
-    !origin.startsWith("Compendium.sf2e.") &&
-    !origin.startsWith("Compendium.pf2e-animal-companions.sf-AC-")
-  )
+  if (origin && entry.uuid && matchesNativeUuid(origin, entry.uuid)) return true;
+  const activeSystem = systemId();
+  const prefixes = activeSystem === "sf2e"
+    ? ["Compendium.sf2e.", "Compendium.pf2e-animal-companions.sf-AC-"]
+    : hasAnachronism()
+      ? ["Compendium.sf2e-anachronism.", "Compendium.pf2e-animal-companions.AC-"]
+      : [];
+  if (origin && !prefixes.some((prefix) => origin.startsWith(prefix)))
     return false;
   const system = item.system ?? {};
   if ((system.slug ?? system.identifier) !== entry.slug) return false;
@@ -95,7 +88,7 @@ export function ownedCompanionSources(actor) {
 }
 export function sourceFamiliarAllowance(actor) {
   return Math.max(
-    2,
+    0,
     ...ownedCompanionSources(actor).map((entry) => entry.allowance ?? 0),
   );
 }

@@ -1,7 +1,4 @@
-// Сверено с Tech Core/AON и исходными Items SF2e 1.6.0. Чистые расчёты без записи в актёров.
-export const EXOCORTEX_SOURCE =
-  "https://2e.aonsrd.com/classes/7-mechanic/exocortex";
-export const MECHANIC_SOURCE = "https://2e.aonsrd.com/classes/7-mechanic";
+import { matchesNativeUuid } from "./system-context.mjs";
 export const NATIVE_EXOCORTEX = {
   exocortex: "Compendium.sf2e.class-features.Item.23Km290iJ9SNG7w1",
   drone: "Compendium.sf2e.class-features.Item.UCilslXlrd7ihsgY",
@@ -51,7 +48,7 @@ export function isMechanic(actor) {
     ) ||
       has(actor, "mechanic-dedication") ||
       items(actor).some(
-        (item) => itemSource(item) === NATIVE_EXOCORTEX.exocortex,
+        (item) => matchesNativeUuid(itemSource(item), NATIVE_EXOCORTEX.exocortex),
       ))
   );
 }
@@ -60,7 +57,7 @@ export function exocortexVariants(actor) {
     items(actor).some(
       (item) =>
         item.type === "feat" &&
-        (itemSource(item) === NATIVE_EXOCORTEX[variant] ||
+        (matchesNativeUuid(itemSource(item), NATIVE_EXOCORTEX[variant]) ||
           (slug(item) === variant &&
             item.system?.traits?.otherTags?.includes("mechanic-exocortex"))),
     ),
@@ -133,6 +130,20 @@ export function eligibleExocortexActions(actor) {
   if (stats.mobile && stats.variants.some((variant) => variant !== "drone"))
     result.push("reposition");
   return result;
+}
+// Требование «любая из» засчитывают только каталоговые записи; ручные заметки не подтверждают предпосылку.
+export function unmetCustomizationRequirements(modifications, catalog) {
+  const present = new Set(
+    (modifications ?? [])
+      .filter((entry) => !entry?.manual && entry?.catalogId)
+      .map((entry) => entry.catalogId),
+  );
+  return (catalog ?? []).filter(
+    (entry) =>
+      present.has(entry.id) &&
+      entry.requiresAny?.length &&
+      !entry.requiresAny.some((id) => present.has(id)),
+  );
 }
 // Ограниченные слоты оплачивают только записи каталога своей ступени; ручные записи — общими слотами.
 export function customizationCapacity(

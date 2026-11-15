@@ -439,7 +439,7 @@ test("Операции запрещены без зависимости, в PF2e
   await assert.rejects(updateExocortex(owner, "mine-craft"));
   owner.isOwner = true;
   game.modules.get("pf2e-animal-companions").active = false;
-  assert.throws(() => assertExocortexAccess(owner));
+  assert.doesNotThrow(() => assertExocortexAccess(owner));
   game.modules.get("pf2e-animal-companions").active = true;
   game.system.id = "pf2e";
   await assert.rejects(rollMineDamage(owner));

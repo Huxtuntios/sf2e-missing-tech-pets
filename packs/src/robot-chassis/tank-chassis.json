@@ -9,7 +9,7 @@
   "system": {
     "slug": "tank-chassis",
     "description": {
-      "value": "<p>Tank Chassis</p><p><strong>Support Benefit:</strong> Gain a +1 circumstance bonus to your next Strike against a foe within the robot’s melee reach; it ends after the Strike or at the start of your next turn.</p><p><strong>Advanced Maneuver:</strong> Ram Slam</p><p>Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.</p><p><a href=\"https://2e.aonsrd.com/companions/all#tank-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+      "value": "<p>Tank Chassis</p><p><strong>Support Benefit:</strong> Gain a +1 circumstance bonus to your next Strike against a foe within the robot’s melee reach; it ends after the Strike or at the start of your next turn.</p><p><strong>Advanced Maneuver:</strong> Ram Slam</p><p>Chassis statistics use native fields and Rule Elements. Support benefits and advanced maneuver effects require manual resolution.</p>"
     },
     "publication": {
       "title": "Tech Core",
@@ -141,7 +141,7 @@
         "key": "Strike",
         "slug": "battering-ram",
         "category": "unarmed",
-        "label": "Battering ram",
+        "label": "SFMTP.AttackLabels.battering-ram",
         "group": "brawling",
         "replaceBasicUnarmed": true,
         "traits": [

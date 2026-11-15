@@ -138,7 +138,9 @@
 }
 
 /* Только список родословных: компендиум и штатный drag-and-drop не скрываются. */
-.abc-picker li[data-uuid^="Compendium.sf2e-missing-tech-pets.robot-chassis."] {
+.abc-picker li[data-uuid^="Compendium.sf2e-missing-tech-pets.robot-chassis."],
+.abc-picker
+  li[data-uuid^="Compendium.sf2e-missing-tech-pets.pf2e-robot-chassis."] {
   display: none !important;
 }
 .abc-picker li[hidden] {

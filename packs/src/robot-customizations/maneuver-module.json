@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Choose two of Disarm, Grapple, Reposition, Shove or Trip. Gain a +1 circumstance bonus to those actions, or +2 if superior. Repeat selections must choose different actions.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Choose two of Disarm, Grapple, Reposition, Shove or Trip. Gain a +1 circumstance bonus to those actions, or +2 if superior. Repeat selections must choose different actions.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

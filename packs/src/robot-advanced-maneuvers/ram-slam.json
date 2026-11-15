@@ -22,7 +22,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>The robot companion Strides in a straight line and makes a battering ram Strike. If it moved at least 20 feet and the Strike hits, the target is pushed back 10 feet.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#tank-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+      "value": "<p>The robot companion Strides in a straight line and makes a battering ram Strike. If it moved at least 20 feet and the Strike hits, the target is pushed back 10 feet.</p><p>@Localize[SFMTP.ManualActionHint]</p>"
     },
     "rules": [],
     "traits": {

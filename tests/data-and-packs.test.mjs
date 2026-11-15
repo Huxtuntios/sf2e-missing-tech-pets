@@ -33,7 +33,7 @@ async function packSources(name) {
     .sort();
   return Promise.all(names.map((file) => json(`packs/src/${name}/${file}`)));
 }
-test("Манифест v14/SF2e, обязательная зависимость 7.6.3 и пять собственных паков", async () => {
+test("Манифест v14/PF2e/SF2e, необязательная интеграция 7.6.3 и десять паков", async () => {
   const manifest = await json("module.json");
   assert.equal(manifest.id, "sf2e-missing-tech-pets");
   assert.match(manifest.version, /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/);
@@ -47,14 +47,17 @@ test("Манифест v14/SF2e, обязательная зависимость
     manifest.relationships.systems[0].compatibility.minimum,
     "1.6.0",
   );
-  assert.equal(manifest.relationships.requires[0].id, "pf2e-animal-companions");
+  assert.equal(manifest.relationships.systems[1].id, "pf2e");
+  assert.equal(manifest.relationships.systems[1].compatibility.minimum, "8.7.0");
+  assert.equal(manifest.relationships.requires, undefined);
+  assert.equal(manifest.relationships.recommends[0].id, "pf2e-animal-companions");
   assert.equal(
-    manifest.relationships.requires[0].compatibility.minimum,
+    manifest.relationships.recommends[0].compatibility.minimum,
     "7.6.3",
   );
-  assert.equal(manifest.packs.length, 5);
+  assert.equal(manifest.packs.length, 10);
   for (const pack of manifest.packs) {
-    assert.equal(pack.system, "sf2e");
+    assert.equal(pack.system, pack.name.startsWith("pf2e-") ? "pf2e" : "sf2e");
     assert.equal(pack.type, "Item");
     assert.equal(pack.path, `packs/${pack.name}`);
     assert.equal(pack.ownership.PLAYER, "OBSERVER");
@@ -313,7 +316,7 @@ test("Ключи локализации разрешаются по пути Fou
           : leaves(entry, fullKey);
       });
     const entries = leaves(translations.SFMTP);
-    assert.equal(entries.length, 361);
+    assert.equal(entries.length, 370);
     for (const [key, value] of entries) {
       assert.equal(typeof value, "string");
       assert.ok(lookup(translations, `SFMTP.${key}`));

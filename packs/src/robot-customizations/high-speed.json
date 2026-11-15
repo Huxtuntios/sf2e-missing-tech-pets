@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Increase one of the robot’s Speeds to 40 feet. Choose which Speed manually.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Increase one of the robot’s Speeds to 40 feet. Choose which Speed manually.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

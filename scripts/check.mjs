@@ -4,12 +4,13 @@ import { readdir, readFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { assertReferenceFree } from "../tools/reference-check.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 async function files(directory) {
   const result = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (["node_modules", ".git"].includes(entry.name)) continue;
+    if (["node_modules", ".git", "dist"].includes(entry.name)) continue;
     const filename = path.join(directory, entry.name);
     if (entry.isDirectory()) result.push(...(await files(filename)));
     else if (entry.isFile()) result.push(filename);
@@ -17,6 +18,8 @@ async function files(directory) {
   return result;
 }
 const all = await files(root);
+for (const filename of all.filter((name) => /\.(?:json|db|mjs|md|txt|css|html|svg|ya?ml)$/.test(name)))
+  assertReferenceFree(await readFile(filename, "utf8"), path.relative(root, filename));
 const jsonFiles = all.filter((filename) => filename.endsWith(".json"));
 for (const filename of jsonFiles) JSON.parse(await readFile(filename, "utf8"));
 const modules = all.filter((filename) => filename.endsWith(".mjs"));

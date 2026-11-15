@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Choose a skill in which both owner and robot are trained. While the robot is within reach, the owner gains a +1 circumstance bonus to that skill’s checks.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Choose a skill in which both owner and robot are trained. While the robot is within reach, the owner gains a +1 circumstance bonus to that skill’s checks.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

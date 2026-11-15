@@ -13,7 +13,7 @@
     },
     "category": "familiar",
     "description": {
-      "value": "<p>It gains the amphibious trait, allowing it to breathe in both air and water, and has both a land Speed and a swim Speed, each equal to its highest land Speed or swim Speed.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/28-amphibious\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>It gains the amphibious trait, allowing it to breathe in both air and water, and has both a land Speed and a swim Speed, each equal to its highest land Speed or swim Speed.</p>"
     },
     "publication": {
       "title": "Tech Core",
