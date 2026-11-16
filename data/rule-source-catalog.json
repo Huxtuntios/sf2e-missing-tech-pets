@@ -1,30 +1,27 @@
 {
-  "schemaVersion": 1,
-  "note": "Source index only. This file deliberately does not redistribute full rule text or artwork.",
+  "schemaVersion": 2,
+  "note": "Local document collections for the active system. PF2e uses the pf2e- variants of this module's Item packs.",
   "sources": [
     {
       "category": "robotCompanions",
-      "label": "Starfinder 2e Tech Core — Robot Companions / Robot Customization",
-      "url": "https://2e.aonsrd.com/",
-      "details": "Use Archives of Nethys search for the Robot Companion and Robot Customization sections."
+      "label": "Starfinder Tech Core — Robot Companions",
+      "pack": "robot-chassis"
     },
     {
       "category": "modifications",
-      "label": "Starfinder 2e Tech Core — robot modifications",
-      "url": "https://2e.aonsrd.com/",
-      "details": "The exact modification entries and slot costs should be encoded from verified source entries."
+      "label": "Starfinder Tech Core — Robot Customizations",
+      "pack": "robot-customizations"
     },
     {
       "category": "familiarFeats",
-      "label": "Starfinder 2e Tech Core — familiar feats and abilities",
-      "url": "https://2e.aonsrd.com/",
-      "details": "This extension can search installed item packs and import compatible items."
+      "label": "Starfinder Tech Core — Familiar Abilities",
+      "pack": "familiar-abilities"
     },
     {
-      "category": "pf2eFamiliarFeats",
-      "label": "PF2e system familiar feats / abilities",
-      "url": "https://2e.aonprd.com/",
-      "details": "Check every PF2e Rule Element and prerequisite before using it in SF2e."
+      "category": "companionClass",
+      "label": "PF2e Companion Compendia — Companion Class",
+      "pf2eUuid": "Compendium.pf2e-animal-companions.AC-Features.Item.KKOgokqHa7RjVDN6",
+      "sf2eUuid": "Compendium.pf2e-animal-companions.sf-AC-Features.Item.KKOgokqHa7RjVDN6"
     }
   ]
 }

@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Once per 10 minutes, spend one action to restore HP equal to the robot’s level, or twice its level if superior.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Once per 10 minutes, spend one action to restore HP equal to the robot’s level, or twice its level if superior.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

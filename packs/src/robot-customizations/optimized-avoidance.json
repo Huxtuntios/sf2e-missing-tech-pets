@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Choose a saving throw. A success on that save prevents damage, but not other effects. This customization can be selected more than once.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Choose a saving throw. A success on that save prevents damage, but not other effects. This customization can be selected more than once.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

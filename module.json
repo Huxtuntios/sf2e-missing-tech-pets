@@ -1,8 +1,8 @@
 {
   "id": "sf2e-missing-tech-pets",
   "title": "SF2e Missing Tech Pets",
-  "description": "Tech Core robot companions, native familiar management and mechanic exocortex tools for Starfinder Second Edition. Requires PF2e Companion Compendia.",
-  "version": "0.16.2",
+  "description": "Tech Core robot companions, native familiar management and mechanic exocortex tools for SF2e and PF2e. Companion Compendia supplies robot base classes; PF2e mechanic tools require SF2e Anachronism.",
+  "version": "1.7.0",
   "authors": [
     {
       "name": "Huxtuntios",
@@ -37,9 +37,14 @@
         "compatibility": {
           "minimum": "1.6.0"
         }
+      },
+      {
+        "id": "pf2e",
+        "type": "system",
+        "compatibility": { "minimum": "8.7.0" }
       }
     ],
-    "requires": [
+    "recommends": [
       {
         "id": "pf2e-animal-companions",
         "type": "module",
@@ -58,7 +63,7 @@
   "packs": [
     {
       "name": "robot-chassis",
-      "label": "Robot Chassis — Шасси роботов",
+      "label": "Tech Pets: Robot Chassis (SF2e)",
       "path": "packs/robot-chassis",
       "type": "Item",
       "system": "sf2e",
@@ -70,7 +75,7 @@
     },
     {
       "name": "robot-advanced-maneuvers",
-      "label": "SF2e Missing Tech Pets: Robot Advanced Maneuvers",
+      "label": "Tech Pets: Robot Advanced Maneuvers (SF2e)",
       "path": "packs/robot-advanced-maneuvers",
       "type": "Item",
       "system": "sf2e",
@@ -82,7 +87,7 @@
     },
     {
       "name": "robot-support",
-      "label": "Robot Support Benefits / Поддержка роботов",
+      "label": "Tech Pets: Robot Support Benefits (SF2e)",
       "path": "packs/robot-support",
       "type": "Item",
       "system": "sf2e",
@@ -93,7 +98,7 @@
     },
     {
       "name": "familiar-abilities",
-      "label": "Tech Core Familiar Abilities / Способности фамильяров",
+      "label": "Tech Pets: Familiar Abilities (SF2e)",
       "path": "packs/familiar-abilities",
       "type": "Item",
       "system": "sf2e",
@@ -104,7 +109,7 @@
     },
     {
       "name": "robot-customizations",
-      "label": "Robot Customizations / Кастомизации роботов",
+      "label": "Tech Pets: Robot Customizations (SF2e)",
       "path": "packs/robot-customizations",
       "type": "Item",
       "system": "sf2e",
@@ -112,6 +117,41 @@
         "PLAYER": "OBSERVER",
         "ASSISTANT": "OWNER"
       }
+    },
+    {
+      "name": "pf2e-robot-chassis",
+      "label": "Tech Pets: Robot Chassis (PF2e)",
+      "path": "packs/pf2e-robot-chassis",
+      "type": "Item", "system": "pf2e",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "pf2e-robot-advanced-maneuvers",
+      "label": "Tech Pets: Robot Advanced Maneuvers (PF2e)",
+      "path": "packs/pf2e-robot-advanced-maneuvers",
+      "type": "Item", "system": "pf2e",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "pf2e-robot-support",
+      "label": "Tech Pets: Robot Support Benefits (PF2e)",
+      "path": "packs/pf2e-robot-support",
+      "type": "Item", "system": "pf2e",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "pf2e-familiar-abilities",
+      "label": "Tech Pets: Familiar Abilities (PF2e)",
+      "path": "packs/pf2e-familiar-abilities",
+      "type": "Item", "system": "pf2e",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "pf2e-robot-customizations",
+      "label": "Tech Pets: Robot Customizations (PF2e)",
+      "path": "packs/pf2e-robot-customizations",
+      "type": "Item", "system": "pf2e",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
     }
   ],
   "packFolders": [
@@ -123,7 +163,12 @@
         "robot-advanced-maneuvers",
         "robot-support",
         "familiar-abilities",
-        "robot-customizations"
+        "robot-customizations",
+        "pf2e-robot-chassis",
+        "pf2e-robot-advanced-maneuvers",
+        "pf2e-robot-support",
+        "pf2e-familiar-abilities",
+        "pf2e-robot-customizations"
       ]
     }
   ],
@@ -131,7 +176,7 @@
   "readme": "README.md",
   "url": "https://github.com/Huxtuntios/sf2e-missing-tech-pets",
   "manifest": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/latest/download/module.json",
-  "download": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/download/v0.16.2/module.zip",
+  "download": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/download/v1.7.0/module.zip",
   "bugs": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/issues",
   "changelog": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/blob/main/CHANGELOG.md"
 }

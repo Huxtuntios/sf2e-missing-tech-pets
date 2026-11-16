@@ -1,4 +1,5 @@
 // Свой словарь загружается до регистрации окон; методы локализации Foundry не подменяются.
+import { initializeContentLocalization } from "./content-localization.mjs";
 const MODULE_ID = "sf2e-missing-tech-pets";
 let loading;
 let dictionary = {};
@@ -36,6 +37,7 @@ export function initializeLocalization() {
     };
     const english = await load("en");
     const selected = language === "en" ? english : await load(language);
+    if (language === "ru") await initializeContentLocalization();
     dictionary = {
       ...flatten({ SFMTP: english }),
       ...flatten({ SFMTP: selected }),

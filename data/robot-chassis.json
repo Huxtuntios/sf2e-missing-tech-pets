@@ -1,13 +1,11 @@
 {
   "schemaVersion": 2,
-  "source": "Archives of Nethys — Starfinder 2e Tech Core, p. 73",
-  "sourceUrl": "https://2e.aonsrd.com/companions/all",
-  "note": "Собственные Items задают параметры шасси через нативные поля и Rule Elements. Поддержка и манёвры представлены отдельными действиями; выполнение и условные эффекты остаются ручными. Манёвры выдаются при ступени Advanced/Superior.",
+  "source": "Starfinder Tech Core, p. 73",
+  "note": "Native chassis Items provide statistics, speeds, senses, skills and supported Strikes. Support and advanced maneuvers are separate actions; their conditional effects remain manual. Advanced maneuvers are granted at Advanced or Superior grade.",
   "entries": [
     {
       "id": "agile-chassis",
       "name": "Agile Chassis",
-      "sourceUrl": "https://2e.aonsrd.com/companions/all#agile-chassis",
       "type": "Robot",
       "size": "Small or Medium",
       "attacks": [
@@ -42,7 +40,7 @@
       },
       "supportBenefit": "An item or weapon carried by the robot is launched up to 20 feet into the air; you Interact to catch it.",
       "advancedManeuver": "Surgical Strike",
-      "rulesNote": "Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.",
+      "rulesNote": "Chassis statistics use native fields and Rule Elements. Support benefits and advanced maneuver effects require manual resolution.",
       "advancedManeuverId": "surgical-strike",
       "advancedManeuverActions": 2,
       "advancedManeuverTraits": [
@@ -53,7 +51,6 @@
     {
       "id": "imitator-chassis",
       "name": "Imitator Chassis",
-      "sourceUrl": "https://2e.aonsrd.com/companions/all#imitator-chassis",
       "type": "Robot",
       "size": "Varies (selected ancestry/animal)",
       "attacks": [
@@ -85,7 +82,7 @@
       "special": "Choose one ancestry or animal. The robot has that species’ size and Speeds and looks like it. Choose one unarmed attack from that species; the robot uses agile and finesse and deals 1d4 damage.",
       "supportBenefit": "Focuses on a target within the first range increment or reach; your damaging Strikes against it make it off-guard until the start of your next turn.",
       "advancedManeuver": "Disturbing Display",
-      "rulesNote": "Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.",
+      "rulesNote": "Chassis statistics use native fields and Rule Elements. Support benefits and advanced maneuver effects require manual resolution.",
       "advancedManeuverId": "disturbing-display",
       "advancedManeuverActions": 1,
       "advancedManeuverTraits": [],
@@ -94,7 +91,6 @@
     {
       "id": "powerful-chassis",
       "name": "Powerful Chassis",
-      "sourceUrl": "https://2e.aonsrd.com/companions/all#powerful-chassis",
       "type": "Robot",
       "size": "Medium or Large",
       "attacks": [
@@ -129,7 +125,7 @@
       },
       "supportBenefit": "Until the start of your next turn, your Strikes that damage creatures within the robot companion's melee reach also deal 1d6 persistent bleed damage (2d6 if burly or deft).",
       "advancedManeuver": "Hydraulic Flipper",
-      "rulesNote": "Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.",
+      "rulesNote": "Chassis statistics use native fields and Rule Elements. Support benefits and advanced maneuver effects require manual resolution.",
       "advancedManeuverId": "hydraulic-flipper",
       "advancedManeuverActions": 2,
       "advancedManeuverTraits": [],
@@ -138,7 +134,6 @@
     {
       "id": "surveillance-chassis",
       "name": "Surveillance Chassis",
-      "sourceUrl": "https://2e.aonsrd.com/companions/all#surveillance-chassis",
       "type": "Robot",
       "size": "Small",
       "attacks": [
@@ -172,7 +167,7 @@
       },
       "supportBenefit": "Until the end of your next turn, creatures adjacent to the robot can’t flank you or make you off-guard.",
       "advancedManeuver": "Blinding Spotlight",
-      "rulesNote": "Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.",
+      "rulesNote": "Chassis statistics use native fields and Rule Elements. Support benefits and advanced maneuver effects require manual resolution.",
       "advancedManeuverId": "blinding-spotlight",
       "advancedManeuverActions": 2,
       "advancedManeuverTraits": [
@@ -183,7 +178,6 @@
     {
       "id": "tank-chassis",
       "name": "Tank Chassis",
-      "sourceUrl": "https://2e.aonsrd.com/companions/all#tank-chassis",
       "type": "Robot",
       "size": "Medium or Large",
       "attacks": [
@@ -215,7 +209,7 @@
       },
       "supportBenefit": "Gain a +1 circumstance bonus to your next Strike against a foe within the robot’s melee reach; it ends after the Strike or at the start of your next turn.",
       "advancedManeuver": "Ram Slam",
-      "rulesNote": "Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.",
+      "rulesNote": "Chassis statistics use native fields and Rule Elements. Support benefits and advanced maneuver effects require manual resolution.",
       "advancedManeuverId": "ram-slam",
       "advancedManeuverActions": 2,
       "advancedManeuverTraits": [

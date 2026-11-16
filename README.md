@@ -1,8 +1,16 @@
 # SF2e Missing Tech Pets
 
+## 1.7.0 — PF2e, Russian content and safer selections
+
+Five pack families are supplied for each system (10 packs, 178 documents). English remains the source language; all 89 distinct documents have Russian names and descriptions. Babele is optional: catalogs, local source viewers and newly generated Items are localized without it. Enable Babele for translated native compendium display; translation files use stable document IDs. IDs, slugs, UUIDs and rule keys are not translated.
+
+Valid ChoiceSet changes remain manageable rather than protecting an otherwise unchanged Item forever. Linguistic Upload and Glow Up require Artificial Personality or Sapient in module selections. Existing invalid legacy selections are not silently erased. Familiar saves report actual creation/removal counts; cancellation and incomplete creation preserve the previous ability set.
+
+**Release candidate:** publication, a tag and live-world compatibility verification are separate maintainer gates. See [audit](docs/AUDIT-1.7.0.md) and [release notes](docs/RELEASE-NOTES.md).
+
 ## Descriptions, bonus abilities and updates
 
-Expand an entry in **Robot customizations** or in the tools catalog to read its mechanical description in the module; the Archives of Nethys link is an additional reference, not a replacement for the description.
+Expand an entry in **Robot customizations** or in the tools catalog to read its mechanical description. **Open local document** opens the corresponding Item from the active system's pack.
 
 Selected robot customizations are native **feat** Items with category **bonus**, shown in **Bonus Feats/Abilities** on the companion's `character` sheet. They belong to the companion, not automatically to its owner. They retain the same passive Rules, action costs and source UUIDs; no second Action/Rule Element copy is granted. Familiar abilities remain native actions on the `familiar` actor because that actor has no character bonus-feat group. Support and advanced maneuvers remain actions.
 
@@ -14,25 +22,25 @@ The installation/update URL remains:
 https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/latest/download/module.json
 ```
 
-Foundry only sees a newer version after its public GitHub release and updated Assets exist. Committing files or receiving a ZIP does not publish a release. Publish tag **v0.16.2** as a normal **Latest** release, not a draft or prerelease. The release workflow now verifies the version returned by the public latest manifest after verifying the uploaded Assets. If an old installation uses a tag-specific manifest, reinstall once using the stable URL above. See [release instructions](docs/RELEASING.md).
+Foundry only sees a newer version after its public GitHub release and updated Assets exist. Committing files or receiving a ZIP does not publish a release. Publish tag **v1.7.0** as a normal **Latest** release, not a draft or prerelease. The release workflow now verifies the version returned by the public latest manifest after verifying the uploaded Assets. If an old installation uses a tag-specific manifest, reinstall once using the stable URL above. See [release instructions](docs/RELEASING.md).
 
 
 ## Robot customization sources
 
-All **36 robot customizations** now have their own SF2e bonus feat Items in `robot-customizations`. Saving the selection no longer depends on finding a same-named Item in a third-party or familiar pack.
+All **36 robot customizations** have native bonus feat Items in `robot-customizations` (SF2e) and `pf2e-robot-customizations` (PF2e). Saving the selection no longer depends on finding a same-named Item in a third-party or familiar pack.
 
 - **Passive Rule Elements (10):** Aquatic Adaptation, Armored Plates, Climber, Flier, Burrower, Nightvision Sensors, Olfactory Receptors, Echolocation, Hardened Chassis and Speedster.
-- **Manual resolution (26):** the other customizations have descriptions and source links, without invented numerical effects. Speakers, for example, describes speaking through the robot; it does not need an artificial bonus. The catalog marks the difference, and synchronization reports manual selections as information rather than as missing sources.
+- **Manual resolution (26):** the other customizations have descriptions and local document buttons, without invented numerical effects. Speakers, for example, describes speaking through the robot; it does not need an artificial bonus. The catalog marks the difference, and synchronization reports manual selections as information rather than as missing sources.
 - **Armored Plates:** the native ChoiceSet asks for +1, or +2 for an actual Superior robot companion. Select the appropriate bonus when the Item is added; update its Rule Element selection if the robot advances. The catalog's grade limit does not itself grant advancement or decide this bonus.
 - Slot costs, grade limits and existing prerequisites still apply. Possessing an Item does not automate every active effect in its description.
 
 **Upgrading:** reload the world, open the robot's **Feats/Abilities → Robot customizations** section and save the current selection again. Keep the same profile choices. A previously module-generated, unchanged customization is corrected safely; old Actions are replaced with bonus feats after creating their replacement. Manually added or edited Items are retained; review any protected old copy yourself instead of deleting Items in bulk. An exact native drag-and-drop copy of an included customization is not duplicated or adopted for automatic deletion.
 
-Rules reference: [Robot Customizations — Archives of Nethys](https://2e.aonsrd.com/companions/types/robot/customizations).
+Rules are included in the local Robot Customizations Item pack.
 
 ## Optional PF2e Dailies integration
 
-**PF2e Dailies (`pf2e-dailies`) 4.23.1+ is optional. PF2e Companion Compendia 7.6.3+ remains required.** Integration uses the public `game.dailies.api.registerCustomDailies` API, without replacing methods or modifying the Dailies API. The API contract was checked against Dailies 4.23.1.
+**PF2e Dailies (`pf2e-dailies`) is optional; this adapter enables only version 4.23.1. Familiar tools do not require Companion Compendia.** Integration uses the public `game.dailies.api.registerCustomDailies` API, without replacing methods or modifying the Dailies API. The API contract was checked against Dailies 4.23.1.
 
 1. Enable Dailies and reload the world. Link one native `familiar` actor to its `character` owner; you must own both actors.
 2. Close existing daily-preparation windows. On the familiar sheet, expand **Choose familiar abilities** and click **Prepare in Dailies**. The same controls are available in the familiar management tool.
@@ -65,7 +73,7 @@ After updating, reload the world page to refresh translations. Existing imported
 ![Foundry VTT 14](https://img.shields.io/badge/Foundry_VTT-14-informational)
 ![Starfinder 2e](https://img.shields.io/badge/System-Starfinder_2e-orange)
 
-**Version 0.16.2.** Tech Core robot companions and native familiars: items and management tools for Foundry VTT v14 / Starfinder Second Edition.
+**Version 1.7.0 candidate.** Tech Core robot companions and native familiars: items and tools for Foundry VTT v14 / SF2e and PF2e.
 
 > Action descriptions and automated mechanics are different. See the automation notes below for effects that require manual resolution.
 
@@ -80,20 +88,22 @@ Open **Tech Pets → Companion sources and Pet**, or use the same button in **Fa
 - The recognized Drone grade is informational. **Grade limit**, actual advancement Items, burly/deft/specialization choices and their statistics remain under player/GM control. Grade-specific slots cannot pay for manual notes or a different grade. Existing records and unrelated Items are preserved.
 - **Pet** has a separate manual profile: name, active state and exactly two distinct abilities from the Pet category. The profile persists on its owner and creates no actor, feat, HP/AC, actions or Rule Elements. Its rule reference includes the Pet's statistics and prohibition on Strikes. Natural abilities and replacement/retraining are checked manually; other familiar abilities are not offered without a GM-approved workflow.
 - An active Pet profile prevents linking/creating a familiar through this module; a linked familiar prevents activating a Pet profile. Existing conflicting data is warned about, never deleted. A familiar grant that requires retraining Pet is not silently resolved.
-- Animal companions remain supported through the dependency's SF2e packs and existing linking/import tools. The module does not infer an animal-companion grant from a class, ancestry or matching name. Animal and robot companions are mutually exclusive under the rules, but either can coexist with a familiar or Pet. This broader cross-module restriction is a reminder, not an automatic scanner of every actor.
+- Animal-companion linking/import tools use Companion Compendia packs for the active system. The module does not infer an animal-companion grant from a class, ancestry or matching name. Animal and robot companions are mutually exclusive under the rules, but either can coexist with a familiar or Pet. This broader cross-module restriction is a reminder, not an automatic scanner of every actor.
 - Purchased minibots, delivery drones and turrets are not treated as companion/familiar grants. Devoted Pet Owner is a healing benefit, not a creature grant; healing and robot immunity remain manual.
 
-The source list is a curated SF2e integration, **not an exhaustive importer of PF2e classes, archetypes or ancestry feats**. Pet has an AON reference but no invented native system UUID. Full Pet sheet automation, general animal-companion grant discovery, creature prerequisite enforcement and automatic advancement-stat application are not implemented.
+The source list is a curated SF2e integration, **not an exhaustive importer of PF2e classes, archetypes or ancestry feats**. Pet has no unverified native system UUID. Full Pet sheet automation, general animal-companion grant discovery, creature prerequisite enforcement and automatic advancement-stat application are not implemented.
 
 See [source guide](docs/COMPANION-SOURCES.md) for provenance and boundaries.
 
 
-## Compatibility and Required Dependency
+## Compatibility and optional integrations
 
-- Foundry VTT **v14**, minimum **14.361**. The `minimum`, `verified`, and `maximum` fields limit support to v14.
-- Starfinder Second Edition: **sf2e 1.6.0+**.
-- **PF2e Companion Compendia (`pf2e-animal-companions`) 7.6.3+ is required and must be active.** It is declared in `relationships.requires`. The main interface and integration do not start without it.
-- The dependency's source code, SF2e items, release 7.7.3, and the SF2e reference fixes in 7.6.3 were reviewed. Its minimum required version has not been raised.
+- Foundry VTT **v14**, minimum **14.361**. The manifest's `verified` value is unchanged; it is not proof of live testing of this build.
+- Declared systems: **SF2e 1.6.0+** and **PF2e 8.7.0+**. Sources reviewed for this change: SF2e 1.7.0, PF2e 8.7.0 and SF2e Anachronism 2.5.0.
+- **PF2e Companion Compendia (`pf2e-animal-companions`) 7.6.3+ is optional (`relationships.recommends`).** Its base class is required for robot chassis, but familiar tools and exocortex bookkeeping do not require it. Pack contracts were reviewed against 7.7.3; the declared minimum is unchanged.
+- **PF2e + SF2e Anachronism:** mechanic features and SF2e source references require an active Anachronism installation and its UUID redirects. PF2e without Anachronism still offers native familiars and the module's PF2e robot packs; it does not invent mechanic features.
+- **Dailies:** only 4.23.1 is enabled by this adapter; other versions use the local editor. **Babele:** optional Russian compendium display, source-reviewed against 2.9.1.
+- Unit/mock and browser-fixture checks are not live compatibility verification. This build has not been installed in a disposable Foundry world. See [audit and live checklist](docs/AUDIT-1.7.0.md).
 
 Dependency manifest:
 
@@ -105,7 +115,7 @@ https://github.com/TikaelSol/PF2e-Animal-Companions/releases/latest/download/mod
 
 ### Install through Foundry
 
-Install and enable the required dependency first. In **Add-on Modules → Install Module**, paste:
+Enable Companion Compendia if using robot chassis. In **Add-on Modules → Install Module**, paste:
 
 ```text
 https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/latest/download/module.json
@@ -121,7 +131,7 @@ For the release asset **module.zip**, create `Data/modules/sf2e-missing-tech-pet
 1. Back up your world, actors, and existing module folder. Use a copy of your world for the first test.
 2. With Foundry shut down, extract the installation archive using the appropriate path described above. The resulting manifest path must be `Data/modules/sf2e-missing-tech-pets/module.json`, without an extra nested folder.
 3. When updating, replace the old module folder completely. Do not mix files from different versions.
-4. Install or update the required dependency, then enable both modules in your SF2e world.
+4. Enable the module in your SF2e or PF2e world. For robot chassis, also enable Companion Compendia; PF2e mechanic tools additionally require Anachronism.
 5. In module settings, click **Open tools**, select the actor and open **Tech Pets** or **Familiars**. No buttons are added to actor-sheet headers.
 
 The archive includes ready-to-use **LevelDB compendiums**. Node.js and a build step are not required for manual installation.
@@ -133,7 +143,7 @@ SF2e 1.6.0 already includes the native `familiar` actor type, its system sheet, 
 1. For initial setup, open **Module Settings → SF2e Missing Tech Pets → Open tools**, select the owner and choose **Familiars**. After linking, change the daily set directly in the familiar sheet's **Abilities** section. The advanced manager remains available from settings.
 2. Create a native familiar, or select an existing `familiar` actor that is not assigned to another master. Select the master's attribute and click **Link / save attribute**. A newly created familiar copies the master's ownership permissions. Foundry still enforces permission to create actors; if you cannot create one, ask your GM to do so.
 3. Open the familiar's native sheet and check its statistics. The module does not grant a familiar feat, determine whether the character is entitled to a familiar, or replace system methods.
-4. Select and save a daily ability set. A positive `system.attributes.familiarAbilities.value` on the master is used as the allowance; otherwise, the panel defaults to the **2 abilities** specified by the familiar rules. An explicit allowance can be entered for house rules or feats that are not automated. Leave the field blank to restore automatic handling. **This is the panel's allowance:** it does not create feats or the master's native counter. If that counter is 0, the native sheet may continue to show 0 until an appropriate system item is added.
+4. Select and save a daily ability set. The allowance uses recognized familiar grants (2/4/6) and the native counter without adding them together. With neither source nor native capacity, it is **0**, not an automatic grant of two abilities. An explicit allowance can be entered for house rules or unautomated feats; leave it blank to restore automatic handling. This panel does not create feats or change the master's native counter.
 5. Mark installed innate abilities and save those markers separately. Innate abilities count toward the allowance and cannot be removed by changing the daily set. The module does not infer them from artwork or creature type; they are explicitly designated by the user.
 
 The panel supports searching, reading descriptions, opening installed Items, sending them to chat, and opening the native familiar sheet. Links persist across restarts through native Actor data. A familiar assigned to another master is not silently reassigned. If several familiars are already linked to the same master, select the one you want to inspect and correct unwanted links on their native sheets.
@@ -166,7 +176,7 @@ The panel checks required abilities for Construct, Elemental, Kinspeech, Master'
 
 Repeated selections of Skilled for different skills currently require native drag-and-drop and manual configuration; the panel selects one copy. Imports through the module's API or browser route familiar actions to the native familiar, not to a `character` robot. Native drag-and-drop remains a user-controlled operation: do not drop these Items onto the robot or master.
 
-Changing the daily set removes only unchanged Items created by this panel for the current master. Manually added, third-party, edited, and innate Items are retained and count toward the allowance. Remove them deliberately on the native sheet if needed. Repeated or concurrent synchronization does not create duplicates. Failure to load the catalog does not clear existing abilities.
+Changing the daily set removes only unchanged Items created by this panel for the current master. Manually added, third-party, edited, and innate Items are retained and count toward the allowance. Remove them deliberately on the native sheet if needed. Repeated synchronization and queued operations within one client do not create duplicates. Cross-client writes are not locked; use one controlling client. Failure to load the catalog does not clear existing abilities.
 
 ### Migrating from the Old Familiar Catalog
 
@@ -174,7 +184,7 @@ Existing `robot.familiarAbilities` entries are not erased or transferred without
 
 Old Items on the `character` robot are not deleted. **Legacy robot synchronization no longer creates familiar Items on a character actor:** those selections are reported as skipped, while existing applied Items remain protected. After making a backup, review and manually remove unwanted old effects so they do not remain active on both the robot and familiar.
 
-At the time of review, AON appended Vital Bond's text to the end of Spell Delivery. The catalog separates that text into its existing Vital Bond entry without inventing any mechanics. The source reference and caveat are preserved.
+Vital Bond and Spell Delivery are separate catalog entries. Their descriptions remain separate without adding unsupported mechanics.
 
 ## Master and Robot Companion
 
@@ -200,10 +210,11 @@ An actor cannot have two ancestry Items. The module **does not delete** a confli
 | `familiar-abilities` | 38 action Items: Pet, Familiar, and Master abilities from Tech Core |
 | `robot-customizations` | 36 bonus feat Items with descriptions; 10 contain passive Rule Elements |
 
-Chassis use native ancestry fields and Rule Elements for base attribute modifiers, HP, size, Speeds, senses, skill training, traits, and Strikes. The base companion class is granted through `GrantItem` from the dependency's **SF2e** pack:
+Each family also has a `pf2e-` collection with the same IDs, slugs and types. Chassis use native ancestry fields and Rule Elements for base attribute modifiers, HP, size, Speeds, senses, skill training, traits and Strikes. `GrantItem` uses the active system's Companion Compendia class:
 
 ```text
-Compendium.pf2e-animal-companions.sf-AC-Features.Item.KKOgokqHa7RjVDN6
+SF2e: Compendium.pf2e-animal-companions.sf-AC-Features.Item.KKOgokqHa7RjVDN6
+PF2e: Compendium.pf2e-animal-companions.AC-Features.Item.KKOgokqHa7RjVDN6
 ```
 
 If the class is unavailable, the module does not create an incomplete new chassis. Existing Items are retained and a warning is shown.
@@ -217,7 +228,7 @@ The Support Benefit is granted with the chassis. The advanced maneuver is grante
 Before configuration, Imitator has **no generated imitated Strike**. The Medium size and 25-foot Speed in its source ancestry are placeholders, not a selected creature form. Configure the chassis before play.
 
 1. Select Imitator, then open its configuration.
-2. Find a living ancestry in `sf2e.ancestries`, or an animal from Companion Compendia's SF2e ancestry pack.
+2. Find a living ancestry in the active system's ancestry pack, or an animal from Companion Compendia's pack for that system.
 3. The source must explicitly provide a size, Speeds, and at least one unconditional melee unarmed attack.
 4. Choose a specific attack and confirm.
 
@@ -228,7 +239,7 @@ Conditional, calculated, and ranged attacks, as well as sources with ambiguous s
 ## Customizations, Abilities, and Slots
 
 - The 36 customizations have their own source Items; search tools and the compendium browser are retained. The 38 familiar abilities now have standalone Items and a dedicated panel.
-- Only compatible SF2e Item packs are used. PF2e packs, packs explicitly assigned to another system, PF2e references in Rules, and Rule Element keys unknown to the installed system are rejected.
+- Imports use Item packs for the active system; opposite-system packs and Rule references, incompatible metadata and unknown Rule Element keys are rejected. Anachronism UUID redirects are used for curated SF2e features in PF2e, not as permission to import arbitrary opposite-system documents.
 - Known robot customizations use exact own-catalog IDs, never familiar Items with matching names. For other searches, exact slug/identifier matches are searched across all allowed packs **before** falling back to names. Item types are checked. Imports preserve Rules and `flags.core.sourceId`.
 - Unidentified third-party packs without system metadata are not automatically considered safe.
 - If a source is unavailable, the selection stays in the profile; effects are not invented. A previously applied Item is not deleted merely because its source is temporarily unavailable.
@@ -241,7 +252,7 @@ Conditional, calculated, and ranged attacks, as well as sources with ambiguous s
 
 Synchronization is serialized for each controller/companion. Running it again does not recreate Items that have already been applied.
 
-Only module-generated Items belonging to the relevant `controllerActorId` and matching their unchanged control snapshot can be deleted or replaced. Manually added Items, Items belonging to other controllers, and user-edited copies are retained.
+Only module-generated Items belonging to the relevant `controllerActorId` and matching their control snapshot can be deleted or replaced. Valid declared ChoiceSet changes alone remain manageable and are preserved; changing text, other rules or using invalid choice values protects the Item. Manually added Items and Items belonging to other controllers are retained.
 
 **Older Items may not have a snapshot.** They are protected from automatic replacement even if they have an old module marker. After making a backup, compare them against the new compendiums. To migrate, manually remove only confirmed old chassis copies and their related old actions, then drag the new chassis from its compendium and synchronize again. Do not delete unrelated Items or clear flags in bulk.
 
@@ -251,7 +262,7 @@ Legacy entries without a `controllerActorId` are recognized only when the previo
 
 Open **Tech Pets → Mechanic: Exocortex** on the mechanic's character. First choose the exocortex through the **native SF2e class feature**. The panel recognizes owned Drone, Mine and Turret features, including multiple variants obtained legitimately. It does not grant the class, dedication, feats or an extra exocortex.
 
-The integration uses the existing **SF2e 1.6.0** feature and action UUIDs rather than distributing duplicate class features. **Add missing native actions to my sheet** imports only eligible Modify, Deploy Mine, Detonate Mine, Deploy Turret, Reposition Exocortex and Synchronized Step actions, preserving their source IDs and avoiding duplicate imports. Existing and manually imported actions are not replaced or deleted. Native rules can be opened or sent to chat.
+The integration uses native feature/action UUIDs reviewed in **SF2e 1.7.0**; in PF2e it requires Anachronism redirects. It does not distribute duplicate class features. **Add missing native actions to my sheet** imports only eligible Modify, Deploy Mine, Detonate Mine, Deploy Turret, Reposition Exocortex and Synchronized Step actions, preserving their source IDs and avoiding duplicate imports. Existing and manually imported actions are not replaced or deleted. Native rules can be opened or sent to chat.
 
 ### Drone
 
@@ -317,7 +328,7 @@ await api.linkFamiliar(owner, familiar, "wis");
 await api.syncFamiliarAbilities(owner, familiar, ["flier", "tough"]);
 ```
 
-`createFamiliar` requires that no other familiar is already linked and does not grant a feat to the master. `linkFamiliar` does not take over an actor assigned to another master. `syncFamiliarAbilities` returns `{ created, removed, protected }` and rejects invalid selections with a localized error. These methods also require the mandatory dependency to be active.
+`createFamiliar` requires that no other familiar is already linked and does not grant a feat to the master. `linkFamiliar` does not take over an actor assigned to another master. `syncFamiliarAbilities` returns `{ created, removed, protected }` and rejects invalid selections with a localized error. These methods work in either supported system without Companion Compendia.
 
 Additional exocortex API (all existing methods remain available):
 
@@ -344,7 +355,7 @@ Robot Item sources are defined in `data/robot-chassis.json` and `scripts/item-so
 
 Customization sources are defined in `data/robot-customizations.json` and `scripts/customization-sources.mjs`.
 
-The build updates the five `packs/src/` directories, textual `.db` snapshots, and ready-to-use LevelDB directories. The manifest loads **LevelDB**. The `.db` files are retained as inspectable text snapshots, not as the runtime pack paths for v14.
+The build updates ten `packs/src/` directories, textual `.db` snapshots, ready-to-use LevelDB directories and ten Babele translation files. The five PF2e collections have the `pf2e-` prefix; each system has 89 documents. The manifest loads **LevelDB**. The `.db` files are retained as inspectable text snapshots, not as the runtime pack paths for v14.
 
 Reproducibility is checked by document contents and IDs, not by byte-for-byte equality of LevelDB's internal files. The builder first compiles into a temporary directory, extracts and verifies the documents, then replaces the generated pack.
 
@@ -354,13 +365,7 @@ See the [changelog](CHANGELOG.md) and [release instructions](docs/RELEASING.md).
 
 - [PF2e Companion Compendia](https://github.com/TikaelSol/PF2e-Animal-Companions)
 - [PF2e Runesmith Assistant](https://github.com/ChasarooniZ/pf2e-runesmith-assistant)
-- [Robot Companions — Archives of Nethys](https://2e.aonsrd.com/companions/types/robot)
-- [Robot Customizations — Archives of Nethys](https://2e.aonsrd.com/companions/types/robot/customizations)
-- [Familiar Abilities — Archives of Nethys](https://2e.aonsrd.com/familiars/abilities)
-- [Familiar Rules — Archives of Nethys](https://2e.aonsrd.com/rules/1437-familiars)
+- Starfinder Tech Core: robot companions, customizations and familiar abilities are described in this module's local Item packs.
 - [PF2e Familiar Ability Sources](https://github.com/foundryvtt/pf2e/tree/master/packs/familiar-abilities)
 
-The interface is localized in English and Russian. Original rules and catalog names/descriptions are primarily in English. See `LICENSE.txt` for legal notices and caveats. The archive does not itself establish permission to redistribute third-party content publicly.
-
-- [Mechanic and Exocortex — Archives of Nethys](https://2e.aonsrd.com/classes/7-mechanic/exocortex)
-- [Mechanic class — Archives of Nethys](https://2e.aonsrd.com/classes/7-mechanic)
+English remains the source language of the catalogs and Item packs. Russian translations cover all 89 module-owned documents, including descriptions, support and maneuvers. Catalogs, source previews and newly applied Items use built-in localization without Babele. Enable Babele for Russian names and descriptions in native compendium browsing; ID-keyed files for both systems are included. See `LICENSE.txt` for legal notices and caveats. The archive does not itself establish permission to redistribute third-party content publicly.

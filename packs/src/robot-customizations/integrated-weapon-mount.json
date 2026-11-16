@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Gain one weapon mount per selection. Installing or removing a weapon takes 10 minutes and has the manipulate trait. One-handed weapons require one mount; two-handed weapons require two. A mounted weapon is wielded and cannot be Disarmed. Interact to reload it requires no hands and loses the manipulate trait.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Gain one weapon mount per selection. Installing or removing a weapon takes 10 minutes and has the manipulate trait. One-handed weapons require one mount; two-handed weapons require two. A mounted weapon is wielded and cannot be Disarmed. Interact to reload it requires no hands and loses the manipulate trait.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

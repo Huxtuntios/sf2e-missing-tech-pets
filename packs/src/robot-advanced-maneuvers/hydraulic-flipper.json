@@ -22,7 +22,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>The robot companion makes a melee Strike. On a successful hit, it knocks the target @UUID[Compendium.sf2e.conditions.Item.j91X7x0XSomq8d60]{prone}.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#powerful-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+      "value": "<p>The robot companion makes a melee Strike. On a successful hit, it knocks the target @UUID[Compendium.sf2e.conditions.Item.j91X7x0XSomq8d60]{prone}.</p><p>@Localize[SFMTP.ManualActionHint]</p>"
     },
     "rules": [],
     "traits": {

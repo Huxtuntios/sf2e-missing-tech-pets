@@ -44,6 +44,20 @@ test("Фильтр распознаёт пак, world-копию и родные
     true,
   );
   assert.equal(
+    isChassisSource({
+      type: "ancestry",
+      uuid: `Compendium.${ID}.pf2e-robot-chassis.Item.test`,
+    }),
+    true,
+  );
+  assert.equal(
+    isChassisSource({
+      type: "ancestry",
+      _stats: { compendiumSource: `Compendium.${ID}.pf2e-robot-chassis.Item.test` },
+    }),
+    true,
+  );
+  assert.equal(
     isChassisSource({ type: "ancestry", system: { slug: "human" } }),
     false,
   );
@@ -172,6 +186,36 @@ test("Недоступная ступень не выдаётся, но стар
     [],
   );
 });
+test("Linguistic Upload и Glow Up требуют Artificial Personality или Sapient", () => {
+  setup();
+  const add = (previous, counts) =>
+    selectedModifications(previous, catalog, counts, "superior", () => "new");
+  for (const id of ["linguistic-upload", "glow-up"]) {
+    assert.deepEqual(
+      catalog.find((entry) => entry.id === id).requiresAny,
+      ["artificial-personality", "sapient"],
+    );
+    assert.throws(() => add([], { [id]: 1 }), /CustomizationRequires/);
+    assert.throws(
+      () => add([{ id: "note", manual: true, catalogId: "sapient" }], { [id]: 1 }),
+      /CustomizationRequires/,
+    );
+    for (const base of ["artificial-personality", "sapient"])
+      assert.equal(add([], { [base]: 1, [id]: 1 }).length, 2);
+  }
+  const both = [
+    { id: "ap", catalogId: "artificial-personality" },
+    { id: "lu", catalogId: "linguistic-upload" },
+  ];
+  assert.throws(
+    () => add(both, { "artificial-personality": 0 }),
+    /CustomizationRequires/,
+  );
+  assert.deepEqual(add(both, { "artificial-personality": 0, "linguistic-upload": 0 }), []);
+  // Ранее сохранённое нарушение не мешает правке других записей.
+  const legacy = [{ id: "lu", catalogId: "linguistic-upload" }];
+  assert.equal(add(legacy, { cameras: 1 }).length, 2);
+});
 test("Контроллер: только взаимная связь или самостоятельное шасси, не обычный PC", () => {
   setup();
   const data = new Map();
@@ -223,19 +267,24 @@ test("ABCPicker скрывает только шасси, восстанавли
     hidden: false,
   };
   const world = { dataset: { uuid: "Item.copy" }, hidden: false };
+  const pf2e = {
+    dataset: { uuid: `Compendium.${ID}.pf2e-robot-chassis.Item.test` },
+    hidden: false,
+  };
   game.items.set("copy", {
     type: "ancestry",
     flags: { [ID]: { chassisId: "agile-chassis" } },
   });
   const root = {
     querySelector: () => null,
-    querySelectorAll: () => [normal, chassis, world],
+    querySelectorAll: () => [normal, chassis, world, pf2e],
   };
   const app = { options: { itemType: "ancestry" } };
   hooks.get("renderABCPicker")(app, root);
   assert.equal(normal.hidden, false);
   assert.equal(chassis.hidden, true);
   assert.equal(world.hidden, true);
+  assert.equal(pf2e.hidden, true);
   chassis.dataset.uuid = normal.dataset.uuid;
   hooks.get("renderABCPicker")(app, root);
   assert.equal(chassis.hidden, false);

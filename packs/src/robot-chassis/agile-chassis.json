@@ -9,7 +9,7 @@
   "system": {
     "slug": "agile-chassis",
     "description": {
-      "value": "<p>Agile Chassis</p><p><strong>Support Benefit:</strong> An item or weapon carried by the robot is launched up to 20 feet into the air; you Interact to catch it.</p><p><strong>Advanced Maneuver:</strong> Surgical Strike</p><p>Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.</p><p><a href=\"https://2e.aonsrd.com/companions/all#agile-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+      "value": "<p>Agile Chassis</p><p><strong>Support Benefit:</strong> An item or weapon carried by the robot is launched up to 20 feet into the air; you Interact to catch it.</p><p><strong>Advanced Maneuver:</strong> Surgical Strike</p><p>Chassis statistics use native fields and Rule Elements. Support benefits and advanced maneuver effects require manual resolution.</p>"
     },
     "publication": {
       "title": "Tech Core",
@@ -146,7 +146,7 @@
         "key": "Strike",
         "slug": "blade",
         "category": "unarmed",
-        "label": "Blade",
+        "label": "SFMTP.AttackLabels.blade",
         "group": "brawling",
         "replaceBasicUnarmed": true,
         "traits": [

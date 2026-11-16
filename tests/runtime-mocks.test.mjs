@@ -96,6 +96,16 @@ class Actor {
     this.flags[scope][key] = clone(value);
     return this;
   }
+  async update(data) {
+    for (const [key, value] of Object.entries(data)) {
+      const parts = key.split(".");
+      let cursor = this;
+      for (const part of parts.slice(0, -1)) cursor = cursor[part] ??= {};
+      cursor[parts.at(-1)] = clone(value);
+    }
+    this.writes.actorUpdates = (this.writes.actorUpdates ?? 0) + 1;
+    return this;
+  }
   async createEmbeddedDocuments(_type, sources) {
     return sources.map((source) => {
       const item = new Item(source, this);
@@ -154,6 +164,12 @@ async function harness({
       .split("\n")
       .map(JSON.parse);
     packs.set(ID + "." + name, pack(ID + "." + name, sources));
+    if (system === "pf2e") {
+      const pfSources = (await readFile(path.join(root, "packs", "pf2e-" + name + ".db"), "utf8"))
+        .trim().split("\n").map(JSON.parse);
+      const collection = ID + ".pf2e-" + name;
+      packs.set(collection, pack(collection, pfSources, "pf2e"));
+    }
   }
   const manifest = JSON.parse(
     await readFile(
@@ -161,19 +177,16 @@ async function harness({
       "utf8",
     ),
   );
-  for (const data of manifest.packs.filter((p) => p.name.startsWith("sf-AC-")))
-    packs.set(DEP + "." + data.name, pack(DEP + "." + data.name, []));
-  packs.set(
-    DEP + ".sf-AC-Features",
-    pack(DEP + ".sf-AC-Features", [
-      JSON.parse(
-        await readFile(
-          path.join(root, "tests/fixtures/companion-class.json"),
-          "utf8",
-        ),
-      ),
-    ]),
+  for (const data of manifest.packs.filter((p) => p.system === system))
+    packs.set(DEP + "." + data.name, pack(DEP + "." + data.name, [], system));
+  const classSource = JSON.parse(
+    await readFile(path.join(root, "tests/fixtures/companion-class.json"), "utf8"),
   );
+  if (system === "pf2e") {
+    classSource._stats = { ...classSource._stats, systemId: "pf2e" };
+  }
+  const classCollection = DEP + (system === "pf2e" ? ".AC-Features" : ".sf-AC-Features");
+  packs.set(classCollection, pack(classCollection, [classSource], system));
   const settings = new Map();
   const settingsConfigs = new Map();
   const settingsMenus = new Map();
@@ -273,7 +286,7 @@ async function harness({
   async function load(filename) {
     if (modules.has(filename)) return modules.get(filename);
     let code = await readFile(filename, "utf8");
-    if (filename.endsWith("/main.mjs"))
+    if (path.basename(filename) === "main.mjs")
       code +=
         "\nglobalThis.subject={isCompatibleItemPack,missingCompanionPacks,handleCompanionBuildItem,syncAutomation,generatedItemsForController,cleanupPreviousCompanion,findSourceItem,itemFingerprint,canReplaceManagedItem,validLink,getRobotData,openCompanionSources,openCuratedCatalog};";
     const module = new SourceTextModule(code, {
@@ -316,13 +329,36 @@ async function pair(h, extra = {}) {
   return { owner, robot };
 }
 
-test("Без зависимости или в PF2e API и интеграция не запускаются", async () => {
-  for (const options of [{ active: false }, { system: "pf2e" }]) {
-    const h = await harness(options);
-    assert.equal(h.api, undefined);
-    assert.equal(h.hooks.has("createItem"), false);
-    assert.ok(h.notifications.some((n) => n.type === "error"));
+test("Неизвестная система не запускает API и интеграцию", async () => {
+  const h = await harness({ system: "other" });
+  assert.equal(h.api, undefined);
+  assert.equal(h.hooks.has("createItem"), false);
+  assert.ok(h.notifications.some((n) => n.type === "error"));
+});
+test("Без Companion Compendia API доступен в SF2e и PF2e", async () => {
+  for (const system of ["sf2e", "pf2e"]) {
+    const h = await harness({ active: false, system });
+    assert.equal(typeof h.api.createFamiliar, "function");
+    assert.equal(typeof h.api.openExocortex, "function");
+    assert.equal(h.hooks.has("createItem"), true);
+    assert.equal(h.notifications.some((n) => n.type === "error"), false);
   }
+});
+test("PF2e синхронизация использует свои паки и сохраняет ID при повторе", async () => {
+  const h = await harness({ system: "pf2e" });
+  const { owner, robot } = await pair(h);
+  await h.api.syncAutomation(owner);
+  const ancestry = robot.items.find((item) => item.type === "ancestry");
+  assert.ok(ancestry);
+  assert.match(ancestry.system.rules.find((rule) => rule.key === "GrantItem").uuid, /\.AC-Features\./);
+  assert.ok(ancestry.flags.pf2e);
+  assert.equal(ancestry.flags.sf2e, undefined);
+  assert.match(ancestry.flags[ID].automationSource.sourcePack, /\.pf2e-robot-chassis$/);
+  const ids = [...robot.items.keys()];
+  await h.api.syncAutomation(owner);
+  assert.deepEqual([...robot.items.keys()], ids);
+  assert.equal(h.subject.isCompatibleItemPack(pack("sf2e.feats", [], "sf2e")), false);
+  assert.equal(h.subject.isCompatibleItemPack(pack("pf2e.feats-srd", [], "pf2e")), true);
 });
 test("API сохраняет все исходные методы и добавляет linkActors", async () => {
   const { api } = await harness();
@@ -578,6 +614,20 @@ test("Нативный drag-and-drop распознаёт sourceId, повтор
   );
   assert.equal(h.api.getRobotData(robot).standaloneCompanion, true);
   assert.equal(h.api.getRobotData(robot).companionActorId, "");
+});
+test("Обычная ancestry Companion Compendia не создаёт роботский профиль", async () => {
+  const h = await harness();
+  const actor = new Actor("animal");
+  h.game.actors.set(actor.id, actor);
+  const before = structuredClone(actor.flags);
+  const [item] = await actor.createEmbeddedDocuments("Item", [{
+    name: "Bird", type: "ancestry", system: { slug: "bird", rules: [] },
+    flags: { core: { sourceId: `Compendium.${DEP}.sf-AC-Ancestries-and-Class.Item.bird` } },
+  }]);
+  await h.subject.handleCompanionBuildItem(item);
+  assert.deepEqual(actor.flags, before);
+  assert.equal(actor.items.size, 1);
+  assert.equal(actor.writes.deleted, 0);
 });
 test("Связь запрещает self/cycle и занятого компаньона", async () => {
   const h = await harness(),
@@ -1067,7 +1117,8 @@ test("Новое окно источников: EN/RU, 13 источников, 
       config.content,
       /name="pet-ability" value="accompanist"/,
     );
-    assert.match(config.content, /2e.aonsrd.com\/feats\/2692-pet/);
+    assert.match(config.content, /data-pet-source=/);
+    assert.doesNotMatch(config.content, /<a\s+href=/);
     assert.equal(owner.items.size, 0);
     const handlers = new Map();
     dialog.legacyConfiguration.render({
@@ -1273,6 +1324,123 @@ test("Выбор ChoiceSet Armored Plates сохраняется повторн�
   assert.equal(item.flags.sf2e.rulesSelections.armoredPlatesBonus, 2);
   assert.deepEqual(robot.writes, writes);
 });
+test("Сменённый на Item выбор ChoiceSet не оставляет осиротевшую кастомизацию", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      modifications: [customizationChoice("armored-plates")],
+    });
+  await h.api.syncAutomation(owner);
+  const item = robot.items.find((i) => i.system.slug === "armored-plates");
+  // Снимок без выбора, затем выбор сделан на самом Item без повторного снимка.
+  item.source.system.rules[0].selection = 2;
+  item.source.flags.sf2e = { rulesSelections: { armoredPlatesBonus: 2 } };
+  const writes = clone(robot.writes);
+  await h.api.syncAutomation(owner);
+  assert.equal(item.flags.sf2e.rulesSelections.armoredPlatesBonus, 2);
+  assert.equal(robot.writes.deleted, writes.deleted);
+  assert.equal(
+    h.notifications.some((n) => n.msg === h.game.i18n.localize("SFMTP.ProtectedItems")),
+    false,
+  );
+  const data = h.api.getRobotData(owner);
+  data.modifications = [];
+  await owner.setFlag(ID, "robot", data);
+  await h.api.syncAutomation(owner);
+  assert.equal(robot.items.has(item.id), false);
+});
+test("Выбор только в rule.selection, как в источнике Foundry, тоже не замораживает Item", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      modifications: [customizationChoice("armored-plates")],
+    });
+  await h.api.syncAutomation(owner);
+  const item = robot.items.find((i) => i.system.slug === "armored-plates");
+  item.source.system.rules[0].selection = 1;
+  delete item.source.flags.sf2e;
+  item.getFlag(ID, "automationSource").fingerprint = h.subject.itemFingerprint(
+    item.toObject(),
+  );
+  item.source.system.rules[0].selection = 2;
+  const data = h.api.getRobotData(owner);
+  data.modifications = [];
+  await owner.setFlag(ID, "robot", data);
+  await h.api.syncAutomation(owner);
+  assert.equal(robot.items.has(item.id), false);
+});
+test("Недопустимый выбор или правка текста по-прежнему защищают кастомизацию", async () => {
+  for (const edit of [
+    (item) => (item.source.flags.sf2e = { rulesSelections: { armoredPlatesBonus: 7 } }),
+    (item) => (item.source.system.description.value += "<p>Моя правка</p>"),
+  ]) {
+    const h = await harness(),
+      { owner, robot } = await pair(h, {
+        modifications: [customizationChoice("armored-plates")],
+      });
+    await h.api.syncAutomation(owner);
+    const item = robot.items.find((i) => i.system.slug === "armored-plates");
+    edit(item);
+    const data = h.api.getRobotData(owner);
+    data.modifications = [];
+    await owner.setFlag(ID, "robot", data);
+    await h.api.syncAutomation(owner);
+    assert.equal(robot.items.has(item.id), true);
+  }
+});
+test("SF2e/PF2e: selection-only смена размера со stored flag null не защищает шасси", async () => {
+  for (const system of ["sf2e", "pf2e"]) {
+    const h = await harness({ system });
+    const { owner, robot } = await pair(h, { chassisCatalogId: "tank-chassis" });
+    await h.api.syncAutomation(owner);
+    const chassis = robot.items.find((item) => item.type === "ancestry");
+    const rule = chassis.system.rules.find((item) => item.flag === "chassisSize");
+    assert.equal(chassis.toObject().flags[system].rulesSelections.chassisSize, null);
+    rule.selection = "lg";
+    chassis.getFlag(ID, "automationSource").fingerprint = h.subject.itemFingerprint(chassis.toObject());
+    rule.selection = "med";
+    const before = chassis.toObject();
+    assert.equal(before.flags[system].rulesSelections.chassisSize, null);
+    assert.equal(h.subject.canReplaceManagedItem(chassis), true);
+    assert.deepEqual(chassis.toObject(), before);
+    await h.api.syncAutomation(owner);
+    assert.equal(h.api.getRobotData(owner).chassisSizes["tank-chassis"], "med");
+    assert.equal(robot.items.find((item) => item.type === "ancestry").id, chassis.id);
+    const writes = clone(robot.writes);
+    await h.api.syncAutomation(owner);
+    assert.deepEqual(robot.writes, writes);
+    const data = h.api.getRobotData(owner);
+    data.chassisCatalogId = "";
+    data.chassis = "";
+    await owner.setFlag(ID, "robot", data);
+    await h.api.syncAutomation(owner);
+    assert.equal(robot.items.has(chassis.id), false);
+  }
+});
+test("Размер, выбранный ChoiceSet на шасси, записывается в профиль и не откатывается", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      chassisCatalogId: "tank-chassis",
+      chassisSizes: { "tank-chassis": "lg" },
+    });
+  await h.api.syncAutomation(owner);
+  const chassis = robot.items.find((i) => i.type === "ancestry");
+  const rule = chassis.system.rules.find((r) => r.flag === "chassisSize");
+  assert.equal(rule.selection, "lg");
+  rule.selection = "med";
+  chassis.source.flags.sf2e.rulesSelections.chassisSize = "med";
+  await h.api.syncAutomation(owner);
+  assert.equal(h.api.getRobotData(owner).chassisSizes["tank-chassis"], "med");
+  assert.equal(robot.items.find((i) => i.type === "ancestry").id, chassis.id);
+  assert.equal(chassis.flags.sf2e.rulesSelections.chassisSize, "med");
+  const writes = clone(robot.writes);
+  await h.api.syncAutomation(owner);
+  assert.deepEqual(robot.writes, writes);
+  // Изменение в профиле после этого снова применяется к неизменённому Item.
+  const data = h.api.getRobotData(owner);
+  data.chassisSizes["tank-chassis"] = "lg";
+  await owner.setFlag(ID, "robot", data);
+  await h.api.syncAutomation(owner);
+  assert.equal(chassis.flags.sf2e.rulesSelections.chassisSize, "lg");
+});
 
 test("Отсутствующий собственный пак кастомизаций использует локальный источник", async () => {
   const h = await harness(),
@@ -1390,7 +1558,56 @@ test("Отмена preCreate без исключения сохраняет пр
   assert.equal(result.skipped, 1);
   assert.equal(old.type, "action");
 });
-test("Каталог инструментов содержит раскрываемое описание, а не одну ссылку AON", async () => {
+test("SF2e/PF2e: прямой API не применяет кастомизацию без предпосылки и сохраняет старую", async () => {
+  for (const system of ["sf2e", "pf2e"]) {
+    const h = await harness({ system });
+    const { owner, robot } = await pair(h, { baseSlots: 6, gradeLimit: "superior" });
+    await h.api.syncAutomation(owner);
+    const data = h.api.getRobotData(owner);
+    data.modifications = [customizationChoice("linguistic-upload"), customizationChoice("glow-up")];
+    await h.api.setRobotData(owner, data);
+    const rejected = await h.api.syncAutomation(owner);
+    assert.equal(rejected.skipped, 2);
+    assert.equal(robot.items.filter(i => ["linguistic-upload", "glow-up"].includes(i.system.slug)).length, 0);
+    data.modifications.push(customizationChoice("artificial-personality"));
+    await h.api.setRobotData(owner, data);
+    await h.api.syncAutomation(owner);
+    const previous = robot.items.find(i => i.system.slug === "linguistic-upload");
+    assert.ok(previous);
+    data.modifications = data.modifications.filter(i => i.catalogId !== "artificial-personality");
+    await h.api.setRobotData(owner, data);
+    await h.api.syncAutomation(owner);
+    assert.ok(robot.items.has(previous.id));
+  }
+});
+test("Отмена обычного создания не считается применённой кастомизацией", async () => {
+  const h = await harness();
+  const { owner, robot } = await pair(h);
+  const baseline = await h.api.syncAutomation(owner);
+  const data = h.api.getRobotData(owner);
+  data.modifications = [customizationChoice("aquatic-adaptation")];
+  await h.api.setRobotData(owner, data);
+  robot.createEmbeddedDocuments = async () => [];
+  const result = await h.api.syncAutomation(owner);
+  assert.equal(result.applied, baseline.applied);
+  assert.equal(result.skipped, 1);
+  assert.equal(robot.items.find(i => i.system.slug === "aquatic-adaptation"), undefined);
+});
+test("Частичное обычное создание учитывает только созданные Items", async () => {
+  const h = await harness();
+  const { owner, robot } = await pair(h, { baseSlots: 2 });
+  const baseline = await h.api.syncAutomation(owner);
+  const data = h.api.getRobotData(owner);
+  data.modifications = [customizationChoice("aquatic-adaptation"), customizationChoice("cameras")];
+  await h.api.setRobotData(owner, data);
+  const create = robot.createEmbeddedDocuments.bind(robot);
+  robot.createEmbeddedDocuments = (type, sources) => create(type, sources.slice(0, 1));
+  const result = await h.api.syncAutomation(owner);
+  assert.equal(result.applied, baseline.applied + 1);
+  assert.equal(result.skipped, 1);
+  assert.equal(robot.items.filter(i => ["aquatic-adaptation", "cameras"].includes(i.system.slug)).length, 1);
+});
+test("Каталог инструментов содержит раскрываемое описание и локальный документ", async () => {
   const h = await harness(),
     { owner } = await pair(h);
   await h.subject.openCuratedCatalog(owner, "robot-customizations");

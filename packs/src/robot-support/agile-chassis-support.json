@@ -22,7 +22,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>An item or weapon carried by the robot is launched up to 20 feet into the air; you Interact to catch it.</p><p>@Localize[SFMTP.ManualActionHint]</p><p><a href=\"https://2e.aonsrd.com/companions/all#agile-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+      "value": "<p>An item or weapon carried by the robot is launched up to 20 feet into the air; you Interact to catch it.</p><p>@Localize[SFMTP.ManualActionHint]</p>"
     },
     "rules": [],
     "traits": {

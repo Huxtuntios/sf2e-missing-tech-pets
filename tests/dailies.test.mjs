@@ -65,7 +65,7 @@ class MockActor {
     this.ownership = { default: 0, player: 3 };
     this.system = {
       master: { id: master, ability: "int" },
-      attributes: { familiarAbilities: { value: 0 } },
+      attributes: { familiarAbilities: { value: 2 } },
     };
     this.flags = {};
     this.items = new Collection();
@@ -211,6 +211,17 @@ test("Отсутствующий, выключенный и старый Dailies
     assert.equal(initializeDailiesIntegration(), false);
     assert.equal(dailiesState(owner, familiar).available, false);
     assert.equal(registered.length, 0);
+  }
+});
+test("Непроверенные версии Dailies не записывают внутренние disabled flags", async () => {
+  for (const version of ["4.23.2", "4.24.0", "5.0.0"]) {
+    const { owner, familiar, registered } = integration({ version });
+    const before = structuredClone(owner.flags);
+    assert.equal(initializeDailiesIntegration(), false);
+    await assert.rejects(connectDailies(owner, familiar, true), /DailiesUnavailable/);
+    assert.deepEqual(owner.flags, before);
+    assert.equal(registered.length, 0);
+    assert.equal(dailiesState(owner, familiar).available, false);
   }
 });
 test("Регистрация через замороженный публичный API выполняется один раз", () => {

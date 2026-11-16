@@ -13,7 +13,7 @@
     },
     "category": "familiar",
     "description": {
-      "value": "<p>When you Refocus, you generate magical energy that heals your familiar. Your familiar regains 1 Hit Point per level whenever you Refocus.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/6-focused-rejuvenation\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>When you Refocus, you generate magical energy that heals your familiar. Your familiar regains 1 Hit Point per level whenever you Refocus.</p>"
     },
     "publication": {
       "title": "Tech Core",

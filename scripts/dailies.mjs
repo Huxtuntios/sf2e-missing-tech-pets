@@ -1,6 +1,8 @@
 // Не изменяем замороженный game.dailies.api: регистрируем собственный набор
 // через публичный registerCustomDailies. Формат проверен по Dailies 4.23.1.
 import { t } from "./i18n.mjs";
+import { displayField } from "./content-localization.mjs";
+import { ownPackName } from "./system-context.mjs";
 import { MODULE_ID, escapeHTML as esc } from "./item-sources.mjs";
 import {
   assertFamiliarAccess,
@@ -24,14 +26,8 @@ function apiOf() {
   return game.dailies?.api ?? game.modules.get(DAILIES)?.api;
 }
 function compatible() {
-  const version = String(game.modules.get(DAILIES)?.version ?? "");
-  const parts = version.split(".").map(Number);
-  const current = [4, 23, 1];
-  for (let i = 0; i < 3; i++) {
-    if (!Number.isFinite(parts[i])) return false;
-    if (parts[i] !== current[i]) return parts[i] > current[i];
-  }
-  return true;
+  // Запись disabled использует внутренний контракт, проверенный только на этой версии.
+  return game.modules.get(DAILIES)?.version === "4.23.1";
 }
 function linked(owner, familiar) {
   return (
@@ -152,7 +148,7 @@ export function createFamiliarDaily() {
         { value: "", label: "—", skipUnique: true },
         ...catalog
           .filter((entry) => !protectedSlugs.has(entry.id))
-          .map((entry) => ({ value: entry.id, label: entry.name })),
+          .map((entry) => ({ value: entry.id, label: displayField(entry, "name") })),
       ];
       const note =
         protectedItems.map((item) => item.name).join(", ") || t("NoEntries");
@@ -211,7 +207,7 @@ export function createFamiliarDaily() {
       for (const id of selected) {
         const entry = catalog.find((item) => item.id === id);
         messages.add(KEY, {
-          uuid: `Compendium.${MODULE_ID}.familiar-abilities.Item.${entry.itemId}`,
+          uuid: `Compendium.${MODULE_ID}.${ownPackName("familiar-abilities")}.Item.${entry.itemId}`,
         });
       }
       if (!selected.length)

@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>The robot companion gains an artificial personality. It can attempt skill checks that require Charisma and can speak Common.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>The robot companion gains an artificial personality. It can attempt skill checks that require Charisma and can speak Common.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

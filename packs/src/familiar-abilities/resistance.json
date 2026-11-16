@@ -13,7 +13,7 @@
     },
     "category": "familiar",
     "description": {
-      "value": "<p>Choose two of the following: acid, cold, electricity, fire, poison, or sonic. Your familiar gains resistance equal to half your level (minimum resistance 1) against the chosen damage types.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/14-resistance\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Choose two of the following: acid, cold, electricity, fire, poison, or sonic. Your familiar gains resistance equal to half your level (minimum resistance 1) against the chosen damage types.</p>"
     },
     "publication": {
       "title": "Tech Core",

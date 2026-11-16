@@ -3,6 +3,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
+import { referencePattern } from "./reference-check.mjs";
 const root = path.resolve(import.meta.dirname, "..");
 const args = process.argv.slice(2);
 function option(name, fallback) {
@@ -44,26 +45,29 @@ await writeFile(
 );
 // Стандартная библиотека Python: детерминированный ZIP без дополнительной npm-зависимости.
 execFileSync(
-  "python3",
+  process.platform === "win32" ? "python" : "python3",
   [
     "-c",
     String.raw`
-import pathlib,sys,zipfile
+import pathlib,sys,zipfile,re
 root=pathlib.Path(sys.argv[1]);dist=pathlib.Path(sys.argv[2])
-files=['module.json','module.css','README.md','README.ru.md','CHANGELOG.md','LICENSE.txt','docs/RELEASING.md','docs/RELEASE-NOTES.md','docs/COMPANION-SOURCES.md']
-files += ['scripts/'+s for s in ['main.mjs','customization-sources.mjs','dailies.mjs','sheet-integration.mjs','dialog.mjs','item-sources.mjs','familiars.mjs','familiar-ui.mjs','familiar-sources.mjs','i18n.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs']]
+files=['module.json','module.css','README.md','README.ru.md','CHANGELOG.md','LICENSE.txt','docs/RELEASING.md','docs/RELEASE-NOTES.md','docs/COMPANION-SOURCES.md','docs/AUDIT-1.7.0.md']
+files += ['scripts/'+s for s in ['main.mjs','content-localization.mjs','babele.mjs','catalog-sources.mjs','system-context.mjs','customization-sources.mjs','dailies.mjs','sheet-integration.mjs','dialog.mjs','item-sources.mjs','familiars.mjs','familiar-ui.mjs','familiar-sources.mjs','i18n.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs']]
 for folder in ['assets','data','lang','packs']:
  for p in (root/folder).rglob('*'):
-  if p.is_file() and not p.is_symlink() and p.name not in ['LOG','LOG.old','LOCK']:
+  if p.is_file() and not p.is_symlink() and p.name not in ['LOG','LOG.old','LOCK'] and not p.name.endswith(('.dbtmp','-wal','-shm')):
    files.append(p.relative_to(root).as_posix())
 with zipfile.ZipFile(dist/'module.zip','w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as archive:
  for name in sorted(set(files)):
   data=((dist if name=='module.json' else root)/name).read_bytes()
+  if pathlib.PurePosixPath(name).suffix in ['.json','.db','.mjs','.md','.txt','.css','.html','.svg']:
+   assert re.search(sys.argv[3],data.decode('utf-8'),re.I) is None,'External rules reference: '+name
   info=zipfile.ZipInfo(name,date_time=(2020,1,1,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED;info.external_attr=0o100644<<16
   archive.writestr(info,data,compresslevel=9)
 `,
     root,
     dist,
+    referencePattern.source,
   ],
   { stdio: "pipe" },
 );

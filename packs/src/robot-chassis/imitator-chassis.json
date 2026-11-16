@@ -9,7 +9,7 @@
   "system": {
     "slug": "imitator-chassis",
     "description": {
-      "value": "<p>Choose one ancestry or animal. The robot has that species’ size and Speeds and looks like it. Choose one unarmed attack from that species; the robot uses agile and finesse and deals 1d4 damage.</p><p><strong>Support Benefit:</strong> Focuses on a target within the first range increment or reach; your damaging Strikes against it make it @UUID[Compendium.sf2e.conditions.Item.AJh5ex99aV6VTggg]{off-guard} until the start of your next turn.</p><p><strong>Advanced Maneuver:</strong> Disturbing Display</p><p>Шасси и продвинутый манёвр доступны как собственные нативные Items модуля. Основные параметры, скорости, чувства, навыки и поддерживаемые Strikes задаются Rule Elements. Сам текст преимущества поддержки и правила продвинутого манёвра не равны полной автоматизации их эффектов.</p><p><a href=\"https://2e.aonsrd.com/companions/all#imitator-chassis\">Archives of Nethys · Tech Core, p. 73</a></p>"
+      "value": "<p>Choose one ancestry or animal. The robot has that species’ size and Speeds and looks like it. Choose one unarmed attack from that species; the robot uses agile and finesse and deals 1d4 damage.</p><p><strong>Support Benefit:</strong> Focuses on a target within the first range increment or reach; your damaging Strikes against it make it @UUID[Compendium.sf2e.conditions.Item.AJh5ex99aV6VTggg]{off-guard} until the start of your next turn.</p><p><strong>Advanced Maneuver:</strong> Disturbing Display</p><p>Chassis statistics use native fields and Rule Elements. Support benefits and advanced maneuver effects require manual resolution.</p>"
     },
     "publication": {
       "title": "Tech Core",

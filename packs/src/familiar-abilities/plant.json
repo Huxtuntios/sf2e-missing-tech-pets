@@ -13,7 +13,7 @@
     },
     "category": "familiar",
     "description": {
-      "value": "<p>Your familiar has the plant trait instead of the animal trait.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/12-plant\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Your familiar has the plant trait instead of the animal trait.</p>"
     },
     "publication": {
       "title": "Tech Core",

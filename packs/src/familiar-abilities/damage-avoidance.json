@@ -13,7 +13,7 @@
     },
     "category": "familiar",
     "description": {
-      "value": "<p>Choose one type of save. Your familiar takes no damage when it rolls a success on that type of save; this doesn&#39;t prevent effects other than damage.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/3-damage-avoidance\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Choose one type of save. Your familiar takes no damage when it rolls a success on that type of save; this doesn&#39;t prevent effects other than damage.</p>"
     },
     "publication": {
       "title": "Tech Core",

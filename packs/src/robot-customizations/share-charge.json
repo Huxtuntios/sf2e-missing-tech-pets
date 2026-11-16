@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>The robot can power battery-using items from its reserves, even if the item has no battery or charges.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>The robot can power battery-using items from its reserves, even if the item has no battery or charges.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

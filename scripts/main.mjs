@@ -3,13 +3,23 @@ import {
   preserveCustomizationChoices,
 } from "./customization-sources.mjs";
 import { initializeDailiesIntegration } from "./dailies.mjs";
-import { registerSheetIntegration } from "./sheet-integration.mjs";
+import { openCatalogSource } from "./catalog-sources.mjs";
+import "./babele.mjs";
+import { localizeCatalog, localizeItemSource, displayField, displayTerm } from "./content-localization.mjs";
+import {
+  registerSheetIntegration,
+  requirementMessage,
+} from "./sheet-integration.mjs";
 import { t, initializeLocalization } from "./i18n.mjs";
 import { openFamiliarManager } from "./familiar-ui.mjs";
 import { openExocortexManager } from "./exocortex-ui.mjs";
 import { sourceCustomizationSlots } from "./companion-sources.mjs";
 import { openCompanionSources } from "./companion-sources-ui.mjs";
-import { isMechanic, customizationCapacity } from "./exocortex-rules.mjs";
+import {
+  isMechanic,
+  customizationCapacity,
+  unmetCustomizationRequirements,
+} from "./exocortex-rules.mjs";
 import {
   droneCommercialSlots,
   exocortexState,
@@ -27,12 +37,18 @@ import {
   applyChassisChoices,
   imitationOptions,
   allowedSizes,
-  COMPANION_CLASS_UUID,
   buildChassisSource as createChassisSource,
   buildManeuverSource as createManeuverSource,
   slugify as normalizedSlug,
 } from "./item-sources.mjs";
 import { TechPetsDialog as Dialog } from "./dialog.mjs";
+import {
+  supportedSystem,
+  systemId,
+  ownPackName,
+  companionPackKey,
+  companionClassUuid,
+} from "./system-context.mjs";
 
 const MODULE_ID = "sf2e-missing-tech-pets";
 const DEPENDENCY_ID = "pf2e-animal-companions";
@@ -54,32 +70,31 @@ const PACKS = [
 
 const esc = (value) => foundry.utils.escapeHTML(String(value ?? ""));
 const dependency = () => game.modules.get(DEPENDENCY_ID);
-const packId = (key) => `${DEPENDENCY_ID}.${key}`;
+const packId = (key) => `${DEPENDENCY_ID}.${companionPackKey(key)}`;
+const ownPackId = (name) => `${MODULE_ID}.${ownPackName(name)}`;
 
-// Этот модуль использует именно SF2e-паки Companion Compendia.
-// Не разрешаем случайно импортировать PF2e-документы с совпадающими slug.
 function isCompatibleItemPack(pack) {
   if (pack?.documentName !== "Item") return false;
-  const collection = String(pack.collection ?? "");
+  const system = systemId();
+  const other = system === "sf2e" ? "pf2e" : "sf2e";
+  const collection = String(pack.collection ?? "").replace(/^Compendium\./, "");
   const declaredSystem = String(
     pack.metadata?.system ?? pack.metadata?.systemId ?? "",
   ).toLowerCase();
   const packageName = String(pack.metadata?.packageName ?? "").toLowerCase();
-  if (declaredSystem && declaredSystem !== "sf2e") return false;
-  if (packageName === "pf2e") return false;
-  if (/^(?:Compendium\.)?pf2e\./i.test(collection)) return false;
-  // У Companion Compendia имеются отдельные PF2e- и SF2e-паки с похожими Items;
-  // для SF2e оставляем только коллекции с префиксом sf-AC-.
+  if (declaredSystem && declaredSystem !== system) return false;
+  if (packageName === other || collection.startsWith(`${other}.`)) return false;
+  const companionPrefix = `${DEPENDENCY_ID}.${system === "sf2e" ? "sf-AC-" : "AC-"}`;
   if (
     collection.startsWith(`${DEPENDENCY_ID}.`) &&
-    !collection.startsWith(`${DEPENDENCY_ID}.sf-AC-`)
+    !collection.startsWith(companionPrefix)
   )
     return false;
   if (
     !declaredSystem &&
-    !collection.startsWith("sf2e.") &&
-    !collection.startsWith(`${MODULE_ID}.`) &&
-    !collection.startsWith(`${DEPENDENCY_ID}.sf-AC-`)
+    !collection.startsWith(`${system}.`) &&
+    !collection.startsWith(`${MODULE_ID}.${system === "pf2e" ? "pf2e-" : ""}`) &&
+    !collection.startsWith(companionPrefix)
   )
     return false;
   return true;
@@ -279,8 +294,8 @@ function importActionLabel(sourceActor, sourceItem) {
 }
 
 async function addCompendiumItem(sourceActor, sourceItem) {
-  if (game.system.id !== "sf2e" || !dependency()?.active)
-    return ui.notifications.error(t("DependencyMissing"));
+  if (!supportedSystem())
+    return ui.notifications.error(t("SystemMismatch"));
   if (sourceItem.pack && !isCompatibleItemPack(game.packs.get(sourceItem.pack)))
     return ui.notifications.warn(t("IncompatibleSource"));
   if (!compatibleSourceDocument(sourceItem))
@@ -349,10 +364,16 @@ async function handleCompanionBuildItem(item) {
     try {
       const actorData = getRobotData(actor);
       const chassis = await findChassisEntry(slugOf(item), item.name);
+      if (
+        !chassis &&
+        !actorData.standaloneCompanion &&
+        !actorData.ownerActorId &&
+        !actorData.companionActorId
+      )
+        return;
       if (chassis) {
         actorData.chassis = chassis.name;
         actorData.chassisCatalogId = chassis.id;
-        actorData.chassisSource = chassis.sourceUrl;
         actorData.chassisStats = chassisStatLine(chassis);
         // Только собственное шасси получает метку управления и снимок для замены.
         // Чужое происхождение остаётся пользовательским и не перезаписывается.
@@ -363,7 +384,7 @@ async function handleCompanionBuildItem(item) {
             kind: "robot-chassis",
             catalogId: chassis.id,
             sourceUuid: sourceId,
-            sourcePack: `${MODULE_ID}.robot-chassis`,
+            sourcePack: ownPackId("robot-chassis"),
             controllerActorId,
             fingerprint: itemFingerprint(item.toObject()),
           });
@@ -382,7 +403,6 @@ async function handleCompanionBuildItem(item) {
           const ownerData = getRobotData(owner);
           ownerData.chassis = chassis.name;
           ownerData.chassisCatalogId = chassis.id;
-          ownerData.chassisSource = chassis.sourceUrl;
           ownerData.chassisStats = chassisStatLine(chassis);
           await owner.setFlag(FLAG, "robot", ownerData);
         }
@@ -514,7 +534,7 @@ function packLabel(key) {
 
 async function openHome(actor = activeActor()) {
   if (actor?.type === "familiar") return openFamiliarManager(actor);
-  if (game.system.id !== "sf2e")
+  if (!supportedSystem())
     return ui.notifications.error(t("SystemMismatch"));
   if (!actor) return ui.notifications.warn(t("ActorMissing"));
   const assignedOwner = game.actors.get(getRobotData(actor).ownerActorId);
@@ -525,11 +545,7 @@ async function openHome(actor = activeActor()) {
   )
     return openHome(assignedOwner);
   const companionCompendiaAvailable = Boolean(dependency()?.active);
-  if (!companionCompendiaAvailable) {
-    ui.notifications.error(t("DependencyMissing"));
-    return;
-  }
-  const missingPacks = missingCompanionPacks();
+  const missingPacks = companionCompendiaAvailable ? missingCompanionPacks() : [];
   const summary = robotSummary(actor);
   const chassisEntry = summary.data.chassisCatalogId
     ? await findChassisEntry(summary.data.chassisCatalogId)
@@ -731,7 +747,21 @@ async function openHome(actor = activeActor()) {
         html.find("[data-remove-mod]").on("click", async (event) => {
           const index = Number(event.currentTarget.dataset.removeMod);
           const current = getRobotData(actor);
+          const before = current.modifications.slice();
           current.modifications.splice(index, 1);
+          const entries = (await loadCatalog("robot-customizations.json"))
+            .entries;
+          const old = new Set(
+            unmetCustomizationRequirements(before, entries).map(
+              (item) => item.id,
+            ),
+          );
+          const unmet = unmetCustomizationRequirements(
+            current.modifications,
+            entries,
+          ).filter((item) => !old.has(item.id));
+          if (unmet.length)
+            return ui.notifications.warn(requirementMessage(unmet, entries));
           await actor.setFlag(FLAG, "robot", current);
           await syncAutomation(actor);
           openHome(actor);
@@ -856,7 +886,8 @@ async function openImitationConfig(actor) {
 const CATALOG_CACHE = new Map();
 const GRADE_ORDER = { commercial: 0, tactical: 1, advanced: 2, superior: 3 };
 async function loadCatalog(filename) {
-  if (CATALOG_CACHE.has(filename)) return CATALOG_CACHE.get(filename);
+  if (CATALOG_CACHE.has(filename))
+    return localizeCatalog(CATALOG_CACHE.get(filename), filename.replace(/\.json$/, ""));
   const modulePath =
     game.modules.get(MODULE_ID)?.path ?? `modules/${MODULE_ID}`;
   const response = await fetch(`${modulePath}/data/${filename}`);
@@ -864,39 +895,31 @@ async function loadCatalog(filename) {
     throw new Error(`Could not load ${filename} (${response.status})`);
   const data = await response.json();
   CATALOG_CACHE.set(filename, data);
-  return data;
+  return localizeCatalog(data, filename.replace(/\.json$/, ""));
 }
 function formatAbilityModifiers(abilities = {}) {
   return Object.entries(abilities)
-    .map(
-      ([ability, modifier]) =>
-        `${ability.toUpperCase()} ${Number(modifier) >= 0 ? "+" : ""}${modifier}`,
-    )
+    .map(([ability, modifier]) => `${displayTerm(ability.toUpperCase())} ${Number(modifier) >= 0 ? "+" : ""}${modifier}`)
     .join(", ");
 }
 function chassisStatLine(entry) {
   if (!entry) return "";
-  const attacks = (entry.attacks ?? [])
-    .map(
-      (attack) =>
-        `${attack.name} ${attack.damage}${attack.range ? ` (${attack.range})` : ""}`,
-    )
-    .join("; ");
-  const speeds =
-    Object.entries(entry.speeds ?? {})
-      .map(([kind, speed]) => `${kind} ${speed} ft`)
-      .join(", ") || "variable";
+  const attacks = (entry.attacks ?? []).map((attack) => {
+    const name = entry.display?.attackNames?.[attack.name] ?? attack.name;
+    const damage = entry.display?.attackDamage?.[attack.name] ?? attack.damage.replace(/\b(slashing|bludgeoning|piercing|electricity)\b/g, displayTerm);
+    const range = attack.range?.replace("feet", displayTerm("feet"));
+    return `${name} ${damage}${range ? ` (${range})` : ""}`;
+  }).join("; ");
+  const speeds = Object.entries(entry.speeds ?? {})
+    .map(([kind, speed]) => `${displayTerm(kind)} ${speed} ${displayTerm("ft")}`)
+    .join(", ") || displayTerm("variable");
   const labels = {
-    size: t("StatSize"),
-    hp: t("StatHP"),
-    speed: t("StatSpeed"),
-    skills: t("StatSkills"),
-    senses: t("StatSenses"),
-    advanced: t("StatAdvanced"),
+    size: t("StatSize"), hp: t("StatHP"), speed: t("StatSpeed"),
+    skills: t("StatSkills"), senses: t("StatSenses"), advanced: t("StatAdvanced"),
   };
-  const skills = (entry.skills ?? []).join(", ");
-  const senses = (entry.senses ?? []).join(", ");
-  return `${labels.size}: ${entry.size}; ${labels.hp}: ${entry.hp}; ${formatAbilityModifiers(entry.abilities)}; ${labels.speed}: ${speeds}; ${attacks}; ${labels.skills}: ${skills}; ${labels.senses}: ${senses}; ${labels.advanced}: ${entry.advancedManeuver ?? "—"}`;
+  const skills = (entry.skills ?? []).map(displayTerm).join(", ");
+  const senses = (entry.senses ?? []).map(displayTerm).join(", ");
+  return `${labels.size}: ${displayField(entry, "size")}; ${labels.hp}: ${entry.hp}; ${formatAbilityModifiers(entry.abilities)}; ${labels.speed}: ${speeds}; ${attacks}; ${labels.skills}: ${skills}; ${labels.senses}: ${senses}; ${labels.advanced}: ${displayField(entry, "advancedManeuver") ?? "—"}`;
 }
 async function findChassisEntry(...values) {
   try {
@@ -949,8 +972,8 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
     const needle = String(term ?? "")
       .toLocaleLowerCase()
       .trim();
-    let entries = catalog.entries.filter((entry) =>
-      `${entry.name} ${entry.grade ?? ""} ${entry.category ?? ""}`
+    let entries = catalog.entries.map((entry) => ({ ...entry, ...entry.display })).filter((entry) =>
+      `${entry.name} ${entry.grade ? t(`Grade.${entry.grade}`) : ""} ${entry.category ? t(`Category.${entry.category}`) : ""}`
         .toLocaleLowerCase()
         .includes(needle),
     );
@@ -996,13 +1019,15 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
             );
         html.find('[name="sfmtp-catalog-query"]').on("input", redraw);
         html.on("click", "[data-open-chassis-pack]", () =>
-          game.packs.get(`${MODULE_ID}.robot-chassis`)?.render(true),
+          game.packs.get(ownPackId("robot-chassis"))?.render(true),
         );
         html.on("click", "[data-source-index]", (event) => {
           const id = event.currentTarget.dataset.sourceIndex;
           const entry = catalog.entries.find((item) => item.id === id);
-          if (entry?.sourceUrl)
-            window.open(entry.sourceUrl, "_blank", "noopener");
+          if (entry)
+            void openCatalogSource(catalogType, entry).catch((error) =>
+              ui.notifications.error(error.message),
+            );
         });
         html.on("click", "[data-select-index]", async (event) => {
           const id = event.currentTarget.dataset.selectIndex;
@@ -1027,11 +1052,18 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
             ) {
               return ui.notifications.warn(t("CustomizationAlreadySelected"));
             }
+            const unmet = unmetCustomizationRequirements(
+              [...data.modifications, candidate],
+              catalog.entries,
+            ).filter((item) => item.id === entry.id);
+            if (unmet.length)
+              return ui.notifications.warn(
+                requirementMessage(unmet, catalog.entries),
+              );
             data.modifications.push({
               id: foundry.utils.randomID(),
               name: entry.name,
               grade: entry.grade,
-              source: entry.sourceUrl,
               cost: Math.max(1, Number(entry.cost) || 1),
               catalogId: entry.id,
             });
@@ -1128,10 +1160,12 @@ function sourceForSelection(selection, kind) {
 }
 
 function compatibleSourceDocument(document) {
-  if (document._stats?.systemId && document._stats.systemId !== "sf2e")
+  const system = systemId();
+  if (document._stats?.systemId && document._stats.systemId !== system)
     return false;
+  const other = system === "sf2e" ? "pf2e" : "sf2e";
   return (document.system?.rules ?? []).every((rule) => {
-    if (JSON.stringify(rule).includes("Compendium.pf2e.")) return false;
+    if (JSON.stringify(rule).includes(`Compendium.${other}.`)) return false;
     const registered = game.pf2e?.RuleElements?.all;
     return !registered || Boolean(registered[rule.key]);
   });
@@ -1142,7 +1176,7 @@ function compatibleSourceDocument(document) {
  * Это не режим работы без обязательной зависимости Companion Compendia.
  */
 function buildModuleChassisSource(entry) {
-  return createChassisSource(entry);
+  return createChassisSource(entry, systemId());
 }
 
 async function moduleChassisSource(selection) {
@@ -1153,7 +1187,7 @@ async function moduleChassisSource(selection) {
   );
   if (!entry) return null;
   // Не создаём частично работающее шасси без базового класса компаньона.
-  const [classCollection, classId] = COMPANION_CLASS_UUID.replace(
+  const [classCollection, classId] = companionClassUuid().replace(
     "Compendium.",
     "",
   ).split(".Item.");
@@ -1175,13 +1209,13 @@ async function moduleChassisSource(selection) {
 
   // Основной источник — встроенный модульный Compendium Pack, как в Companion Compendia.
   // Локальная генерация оставлена как безопасный fallback на случай миграции/повреждения pack.
-  const packId = `${MODULE_ID}.robot-chassis`;
+  const packId = ownPackId("robot-chassis");
   const pack =
     game.packs?.get?.(packId) ??
     [...game.packs].find(
       (candidate) =>
         candidate.metadata?.packageName === MODULE_ID &&
-        candidate.metadata?.name === "robot-chassis",
+        candidate.metadata?.name === ownPackName("robot-chassis"),
     );
   if (pack) {
     try {
@@ -1228,13 +1262,13 @@ async function moduleChassisSource(selection) {
 async function moduleManeuverSource(selection) {
   const entry = await findChassisEntry(selection.chassisCatalogId ?? "");
   if (!entry?.advancedManeuverId) return null;
-  const packId = `${MODULE_ID}.robot-advanced-maneuvers`;
+  const packId = ownPackId("robot-advanced-maneuvers");
   const pack =
     game.packs?.get?.(packId) ??
     [...game.packs].find(
       (candidate) =>
         candidate.metadata?.packageName === MODULE_ID &&
-        candidate.metadata?.name === "robot-advanced-maneuvers",
+        candidate.metadata?.name === ownPackName("robot-advanced-maneuvers"),
     );
   if (pack) {
     try {
@@ -1270,7 +1304,7 @@ async function moduleManeuverSource(selection) {
     entry.advancedManeuverId,
   );
   return {
-    source: localSource ?? createManeuverSource(entry),
+    source: localSource ?? createManeuverSource(entry, systemId()),
     uuid: localSource ? `Compendium.${packId}.Item.${localSource._id}` : "",
     pack: packId,
     entry,
@@ -1288,7 +1322,7 @@ function itemFingerprint(source) {
     img: source.img,
     system,
     effects: source.effects ?? [],
-    choices: source.flags?.sf2e?.rulesSelections ?? {},
+    choices: source.flags?.[systemId()]?.rulesSelections ?? {},
   };
   const stable = (entry) =>
     Array.isArray(entry)
@@ -1303,13 +1337,78 @@ function itemFingerprint(source) {
   return JSON.stringify(stable(value));
 }
 
-function canReplaceManagedItem(item) {
-  const metadata = item.getFlag?.(FLAG, AUTOMATION_FLAG);
-  // У старых предметов снимка нет: без доказательства не перезаписываем старый предмет.
-  return Boolean(
-    metadata?.fingerprint &&
-    metadata.fingerprint === itemFingerprint(item.toObject()),
+// Допустимый выбор ChoiceSet — не ручная правка. Снимок сверяется с подстановкой
+// каждого объявленного варианта, поэтому подходят и снимки прежних версий.
+function choiceVariants(source) {
+  const rules = (source.system?.rules ?? []).filter(
+    (rule) =>
+      rule?.key === "ChoiceSet" &&
+      typeof rule.flag === "string" &&
+      Array.isArray(rule.choices) &&
+      rule.choices.length,
   );
+  if (!rules.length) return [];
+  const selections = source.flags?.[systemId()]?.rulesSelections ?? {};
+  const valid = (rule, value) =>
+    value === undefined ||
+    value === null ||
+    rule.choices.some((choice) => choice?.value === value);
+  if (
+    rules.some(
+      (rule) => !valid(rule, rule.selection) || !valid(rule, selections[rule.flag]),
+    )
+  )
+    return [];
+  const options = rules.map((rule) => [
+    undefined,
+    null,
+    ...rule.choices.map((choice) => choice.value),
+  ]);
+  if (options.reduce((total, list) => total * list.length, 1) > 256) return [];
+  let combinations = [[]];
+  for (const list of options)
+    combinations = combinations.flatMap((prefix) =>
+      list.map((value) => [...prefix, value]),
+    );
+  return combinations.map((values) => {
+    const variant = foundry.utils.deepClone(source);
+    const variantRules = variant.system.rules.filter(
+      (rule) =>
+        rule?.key === "ChoiceSet" &&
+        typeof rule.flag === "string" &&
+        Array.isArray(rule.choices) &&
+        rule.choices.length,
+    );
+    // Сохранённый null-флаг остаётся пустым даже при выбранном rule.selection.
+    const flags = variant.flags?.[systemId()]?.rulesSelections;
+    variantRules.forEach((rule, index) => {
+      const value = values[index];
+      if (value === undefined) delete rule.selection;
+      else rule.selection = value;
+      if (flags && Object.hasOwn(flags, rule.flag) && flags[rule.flag] !== null) {
+        if (value === undefined) delete flags[rule.flag];
+        else flags[rule.flag] = value;
+      }
+    });
+    return variant;
+  });
+}
+
+function managedItemState(item) {
+  const fingerprint = item.getFlag?.(FLAG, AUTOMATION_FLAG)?.fingerprint;
+  // У старых предметов снимка нет: без доказательства не перезаписываем старый предмет.
+  if (!fingerprint) return "modified";
+  const source = item.toObject();
+  if (fingerprint === itemFingerprint(source)) return "exact";
+  return choiceVariants(source).some(
+    (variant) => itemFingerprint(variant) === fingerprint,
+  )
+    ? "choices"
+    : "modified";
+}
+
+function canReplaceManagedItem(item) {
+  return managedItemState(item) !== "modified";
 }
 
 async function stampManagedItems(items = []) {
@@ -1326,7 +1425,7 @@ async function stampManagedItems(items = []) {
 async function moduleSupportSource(selection) {
   const entry = await findChassisEntry(selection.chassisCatalogId);
   if (!entry) return null;
-  const collection = `${MODULE_ID}.robot-support`;
+  const collection = ownPackId("robot-support");
   const pack = game.packs.get(collection);
   try {
     const index = await pack?.getIndex({ fields: ["type", "system.slug"] });
@@ -1364,7 +1463,7 @@ async function moduleCustomizationSource(selection) {
     (entry) => entry.id === selection.catalogId,
   );
   if (!entry) return findSourceItem(selection);
-  const packId = `${MODULE_ID}.robot-customizations`;
+  const packId = ownPackId("robot-customizations");
   const pack = game.packs.get(packId);
   if (pack) {
     try {
@@ -1389,7 +1488,7 @@ async function moduleCustomizationSource(selection) {
     local.system?.slug === entry.id &&
     local.flags?.[MODULE_ID]?.robotCustomization
       ? local
-      : buildCustomizationSource(entry);
+      : buildCustomizationSource(entry, systemId());
   if (!compatibleSourceDocument(source)) return null;
   return {
     source,
@@ -1400,6 +1499,7 @@ async function moduleCustomizationSource(selection) {
 }
 
 async function loadOwnItemSource(pack, slug) {
+  pack = ownPackName(pack);
   try {
     const response = await fetch(
       `${game.modules.get(MODULE_ID)?.path ?? `modules/${MODULE_ID}`}/packs/src/${pack}/${slug}.json`,
@@ -1461,7 +1561,7 @@ function syncAutomation(ownerActor) {
   return task;
 }
 async function syncAutomationNow(ownerActor) {
-  if (game.system.id !== "sf2e" || !dependency()?.active) {
+  if (!supportedSystem() || !dependency()?.active) {
     ui.notifications.error(t("DependencyMissing"));
     return { applied: 0, skipped: 0, reason: "dependency-unavailable" };
   }
@@ -1549,6 +1649,14 @@ async function syncAutomationNow(ownerActor) {
       slotSummary.gradedSlots,
     ).accepted,
   );
+  const customizationCatalog = (await loadCatalog("robot-customizations.json")).entries;
+  const unmet = unmetCustomizationRequirements(
+    [...allowedModifications],
+    customizationCatalog,
+  );
+  const unmetIds = new Set(unmet.map((entry) => entry.id));
+  if (unmet.length)
+    ui.notifications.warn(requirementMessage(unmet, customizationCatalog));
   const wanted = [];
   let chassisSelection = null;
   if (data.chassisCatalogId || data.chassis) {
@@ -1636,7 +1744,9 @@ async function syncAutomationNow(ownerActor) {
                 // Неразрешённый вид защищает уже существовавшие предметы от очистки.
                 null
               : selection.kind === "robot-customization"
-                ? await moduleCustomizationSource(selection)
+                ? unmetIds.has(selection.catalogId)
+                  ? null
+                  : await moduleCustomizationSource(selection)
                 : await findSourceItem(selection);
 
     if (!found) {
@@ -1647,6 +1757,11 @@ async function syncAutomationNow(ownerActor) {
         `${MODULE_ID} | Could not resolve module/source item for ${selection.kind}: ${selection.name}. No guessed effect was applied.`,
       );
       continue;
+    }
+    if (found.entry) {
+      const category = selection.kind === "robot-customization" ? "robot-customizations"
+        : selection.kind === "robot-maneuver" ? "robot-advanced-maneuvers" : selection.kind;
+      found.source = localizeItemSource(found.source ?? found.document.toObject(), category, found.entry);
     }
     if (
       selection.kind === "robot-customization" &&
@@ -1694,14 +1809,25 @@ async function syncAutomationNow(ownerActor) {
             selection.catalogId,
       );
       const nativeChoice =
-        currentChassis?.flags?.sf2e?.rulesSelections?.chassisSize;
+        currentChassis?.toObject().system?.rules?.find(
+          (rule) => rule.key === "ChoiceSet" && rule.flag === "chassisSize",
+        )?.selection ??
+        currentChassis?.flags?.[systemId()]?.rulesSelections?.chassisSize;
       const choiceData = foundry.utils.deepClone(data);
+      const nativeChanged =
+        currentChassis && managedItemState(currentChassis) === "choices";
       if (
-        !choiceData.chassisSizes?.[selection.catalogId] &&
+        (!choiceData.chassisSizes?.[selection.catalogId] || nativeChanged) &&
         choices?.includes(nativeChoice)
       ) {
         choiceData.chassisSizes ??= {};
         choiceData.chassisSizes[selection.catalogId] = nativeChoice;
+        // Выбор на самом Item новее профиля: сохраняем его, иначе следующая синхронизация вернёт прежний.
+        if (nativeChanged && data.chassisSizes?.[selection.catalogId] !== nativeChoice)
+          await ownerActor.update({
+            [`flags.${FLAG}.robot.chassisSizes.${selection.catalogId}`]:
+              nativeChoice,
+          });
       }
       found.source = applyChassisChoices(
         found.source ?? found.document.toObject(),
@@ -1821,7 +1947,9 @@ async function syncAutomationNow(ownerActor) {
       if (
         selection.kind === "robot-customization" &&
         found.entry &&
-        (metadata.sourceUuid !== found.uuid || sameGenerated.type !== "feat") &&
+        (metadata.sourceUuid !== found.uuid || sameGenerated.type !== "feat" ||
+          sameGenerated.name !== found.source.name ||
+          sameGenerated.system.description.value !== found.source.system.description.value) &&
         canReplaceManagedItem(sameGenerated)
       ) {
         const replacement = found.source
@@ -1903,8 +2031,9 @@ async function syncAutomationNow(ownerActor) {
     }
     // preCreate/ChoiceSet может отменить создание без исключения.
     // В этом случае старый Action не считаем заменённым и не удаляем.
-    skipped += pendingCustomizationMigrations.size;
-    applied -= pendingCustomizationMigrations.size;
+    const cancelled = toCreate.length - created.length;
+    skipped += cancelled;
+    applied -= cancelled;
   }
   const removeIds = existing
     .filter((item) => {
@@ -2277,22 +2406,15 @@ Hooks.once("ready", async () => {
     ui.notifications.error(t("LocalizationLoadFailed"));
     return;
   }
-  if (game.system.id !== "sf2e") {
+  if (!supportedSystem()) {
     console.warn(
-      `${MODULE_ID} | Current system is ${game.system.id}; SF2e required.`,
+      `${MODULE_ID} | Unsupported system: ${game.system.id}.`,
     );
     if (game.user?.isGM) ui.notifications.error(t("SystemMismatch"));
     return;
   }
-  if (!dependency()?.active) {
-    console.error(
-      `${MODULE_ID} | Required dependency ${DEPENDENCY_ID} is not active. Initialization aborted.`,
-    );
-    ui.notifications.error(t("DependencyMissing"));
-    return;
-  }
   initializeDailiesIntegration();
-  const missingPacks = missingCompanionPacks();
+  const missingPacks = dependency()?.active ? missingCompanionPacks() : [];
   if (missingPacks.length) {
     console.warn(
       `${MODULE_ID} | Required SF2e packs are missing from ${DEPENDENCY_ID}: ${missingPacks.join(", ")}`,
@@ -2366,6 +2488,6 @@ Hooks.once("ready", async () => {
     },
   });
   console.info(
-    `${MODULE_ID} | Ready. Required Companion Compendia dependency verified; missing SF2e packs: ${missingPacks.join(", ") || "none"}.`,
+    `${MODULE_ID} | Ready for ${systemId()}; Companion Compendia active: ${Boolean(dependency()?.active)}; missing packs: ${missingPacks.join(", ") || "none"}.`,
   );
 });

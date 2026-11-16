@@ -1,7 +1,8 @@
 // Собственные SF2e Items устраняют зависимость от совпадений имён в чужих паках.
 // Каталог хранит правила и признаки автоматизации; сборка и runtime используют одну фабрику.
 import { MODULE_ID, escapeHTML as esc } from "./item-sources.mjs";
-export function buildCustomizationSource(entry) {
+import { ownPackName, systemId } from "./system-context.mjs";
+export function buildCustomizationSource(entry, system = "sf2e") {
   const active = [
     "light-mounts",
     "network",
@@ -31,18 +32,22 @@ export function buildCustomizationSource(entry) {
         remaster: true,
       },
       description: {
-        value: `<p>${esc(entry.description)}</p><p>@Localize[SFMTP.${entry.automation === "rules" ? "CustomRulesHint" : "CustomManualHint"}]</p><p><a href="${esc(entry.sourceUrl)}">Tech Core — Archives of Nethys</a></p>`,
+        value: `<p>${esc(entry.description)}</p><p>@Localize[SFMTP.${entry.automation === "rules" ? "CustomRulesHint" : "CustomManualHint"}]</p>`,
       },
       traits: {
         rarity: "common",
         value: entry.id === "recharge" ? ["concentrate"] : [],
         otherTags: [],
       },
-      rules: structuredClone(entry.rules ?? []),
+      rules: structuredClone(entry.rules ?? []).map((rule) =>
+        typeof rule.value === "string"
+          ? { ...rule, value: rule.value.replaceAll("flags.sf2e.", `flags.${system}.`) }
+          : rule,
+      ),
     },
     flags: {
       core: {
-        sourceId: `Compendium.${MODULE_ID}.robot-customizations.Item.${entry.itemId}`,
+        sourceId: `Compendium.${MODULE_ID}.${ownPackName("robot-customizations", system)}.Item.${entry.itemId}`,
       },
       [MODULE_ID]: {
         moduleProvided: true,
@@ -57,16 +62,17 @@ export function buildCustomizationSource(entry) {
 
 // Переносим только подтверждённый нативный выбор, не подготовленные характеристики.
 export function preserveCustomizationChoices(source, previous) {
-  const choices = previous.flags?.sf2e?.rulesSelections;
+  const system = systemId();
+  const choices = previous.flags?.[system]?.rulesSelections;
   if (!choices) return source;
-  source.flags.sf2e ??= {};
-  source.flags.sf2e.rulesSelections = {};
+  source.flags[system] ??= {};
+  source.flags[system].rulesSelections = {};
   for (const rule of source.system.rules) {
     if (rule.key !== "ChoiceSet" || !rule.flag) continue;
     const value = choices[rule.flag];
     if (!rule.choices?.some((choice) => choice.value === value)) continue;
     rule.selection = value;
-    source.flags.sf2e.rulesSelections[rule.flag] = value;
+    source.flags[system].rulesSelections[rule.flag] = value;
   }
   return source;
 }

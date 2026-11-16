@@ -1,4 +1,7 @@
 import { t } from "./i18n.mjs";
+import { openCatalogSource } from "./catalog-sources.mjs";
+import { displayField } from "./content-localization.mjs";
+import { unmetCustomizationRequirements } from "./exocortex-rules.mjs";
 import {
   dailiesState,
   dailiesControls,
@@ -15,7 +18,11 @@ import {
 } from "./familiars.mjs";
 
 const ID = "sf2e-missing-tech-pets";
-const CHASSIS = `Compendium.${ID}.robot-chassis.`;
+const CHASSIS = ["robot-chassis", "pf2e-robot-chassis"].map(
+  (pack) => `Compendium.${ID}.${pack}.`,
+);
+const chassisUuid = (uuid) =>
+  CHASSIS.some((prefix) => String(uuid ?? "").startsWith(prefix));
 const grades = { commercial: 0, tactical: 1, advanced: 2, superior: 3 };
 const esc = (value) => foundry.utils.escapeHTML(String(value ?? ""));
 const elementOf = (html, app) =>
@@ -24,10 +31,8 @@ const elementOf = (html, app) =>
 export function isChassisSource(item) {
   return (
     item?.type === "ancestry" &&
-    (String(item.uuid ?? "").startsWith(CHASSIS) ||
-      String(
-        item.flags?.core?.sourceId ?? item._stats?.compendiumSource ?? "",
-      ).startsWith(CHASSIS) ||
+    (chassisUuid(item.uuid) ||
+      chassisUuid(item.flags?.core?.sourceId ?? item._stats?.compendiumSource) ||
       Boolean(item.flags?.[ID]?.chassisId))
   );
 }
@@ -69,11 +74,31 @@ export function selectedModifications(
         catalogId: entry.id,
         name: entry.name,
         grade: entry.grade,
-        source: entry.sourceUrl,
         cost: Math.max(1, Number(entry.cost) || 1),
       });
   }
+  // Новое нарушение предпосылки запрещено; уже сохранённое ранее состояние не блокирует правку.
+  const before = new Set(
+    unmetCustomizationRequirements(previous, catalog).map((entry) => entry.id),
+  );
+  const unmet = unmetCustomizationRequirements(result, catalog).filter(
+    (entry) => !before.has(entry.id),
+  );
+  if (unmet.length) throw new Error(requirementMessage(unmet, catalog));
   return result;
+}
+
+export function requirementMessage(unmet, catalog) {
+  const name = (id) => {
+    const entry = catalog.find((item) => item.id === id);
+    return entry ? displayField(entry, "name") : id;
+  };
+  return `${t("CustomizationRequires")}: ${unmet
+    .map(
+      (entry) =>
+        `${displayField(entry, "name")} — ${entry.requiresAny.map(name).join(" / ")}`,
+    )
+    .join("; ")}`;
 }
 
 export function robotController(actor, getRobotData) {
@@ -112,7 +137,7 @@ export function registerSheetIntegration(services) {
         const world = uuid?.startsWith("Item.")
           ? game.items?.get(uuid.slice(5))
           : null;
-        const hidden = uuid?.startsWith(CHASSIS) || isChassisSource(world);
+        const hidden = chassisUuid(uuid) || isChassisSource(world);
         if (hidden) {
           row.hidden = true;
           row.dataset.sfmtpHidden = "true";
@@ -198,6 +223,7 @@ export function registerSheetIntegration(services) {
           ? previous.map((item) => item.system?.slug)
           : previous.map((item) => item.catalogId),
       );
+      const visibleCatalog = catalog.map((entry) => ({ ...entry, ...entry.display }));
       const panel = document.createElement("details");
       panel.className = "sfmtp-inline";
       const summary = familiar
@@ -206,7 +232,7 @@ export function registerSheetIntegration(services) {
       const installed =
         previous.map((item) => esc(item.name)).join(", ") ||
         esc(t("NoEntries"));
-      panel.innerHTML = `<summary>${esc(t(familiar ? "InlineFamiliarTitle" : "InlineRobotTitle"))} (${esc(summary)})</summary><p>${esc(t("InlineCurrent"))}: ${installed}</p><p class="hint">${esc(t(familiar ? "InlineFamiliarHint" : "InlineRobotHint"))}</p><input type="search" data-sfmtp-search placeholder="${esc(t("Search"))}" aria-label="${esc(t("Search"))}"><div class="sfmtp-inline-catalog">${catalog
+      panel.innerHTML = `<summary>${esc(t(familiar ? "InlineFamiliarTitle" : "InlineRobotTitle"))} (${esc(summary)})</summary><p>${esc(t("InlineCurrent"))}: ${installed}</p><p class="hint">${esc(t(familiar ? "InlineFamiliarHint" : "InlineRobotHint"))}</p><input type="search" data-sfmtp-search placeholder="${esc(t("Search"))}" aria-label="${esc(t("Search"))}"><div class="sfmtp-inline-catalog">${visibleCatalog
         .map((entry) => {
           const oldCount = familiar
             ? selected.has(entry.id)
@@ -235,7 +261,7 @@ export function registerSheetIntegration(services) {
               : !familiar && locked
                 ? t("InlineGradeLocked")
                 : "";
-          return `<details class="sfmtp-inline-entry" data-sfmtp-entry="${esc(`${entry.name} ${detail}`.toLocaleLowerCase())}"><summary><label>${control} ${esc(entry.name)}</label><small>${esc(detail)} ${esc(status)}</small></summary><p class="sfmtp-rules-text">${esc(entry.description ?? t("InlineRulesOnSource"))}</p>${entry.sourceUrl ? `<a href="${esc(entry.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(t("SourcePage"))}</a>` : ""}</details>`;
+          return `<details class="sfmtp-inline-entry" data-sfmtp-entry="${esc(`${entry.name} ${detail}`.toLocaleLowerCase())}"><summary><label>${control} ${esc(entry.name)}</label><small>${esc(detail)} ${esc(status)}</small></summary><p class="sfmtp-rules-text">${esc(entry.description ?? t("InlineRulesOnSource"))}</p><button type="button" data-sfmtp-source="${esc(entry.id)}">${esc(t("SourcePage"))}</button></details>`;
         })
         .join(
           "",
@@ -265,6 +291,14 @@ export function registerSheetIntegration(services) {
             row.hidden = !row.dataset.sfmtpEntry.includes(needle);
           });
         });
+      panel.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-sfmtp-source]");
+        if (!button) return;
+        const entry = catalog.find((item) => item.id === button.dataset.sfmtpSource);
+        if (entry)
+          void openCatalogSource(familiar ? "familiar-abilities" : "robot-customizations", entry)
+            .catch((error) => ui.notifications.error(error.message));
+      });
       panel
         .querySelector("[data-sfmtp-save]")
         ?.addEventListener("click", async (event) => {
@@ -277,15 +311,19 @@ export function registerSheetIntegration(services) {
               throw new Error(t("DailiesConnected"));
             if (signature() !== snapshot) throw new Error(t("InlineStale"));
             const controls = [...panel.querySelectorAll("[data-sfmtp-id]")];
-            if (familiar)
-              await syncFamiliarAbilities(
+            let saved = t("InlineSaved");
+            if (familiar) {
+              const result = await syncFamiliarAbilities(
                 controller,
                 actor,
                 controls
                   .filter((input) => input.checked)
                   .map((input) => input.dataset.sfmtpId),
               );
-            else {
+              saved += ` (+${result.created} / −${result.removed})`;
+              // Панель перерисовывается сразу, поэтому итог дублируется уведомлением.
+              ui.notifications.info(saved);
+            } else {
               const counts = Object.fromEntries(
                 controls.map((input) => [
                   input.dataset.sfmtpId,
@@ -306,7 +344,7 @@ export function registerSheetIntegration(services) {
                 ),
               );
             }
-            status.textContent = t("InlineSaved");
+            status.textContent = saved;
             app.render(false);
           } catch (error) {
             status.textContent = error.message;

@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tech Pets browser fixture</title>
+<link rel="stylesheet" href="/module.css">
+<style>
+body{font:16px system-ui;margin:24px;background:#f5f3ee;color:#242424}button,input,select{font:inherit}button{cursor:pointer;padding:6px 12px;margin:3px}label{display:block;margin:8px 0}section.fixture-dialog{background:white;padding:20px;border:1px solid #aaa;border-radius:8px;margin:20px auto;max-width:920px}footer{margin-top:16px}#notifications p{padding:8px;border:1px solid #aaa}details{margin:6px 0}.sfmtp-mod-row{display:flex;gap:12px}.sfmtp-familiar-list{max-height:420px;overflow:auto}
+</style>
+</head>
+<body>
+<h1>Tech Pets browser fixture</h1>
+<p>Mock Foundry documents; this page is not a live-world compatibility test.</p>
+<nav><button id="tools">Tools</button><button id="familiar">Familiar</button><button id="sources">Companion sources</button><button id="missing">Remove fixture packs</button><label>Language <select id="language"><option value="en">English</option><option value="ru">Русский</option></select></label></nav>
+<div id="notifications" role="status"></div><main id="windows"></main>
+<script type="module">
+const ID = "sf2e-missing-tech-pets";
+const errors = [];
+window.addEventListener("error", event => errors.push(event.message));
+window.addEventListener("unhandledrejection", event => errors.push(String(event.reason)));
+const clone = value => structuredClone(value);
+const esc = value => String(value ?? "").replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+class Collection extends Map { get contents() { return [...this.values()]; } [Symbol.iterator]() { return this.values(); } find(fn) { return [...this.values()].find(fn); } filter(fn) { return [...this.values()].filter(fn); } map(fn) { return [...this.values()].map(fn); } }
+class FixtureDialogV2 {
+  constructor(options) { this.options = options; }
+  render() {
+    this.element?.remove();
+    const section = document.createElement("section");
+    section.className = "fixture-dialog " + (this.options.classes ?? []).join(" ");
+    const heading = document.createElement("h2"); heading.textContent = this.options.window?.title ?? "Item"; section.append(heading);
+    const content = document.createElement("div"); content.innerHTML = this.options.content ?? ""; section.append(content);
+    const footer = document.createElement("footer");
+    for (const option of this.options.buttons ?? []) {
+      const button = document.createElement("button"); button.textContent = option.label; button.dataset.action = option.action;
+      button.addEventListener("click", () => Promise.resolve(option.callback?.(null, button, this)).catch(error => errors.push(String(error)))); footer.append(button);
+    }
+    const close = document.createElement("button"); close.textContent = "Dismiss fixture window"; close.onclick = () => this.close(); footer.append(close);
+    section.append(footer); this.element = section; document.querySelector("#windows").append(section); this._onRender({}, {}); return this;
+  }
+  _onRender() {}
+  async close() { this.element?.remove(); }
+}
+let serial = 0;
+class FixtureItem {
+  constructor(source, pack = "") { this.source = clone(source); this.id = source._id ?? String(++serial).padStart(16,"0"); this.source._id = this.id; this.pack = pack; }
+  get name() { return this.source.name; } get type() { return this.source.type; } get flags() { return this.source.flags ?? {}; } get system() { return this.source.system; }
+  get uuid() { return this.pack ? `Compendium.${this.pack}.Item.${this.id}` : `Item.${this.id}`; }
+  getFlag(scope,key) { return this.flags[scope]?.[key]; }
+  async setFlag(scope,key,value) { this.source.flags ??= {}; this.source.flags[scope] ??= {}; this.source.flags[scope][key] = clone(value); }
+  toObject() { return clone(this.source); }
+  get sheet() { return { render: () => new FixtureDialogV2({ window:{title:this.name}, content:`<article class="fixture-item" data-slug="${esc(this.system.slug)}">${this.system.description?.value ?? ""}</article>` }).render() }; }
+  static create() { throw new Error("Source viewing must not create world Items"); }
+}
+class FixtureActor {
+  constructor(id,type="character") { this.id=id; this.name=id; this.type=type; this.isOwner=true; this.level=6; this.items=new Collection(); this.flags={}; this.ownership={default:0}; this.system={master:{id:null,ability:"int"},abilities:Object.fromEntries(["str","dex","con","int","wis","cha"].map(key=>[key,{mod:2}])),attributes:{familiarAbilities:{value:2}},details:{level:{value:6}}}; }
+  getFlag(scope,key) { return this.flags[scope]?.[key]; }
+  async setFlag(scope,key,value) { this.flags[scope] ??= {}; this.flags[scope][key]=clone(value); }
+  async update(changes) { for (const [path,value] of Object.entries(changes)) { const parts=path.split("."); let cursor=this; for(const key of parts.slice(0,-1))cursor=cursor[key]??={}; cursor[parts.at(-1)]=value; } }
+  async createEmbeddedDocuments(type,sources) { return sources.map(source=>{ const item=new FixtureItem(source); this.items.set(item.id,item); return item; }); }
+  async deleteEmbeddedDocuments(type,ids) { for (const id of ids)this.items.delete(id); }
+}
+const once=new Map(), hooks=new Map(), settings=new Map();
+globalThis.Hooks={once:(key,fn)=>once.set(key,fn),on:(key,fn)=>hooks.set(key,fn)};
+globalThis.foundry={applications:{api:{DialogV2:FixtureDialogV2},ux:{TextEditor:{implementation:{enrichHTML:async text=>text}}}},utils:{escapeHTML:esc,deepClone:clone,mergeObject:(base,value)=>({...clone(base),...clone(value)}),randomID:()=>String(++serial).padStart(16,"0"),getProperty:(object,key)=>key.split(".").reduce((value,part)=>value?.[part],object)}};
+globalThis.CONFIG={Item:{documentClass:FixtureItem}};
+globalThis.ui={notifications:Object.fromEntries(["info","warn","error"].map(type=>[type,message=>{const p=document.createElement("p");p.dataset.type=type;p.textContent=message;document.querySelector("#notifications").append(p);}]))};
+const owner=new FixtureActor("Fixture owner"), familiar=new FixtureActor("Fixture familiar","familiar"); familiar.system.master.id=owner.id;
+globalThis.game={system:{id:"sf2e"},user:{id:"fixture-gm",isGM:true,character:owner},actors:new Collection([[owner.id,owner],[familiar.id,familiar]]),packs:new Collection(),modules:new Map([[ID,{path:""}],["pf2e-animal-companions",{active:false}]]),i18n:{lang:"en",translations:{},localize(key){return this.translations[key]??key;}},settings:{registerMenu(){},register(scope,key,options){settings.set(key,options.default);},get:(scope,key)=>settings.get(key),set:async(scope,key,value)=>settings.set(key,value)}};
+const factories=await import("/scripts/item-sources.mjs"), customFactory=await import("/scripts/customization-sources.mjs"), familiarFactory=await import("/scripts/familiar-sources.mjs");
+const catalogs={};
+for(const [name,builder] of [["robot-chassis",factories.buildChassisSource],["robot-customizations",customFactory.buildCustomizationSource],["familiar-abilities",familiarFactory.buildFamiliarSource]]) {
+  const catalog=await (await fetch(`/data/${name}.json`)).json();catalogs[name]=catalog.entries;
+  const collection=ID+"."+name; const items=catalog.entries.map(entry=>new FixtureItem(builder(entry),collection));
+  game.packs.set(collection,{collection,documentName:"Item",metadata:{system:"sf2e"},getIndex:async()=>items.map(item=>({_id:item.id,type:item.type,name:item.name,system:{slug:item.system.slug}})),getDocument:async id=>items.find(item=>item.id===id),render:()=>items[0].sheet.render(true)});
+}
+await import("/scripts/main.mjs");
+await once.get("init")?.(); await once.get("ready")?.();
+const {initializeLocalization}=await import("/scripts/i18n.mjs");
+const {openCompanionSources}=await import("/scripts/companion-sources-ui.mjs");
+const run=fn=>Promise.resolve(fn()).catch(error=>errors.push(String(error)));
+document.querySelector("#tools").onclick=()=>run(()=>game.modules.get(ID).api.open(owner));
+document.querySelector("#familiar").onclick=()=>run(()=>game.modules.get(ID).api.openFamiliar(owner));
+document.querySelector("#sources").onclick=()=>run(()=>openCompanionSources(owner));
+document.querySelector("#missing").onclick=()=>{game.packs.clear();document.querySelector("#notifications").textContent="Fixture packs removed; source viewing now uses temporary Items.";};
+document.querySelector("#language").onchange=event=>run(async()=>{game.i18n.lang=event.target.value;await initializeLocalization();for(const node of document.querySelectorAll(".fixture-dialog"))node.remove();await game.modules.get(ID).api.openFamiliar(owner);});
+window.fixture={ready:true,errors,owner,familiar,game,catalogs};
+</script>
+</body>
+</html>

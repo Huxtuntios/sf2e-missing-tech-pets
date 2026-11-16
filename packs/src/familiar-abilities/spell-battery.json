@@ -13,7 +13,7 @@
     },
     "category": "familiar",
     "description": {
-      "value": "<p>You gain one additional spell slot at least 3 ranks lower than your highest-rank spell slot; you must be able to cast 4th-rank spells using spell slots to select this ability.</p><p><a href=\"https://2e.aonsrd.com/familiars/abilities/26-spell-battery\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>You gain one additional spell slot at least 3 ranks lower than your highest-rank spell slot; you must be able to cast 4th-rank spells using spell slots to select this ability.</p>"
     },
     "publication": {
       "title": "Tech Core",

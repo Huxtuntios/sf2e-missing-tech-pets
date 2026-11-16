@@ -30,7 +30,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Choose a skill in which the robot is trained, including training from Skill Module. Its proficiency becomes expert. Repeat selections must choose different skills.</p><p>@Localize[SFMTP.CustomManualHint]</p><p><a href=\"https://2e.aonsrd.com/companions/types/robot/customizations\">Tech Core — Archives of Nethys</a></p>"
+      "value": "<p>Choose a skill in which the robot is trained, including training from Skill Module. Its proficiency becomes expert. Repeat selections must choose different skills.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
     },
     "traits": {
       "rarity": "common",

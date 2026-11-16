@@ -7,4 +7,11 @@ packs/robot-chassis/** -text
 packs/robot-advanced-maneuvers/** -text
 packs/robot-support/** -text
 packs/familiar-abilities/** -text
+packs/robot-customizations/** -text
+packs/pf2e-*/** -text
 *.yml text eol=lf
+*.db text eol=lf
+packs/*/CURRENT text eol=lf
+packs/*/MANIFEST-* binary
+packs/*/*.ldb binary
+packs/*/*.log binary

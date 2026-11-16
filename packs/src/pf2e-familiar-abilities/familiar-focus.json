@@ -1,0 +1,42 @@
+{
+  "_id": "62440dbf843646aa",
+  "name": "Familiar Focus",
+  "type": "action",
+  "img": "systems/pf2e/icons/actions/Passive.webp",
+  "system": {
+    "slug": "familiar-focus",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 2
+    },
+    "category": "familiar",
+    "description": {
+      "value": "<p>Once per day, your familiar can use 2 actions with the concentrate trait to restore 1 Focus Point to your focus pool, up to your usual maximum. You must have a focus pool to select this ability.</p>"
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": []
+    },
+    "rules": []
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.pf2e-familiar-abilities.Item.62440dbf843646aa"
+    },
+    "sf2e-missing-tech-pets": {
+      "familiarAbility": true,
+      "catalogId": "familiar-focus",
+      "abilityCategory": "master",
+      "automation": "manual"
+    }
+  },
+  "effects": []
+}
