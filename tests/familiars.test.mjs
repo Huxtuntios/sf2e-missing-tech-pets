@@ -17,6 +17,7 @@ import {
   syncFamiliarAbilities,
   setInnateFamiliarItems,
   familiarFingerprint,
+  familiarCanRemove,
   familiarCatalog,
 } from "../scripts/familiars.mjs";
 const ID = "sf2e-missing-tech-pets";
@@ -414,10 +415,48 @@ test("Неизменённая управляемая копия Construct по�
   assert.deepEqual(construct.system.rules, [
     { key: "ActorTraits", add: ["construct"], remove: ["animal"] },
   ]);
+  assert.equal(familiarCanRemove(construct, owner, familiar), true);
   assert.deepEqual(
     await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]),
     { created: 0, removed: 0, protected: 0, upgraded: 0 },
   );
+  // Обновлённую копию по-прежнему можно снять через менеджер.
+  assert.deepEqual(await syncFamiliarAbilities(owner, familiar, []), {
+    created: 0,
+    removed: 2,
+    protected: 0,
+    upgraded: 0,
+  });
+});
+test("Прерванное обновление не оставляет копию с новым содержимым и старым снимком", async () => {
+  const { owner, familiar } = setup();
+  await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]);
+  const construct = [...familiar.items].find(
+    (item) => item.system.slug === "construct",
+  );
+  construct.source.system.rules = [];
+  await construct.setFlag(ID, "familiarManaged", {
+    controllerActorId: owner.id,
+    fingerprint: familiarFingerprint(construct),
+  });
+  const before = construct.toObject();
+  const update = construct.update.bind(construct);
+  construct.update = async () => {
+    throw new Error("write failed");
+  };
+  await assert.rejects(
+    syncFamiliarAbilities(owner, familiar, ["tough", "construct"]),
+    /write failed/,
+  );
+  // Запись не произошла: содержимое и снимок прежние, копия остаётся управляемой.
+  assert.deepEqual(construct.toObject(), before);
+  assert.equal(familiarCanRemove(construct, owner, familiar), true);
+  construct.update = update;
+  assert.deepEqual(
+    await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]),
+    { created: 0, removed: 0, protected: 0, upgraded: 1 },
+  );
+  assert.equal(familiarCanRemove(construct, owner, familiar), true);
 });
 test("Изменённая игроком копия Construct не обновляется и остаётся защищённой", async () => {
   const { owner, familiar } = setup();

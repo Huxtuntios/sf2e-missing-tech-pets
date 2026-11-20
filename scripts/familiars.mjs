@@ -329,6 +329,9 @@ async function syncNow(owner, familiar, selectedIds) {
     target.system = { ...target.system, ...source.system };
     target.effects = source.effects ?? [];
     if (familiarFingerprint(item) === familiarFingerprint(target)) continue;
+    // Содержимое и снимок пишутся одним update: прерванная запись не оставит
+    // копию с новым содержимым и старым снимком, которую менеджер счёл бы
+    // «изменённой» и больше не смог ни снять, ни обновить.
     await item.update({
       name: target.name,
       img: target.img,
@@ -336,12 +339,15 @@ async function syncNow(owner, familiar, selectedIds) {
       effects: target.effects,
       flags: {
         core: source.flags.core,
-        [MODULE_ID]: { ...item.flags[MODULE_ID], ...source.flags[MODULE_ID] },
+        [MODULE_ID]: {
+          ...item.flags[MODULE_ID],
+          ...source.flags[MODULE_ID],
+          familiarManaged: {
+            controllerActorId: owner.id,
+            fingerprint: familiarFingerprint(target),
+          },
+        },
       },
-    });
-    await item.setFlag(MODULE_ID, "familiarManaged", {
-      controllerActorId: owner.id,
-      fingerprint: familiarFingerprint(item),
     });
     upgraded++;
   }
