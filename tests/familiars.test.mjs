@@ -17,6 +17,7 @@ import {
   syncFamiliarAbilities,
   setInnateFamiliarItems,
   familiarFingerprint,
+  familiarCanRemove,
   familiarCatalog,
 } from "../scripts/familiars.mjs";
 const ID = "sf2e-missing-tech-pets";
@@ -38,6 +39,9 @@ class Item {
     // Имитируем дополнение отсутствующих полей схемой при создании.
     this.source.system._migration = { version: 1 };
     this.source.system.deathNote = "";
+    this.source.system.description = { gm: "", ...this.source.system.description };
+    this.source.system.traits = { otherTags: [], ...this.source.system.traits };
+    delete this.source.system.traits.rarity;
   }
   get flags() {
     return this.source.flags ?? {};
@@ -55,6 +59,15 @@ class Item {
     this.source.flags ??= {};
     this.source.flags[scope] ??= {};
     this.source.flags[scope][key] = structuredClone(value);
+  }
+  async update(data) {
+    for (const [key, value] of Object.entries(data)) {
+      const parts = key.split(".");
+      let cursor = this.source;
+      for (const part of parts.slice(0, -1)) cursor = cursor[part] ??= {};
+      cursor[parts.at(-1)] = structuredClone(value);
+    }
+    return this;
   }
 }
 class MockActor {
@@ -154,7 +167,7 @@ test("38 полных SF2e Action Items с неизменяемыми уника
   }
   assert.equal(
     catalog.entries.filter((e) => e.automation === "rules").length,
-    10,
+    11,
   );
 });
 test("В Rule Elements только сверенные пассивные схемы; стоимость Familiar Focus — 2 действия", () => {
@@ -289,7 +302,7 @@ test("Повторная синхронизация не создаёт копи
   const { owner, familiar } = setup();
   assert.deepEqual(
     await syncFamiliarAbilities(owner, familiar, ["flier", "darkvision"]),
-    { created: 2, removed: 0, protected: 0 },
+    { created: 2, removed: 0, protected: 0, upgraded: 0 },
   );
   const ids = [...familiar.items.keys()];
   assert.deepEqual(
@@ -298,13 +311,13 @@ test("Повторная синхронизация не создаёт копи
       "darkvision",
       "flier",
     ]),
-    { created: 0, removed: 0, protected: 0 },
+    { created: 0, removed: 0, protected: 0, upgraded: 0 },
   );
   assert.deepEqual([...familiar.items.keys()], ids);
   assert.equal(familiar.writes.created, 2);
   assert.deepEqual(
     await syncFamiliarAbilities(owner, familiar, ["climber", "darkvision"]),
-    { created: 1, removed: 1, protected: 0 },
+    { created: 1, removed: 1, protected: 0, upgraded: 0 },
   );
   assert.equal(familiar.items.size, 2);
   assert.equal(familiar.writes.deleted, 1);
@@ -313,6 +326,7 @@ test("Повторная синхронизация не создаёт копи
     created: 0,
     removed: 2,
     protected: 0,
+    upgraded: 0,
   });
   assert.deepEqual(familiar.writes, { created: 3, deleted: 3 });
 });
@@ -336,6 +350,14 @@ test("Превышение лимита и неизвестные записи �
     "FamiliarSelectionInvalid",
   );
   assert.equal(familiar.writes.created, 0);
+});
+test("Construct автоматизируется через ActorTraits; иммунитеты выводит система из признака", () => {
+  const entry = catalog.entries.find((e) => e.id === "construct");
+  assert.equal(entry.automation, "rules");
+  assert.deepEqual(entry.rules, [
+    { key: "ActorTraits", add: ["construct"], remove: ["animal"] },
+  ]);
+  assert.deepEqual(entry.prerequisites, ["tough"]);
 });
 test("Tough/Construct и другие prerequisites проверяются до записи", async () => {
   const { owner, familiar } = setup();
@@ -376,6 +398,86 @@ test("Изменённые и вручную добавленные Items не �
   await familiar.createEmbeddedDocuments("Item", [source]);
   await syncFamiliarAbilities(owner, familiar, ["flier", "tough"]);
   assert.equal(familiar.items.size, 2);
+});
+test("Неизменённая управляемая копия Construct получает ActorTraits при повторном сохранении", async () => {
+  const { owner, familiar } = setup();
+  await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]);
+  const construct = [...familiar.items].find(
+    (item) => item.system.slug === "construct",
+  );
+  // Копия 1.7.0: правила пусты, снимок соответствует её текущему состоянию.
+  construct.source.system.rules = [];
+  await construct.setFlag(ID, "familiarManaged", {
+    controllerActorId: owner.id,
+    fingerprint: familiarFingerprint(construct),
+  });
+  assert.deepEqual(
+    await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]),
+    { created: 0, removed: 0, protected: 0, upgraded: 1 },
+  );
+  assert.deepEqual(construct.system.rules, [
+    { key: "ActorTraits", add: ["construct"], remove: ["animal"] },
+  ]);
+  assert.equal(familiarCanRemove(construct, owner, familiar), true);
+  assert.deepEqual(
+    await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]),
+    { created: 0, removed: 0, protected: 0, upgraded: 0 },
+  );
+  // Обновлённую копию по-прежнему можно снять через менеджер.
+  assert.deepEqual(await syncFamiliarAbilities(owner, familiar, []), {
+    created: 0,
+    removed: 2,
+    protected: 0,
+    upgraded: 0,
+  });
+});
+test("Прерванное обновление не оставляет копию с новым содержимым и старым снимком", async () => {
+  const { owner, familiar } = setup();
+  await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]);
+  const construct = [...familiar.items].find(
+    (item) => item.system.slug === "construct",
+  );
+  construct.source.system.rules = [];
+  await construct.setFlag(ID, "familiarManaged", {
+    controllerActorId: owner.id,
+    fingerprint: familiarFingerprint(construct),
+  });
+  const before = construct.toObject();
+  const update = construct.update.bind(construct);
+  construct.update = async () => {
+    throw new Error("write failed");
+  };
+  await assert.rejects(
+    syncFamiliarAbilities(owner, familiar, ["tough", "construct"]),
+    /write failed/,
+  );
+  // Запись не произошла: содержимое и снимок прежние, копия остаётся управляемой.
+  assert.deepEqual(construct.toObject(), before);
+  assert.equal(familiarCanRemove(construct, owner, familiar), true);
+  construct.update = update;
+  assert.deepEqual(
+    await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]),
+    { created: 0, removed: 0, protected: 0, upgraded: 1 },
+  );
+  assert.equal(familiarCanRemove(construct, owner, familiar), true);
+});
+test("Изменённая игроком копия Construct не обновляется и остаётся защищённой", async () => {
+  const { owner, familiar } = setup();
+  await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]);
+  const construct = [...familiar.items].find(
+    (item) => item.system.slug === "construct",
+  );
+  construct.source.name = "Player edited Construct";
+  const result = await syncFamiliarAbilities(owner, familiar, [
+    "tough",
+    "construct",
+  ]);
+  assert.equal(result.upgraded, 0);
+  assert.equal(result.protected, 1);
+  assert.equal(construct.source.name, "Player edited Construct");
+  assert.deepEqual(construct.system.rules, [
+    { key: "ActorTraits", add: ["construct"], remove: ["animal"] },
+  ]);
 });
 test("Отказ загрузки источника и неправильная связь ничего не очищают", async () => {
   const { owner, familiar } = setup();
@@ -422,7 +524,7 @@ for (const count of [0, 1]) {
     assert.deepEqual(original.toObject(), snapshot);
     familiar.createEmbeddedDocuments = create;
     const result = await syncFamiliarAbilities(owner, familiar, ["darkvision"]);
-    assert.deepEqual(result, { created: 1, removed: 1, protected: 0 });
+    assert.deepEqual(result, { created: 1, removed: 1, protected: 0, upgraded: 0 });
   });
 }
 test("Ошибка сохранения снимка откатывает только новый набор", async () => {

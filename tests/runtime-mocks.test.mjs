@@ -1615,7 +1615,8 @@ test("Каталог инструментов содержит раскрыва�
   const entries = JSON.parse(
     await readFile(path.join(root, "data/robot-customizations.json"), "utf8"),
   ).entries.filter((e) => e.grade === "commercial");
-  assert.match(content, /<details><summary>/);
+  assert.match(content, /class="sfmtp-row-header" role="button" tabindex="0" aria-expanded="false"/);
+  assert.match(content, /class="sfmtp-row-body"[^>]*hidden/);
   for (const entry of entries)
     assert.ok(content.includes(entry.description), entry.id);
 });

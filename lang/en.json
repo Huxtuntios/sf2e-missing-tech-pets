@@ -383,6 +383,7 @@
     "CustomArmorPrompt": "Armored Plates: choose the bonus appropriate to this robot’s actual advancement.",
     "CustomArmorNormal": "Standard robot: +1 item bonus to AC",
     "CustomArmorSuperior": "Superior robot: +2 item bonus to AC",
+    "ResistantPanelsPrompt": "Resistant Panels: choose the damage type this robot resists.",
     "CustomManualSelections": "Customization Items added as rules references; manual resolution required"
   }
 }

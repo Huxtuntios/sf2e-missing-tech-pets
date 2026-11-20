@@ -63,7 +63,7 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
  assert archive.read('module.json')==(folder/'module.json').read_bytes(),'Манифесты различаются'
  manifest=json.loads(archive.read('module.json'))
  for pack in manifest['packs']:
-  assert pack['system'] in ['sf2e','pf2e'] and pack['type']=='Item','Некорректный пак'
+  assert pack['system'] in ['sf2e','pf2e'] and (pack['type']=='Item' or (pack['type']=='Actor' and pack['name'].endswith('minibot-creature'))),'Некорректный пак'
   current=pack['path']+'/CURRENT'
   assert current in names,'Отсутствует готовый LevelDB'
   target=archive.read(current).decode().strip()
@@ -71,13 +71,14 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
   translation='lang/babele/ru/'+manifest['id']+'.'+pack['name']+'.json'
   assert translation in names,'Отсутствует перевод пака'
   payload=json.loads(archive.read(translation))
-  assert payload['mapping']=={'name':'name','description':'system.description.value'},'Перевод меняет технические поля'
+  expected_desc='system.details.publicNotes' if pack['type']=='Actor' else 'system.description.value'
+  assert payload['mapping']=={'name':'name','description':expected_desc},'Перевод меняет технические поля'
   source_prefix='packs/src/'+pack['name']+'/'
   ids={json.loads(archive.read(p))['_id'] for p in names if p.startswith(source_prefix) and p.endswith('.json')}
   assert set(payload['entries'])==ids,'Не совпали ID переводов'
  assert 'data/ru-content.json' in names,'Отсутствует русский каталог'
  for script in manifest['esmodules']:assert script in names,'Отсутствует entrypoint'
- for script in ['content-localization.mjs','babele.mjs','customization-sources.mjs','dailies.mjs','sheet-integration.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
+ for script in ['content-localization.mjs','babele.mjs','customization-sources.mjs','dailies.mjs','sheet-integration.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs','ability-row.mjs','rich-text.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
  for language in manifest['languages']:assert language['path'] in names,'Отсутствует язык'
  for name in names:
   if pathlib.PurePosixPath(name).suffix in ['.json','.db','.mjs','.md','.txt','.css','.html','.svg']:
@@ -92,10 +93,10 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
  for language in manifest['languages']:
   translations=json.loads(archive.read(language['path']))
   assert isinstance(translations.get('SFMTP',{}).get('ManualActionHint'),str),'Не разрешается ключ Foundry SFMTP.ManualActionHint'
- assert len([p for p in names if p.startswith('packs/src/') and p.endswith('.json')])==178,'Неполные источники'
+ assert len([p for p in names if p.startswith('packs/src/') and p.endswith('.json')])==232,'Неполные источники'
  assert not any(p.startswith(('node_modules/','.git/','.github/','tests/','tools/')) for p in names),'В ZIP попали файлы разработки'
  assert not any(pathlib.PurePosixPath(p).name in ['LOG','LOG.old','LOCK'] or p.endswith(('.dbtmp','-wal','-shm')) for p in names),'В ZIP попали временные файлы базы'
- assert 'docs/AUDIT-1.7.0.md' in names,'Отсутствует отчёт проверки кандидата'
+ assert 'docs/AUDIT-1.8.0.md' in names,'Отсутствует отчёт проверки кандидата'
 `,
     directory,
     referencePattern.source,
@@ -103,5 +104,5 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
   { stdio: "pipe" },
 );
 console.log(
-  "Проверены SHA256, версия/тег, манифест, ZIP, десять LevelDB-паков и 178 исходников Items.",
+  "Проверены SHA256, версия/тег, манифест, ZIP, четырнадцать LevelDB-паков и 232 исходника.",
 );

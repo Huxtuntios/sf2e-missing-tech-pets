@@ -1,0 +1,44 @@
+{
+  "name": "Direct Minibot",
+  "type": "action",
+  "img": "icons/svg/target.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "direct-minibot",
+    "actionType": {
+      "value": "action"
+    },
+    "actions": {
+      "value": 1
+    },
+    "category": "interaction",
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "description": {
+      "value": "<p><strong>Frequency</strong> once per hour</p><p>You turn some dials and flick some levers to activate the linked minibot. You Activate Minibot for the linked minibot.</p><p>@Localize[SFMTP.ManualActionHint]</p>"
+    },
+    "rules": [],
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "manipulate"
+      ],
+      "otherTags": []
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "minibot": true,
+      "itemKind": "minibot-action"
+    }
+  },
+  "_id": "f34c85d67dd1e5d7"
+}

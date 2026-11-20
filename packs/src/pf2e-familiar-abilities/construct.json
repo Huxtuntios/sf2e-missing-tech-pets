@@ -25,7 +25,17 @@
       "rarity": "common",
       "value": []
     },
-    "rules": []
+    "rules": [
+      {
+        "add": [
+          "construct"
+        ],
+        "key": "ActorTraits",
+        "remove": [
+          "animal"
+        ]
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -35,7 +45,7 @@
       "familiarAbility": true,
       "catalogId": "construct",
       "abilityCategory": "familiar",
-      "automation": "manual"
+      "automation": "rules"
     }
   },
   "effects": []

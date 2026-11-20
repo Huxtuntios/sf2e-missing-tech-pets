@@ -2,6 +2,18 @@
 // Каталог хранит правила и признаки автоматизации; сборка и runtime используют одну фабрику.
 import { MODULE_ID, escapeHTML as esc } from "./item-sources.mjs";
 import { ownPackName, systemId } from "./system-context.mjs";
+// Ссылки на выбор игрока хранятся в namespace системы: flags.sf2e → flags.pf2e.
+// Заменяем во всех строках правила (value, path, type и вложенные поля).
+const localizeRuleRefs = (node, system) => {
+  if (typeof node === "string")
+    return node.replaceAll("flags.sf2e.", `flags.${system}.`);
+  if (Array.isArray(node)) return node.map((child) => localizeRuleRefs(child, system));
+  if (node && typeof node === "object")
+    return Object.fromEntries(
+      Object.entries(node).map(([key, value]) => [key, localizeRuleRefs(value, system)]),
+    );
+  return node;
+};
 export function buildCustomizationSource(entry, system = "sf2e") {
   const active = [
     "light-mounts",
@@ -40,9 +52,7 @@ export function buildCustomizationSource(entry, system = "sf2e") {
         otherTags: [],
       },
       rules: structuredClone(entry.rules ?? []).map((rule) =>
-        typeof rule.value === "string"
-          ? { ...rule, value: rule.value.replaceAll("flags.sf2e.", `flags.${system}.`) }
-          : rule,
+        localizeRuleRefs(rule, system),
       ),
     },
     flags: {

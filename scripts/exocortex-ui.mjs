@@ -18,8 +18,9 @@ import {
 } from "./exocortex.mjs";
 const button = (operation, key, attributes = "") =>
   `<button type="button" data-exo-operation="${operation}" ${attributes}>${esc(t(key))}</button>`;
+// Метрики выводим компактной строкой (inline-block), а не отдельными абзацами.
 const stat = (key, value) =>
-  `<p><strong>${esc(t(key))}:</strong> ${esc(value ?? "—")}</p>`;
+  `<span class="sfmtp-stat"><strong>${esc(t(key))}:</strong> ${esc(value ?? "—")}</span>`;
 // Показываем конкретную локализованную причину, не скрываем её общим AddFailed.
 const safe =
   (callback) =>

@@ -1,0 +1,67 @@
+{
+  "name": "Bellbot (Superior)",
+  "type": "equipment",
+  "img": "icons/commodities/tech/electronics-tech-sensor-orange-teal.webp",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "baseItem": null,
+    "bulk": {
+      "value": 1
+    },
+    "containerId": null,
+    "description": {
+      "value": "<p>Bellbots are effectively suitcases with legs, wheels, or tracks that can follow their owners around workplaces and spaceports. They have basic danger avoidance protocols to avoid hazardous terrain and environments that could damage their payloads, though they can be commanded to ignore these protocols. A commercial bellbot has a Speed of 25 feet (but no fly Speed) and holds up to 4 Bulk of items, and the first 2 Bulk don’t apply to the Bulk of a bellbot.</p>\n<p><strong>Activate—Bellhop</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Effect</strong> The bellbot follows you until deactivated. This lasts 1 hour and expends 1 battery charge.</p>\n<p>A tactical bellbot has a fly Speed of 30 feet and an integrated <em>commercial null space chamber</em>.</p><p>An advanced bellbot has a fly Speed of 30 feet and an integrated <em>tactical null space chamber</em>.</p><p>A superior bellbot has a fly Speed of 30 feet and an integrated <em>advanced null space chamber</em>.</p>"
+    },
+    "hardness": 0,
+    "hp": {
+      "max": 0,
+      "value": 0
+    },
+    "level": {
+      "value": 12
+    },
+    "material": {
+      "grade": null,
+      "type": null
+    },
+    "price": {
+      "value": {
+        "sp": 16150
+      }
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "quantity": 1,
+    "rules": [],
+    "size": "med",
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "minibot",
+        "tech"
+      ]
+    },
+    "usage": {
+      "value": "held-in-one-hand"
+    },
+    "slug": "bellbot-superior",
+    "equipped": {
+      "carryType": "held"
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "minibot": true,
+      "group": "bellbot"
+    }
+  },
+  "_id": "c979918fd2f5ae91"
+}

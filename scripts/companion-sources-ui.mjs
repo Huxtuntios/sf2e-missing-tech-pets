@@ -1,6 +1,8 @@
 import { t } from "./i18n.mjs";
 import { openCatalogSource } from "./catalog-sources.mjs";
 import { displayField } from "./content-localization.mjs";
+import { abilityRow, bindAbilityRows } from "./ability-row.mjs";
+import { enrichRowBodies } from "./rich-text.mjs";
 import { TechPetsDialog } from "./dialog.mjs";
 import { escapeHTML as esc } from "./item-sources.mjs";
 import {
@@ -36,13 +38,29 @@ export async function openCompanionSources(owner) {
     const match = owned.find((row) => row.slug === entry.slug);
     return `<tr><td>${esc(t(`SourceNames.${entry.slug}`))}</td><td>${esc(t(`SourceKinds.${entry.kind}`))}</td><td>${esc(t(match ? "SourceOwned" : "SourceAbsent"))}</td><td>${match || entry.uuid ? ` <button type="button" data-source-open="${esc(entry.slug)}">${esc(t("SourceOpen"))}</button>` : ""}${match && entry.repeat ? `<label>${esc(t("SourceCount"))} <input type="number" data-source-count="${esc(entry.slug)}" min="1" max="3" value="${esc(counts[entry.slug] ?? 1)}"></label>` : ""}</td></tr>`;
   }).join("");
-  const content = `<div class="sfmtp-sources"><h3>${esc(owner.name)}</h3><p>${esc(t("SourceHint"))}</p>${warnings.map((key) => `<p class="hint">${esc(t(key))}</p>`).join("")}<table><thead><tr><th>${esc(t("Source"))}</th><th>${esc(t("SourceRole"))}</th><th>${esc(t("SourceStatus"))}</th><th>${esc(t("SourceOpen"))}</th></tr></thead><tbody>${rows}</tbody></table><p class="hint">${esc(t("SourceCountsHint"))}</p><button type="button" data-source-save>${esc(t("SourceSaveCounts"))}</button><hr><h3>${esc(t("PetProfileTitle"))}</h3><p>${esc(t("PetProfileHint"))}</p><p>${esc(t("PetRulesHint"))}</p><label><input type="checkbox" name="pet-enabled" ${pet.enabled ? "checked" : ""}> ${esc(t("PetEnabled"))}</label><label>${esc(t("PetName"))}<input name="pet-name" value="${esc(pet.name ?? "")}"></label><p>${esc(t("PetAbilitiesHint"))}</p>${catalog.map((entry) => `<label class="sfmtp-pet-ability"><input type="checkbox" name="pet-ability" value="${esc(entry.id)}" ${(pet.abilities ?? []).includes(entry.id) ? "checked" : ""}> ${esc(displayField(entry, "name"))} <button type="button" data-pet-source="${esc(entry.id)}">${esc(t("SourcePage"))}</button></label>`).join("")}<p class="hint">${esc(t("PetInnateHint"))}</p><button type="button" data-pet-save>${esc(t("PetSave"))}</button><hr><p>${esc(t("SourceOtherCompanions"))}</p></div>`;
+  const petAbilityRows = catalog
+    .map((entry) =>
+      abilityRow({
+        rowId: entry.id,
+        name: displayField(entry, "name"),
+        meta: [esc(t(`Category.${entry.category}`))],
+        controls: `<input type="checkbox" name="pet-ability" value="${esc(entry.id)}" ${(pet.abilities ?? []).includes(entry.id) ? "checked" : ""} aria-label="${esc(displayField(entry, "name"))}">`,
+        body: `<div class="sfmtp-rules-text" data-sfmtp-enrich>${esc(displayField(entry, "description") ?? "")}</div><button type="button" data-pet-source="${esc(entry.id)}">${esc(t("SourcePage"))}</button>`,
+      }),
+    )
+    .join("");
+  const content = `<div class="sfmtp-sources"><h3>${esc(owner.name)}</h3><p>${esc(t("SourceHint"))}</p>${warnings.map((key) => `<p class="hint">${esc(t(key))}</p>`).join("")}<table><thead><tr><th>${esc(t("Source"))}</th><th>${esc(t("SourceRole"))}</th><th>${esc(t("SourceStatus"))}</th><th>${esc(t("SourceOpen"))}</th></tr></thead><tbody>${rows}</tbody></table><p class="hint">${esc(t("SourceCountsHint"))}</p><button type="button" data-source-save>${esc(t("SourceSaveCounts"))}</button><hr><h3>${esc(t("PetProfileTitle"))}</h3><p>${esc(t("PetProfileHint"))}</p><p>${esc(t("PetRulesHint"))}</p><label><input type="checkbox" name="pet-enabled" ${pet.enabled ? "checked" : ""}> ${esc(t("PetEnabled"))}</label><label>${esc(t("PetName"))}<input name="pet-name" value="${esc(pet.name ?? "")}"></label><p>${esc(t("PetAbilitiesHint"))}</p><div class="sfmtp-pet-abilities">${petAbilityRows}</div><p class="hint">${esc(t("PetInnateHint"))}</p><button type="button" data-pet-save>${esc(t("PetSave"))}</button><hr><p>${esc(t("SourceOtherCompanions"))}</p></div>`;
   return new TechPetsDialog(
     {
       title: t("SourceTitle"),
       content,
       buttons: { close: { label: t("Close") } },
       render: (html) => {
+        const root = html.nodes?.[0];
+        if (root) {
+          bindAbilityRows(root);
+          void enrichRowBodies(root, { secrets: owner.isOwner !== false });
+        }
         html.find("[data-source-open]").on("click", async (event) => {
           const slug = event.currentTarget.dataset.sourceOpen;
           const entry = COMPANION_SOURCES.find((row) => row.slug === slug);

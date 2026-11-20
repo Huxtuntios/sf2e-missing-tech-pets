@@ -304,10 +304,67 @@ async function syncNow(owner, familiar, selectedIds) {
       "Item",
       obsolete.map((item) => item.id),
     );
+  // Обновляем неизменённые управляемые копии, чьё содержимое изменилось в каталоге
+  // (например, Construct получил ActorTraits). Изменённые, врождённые и ручные
+  // Items защищены тем же familiarCanRemove, что и при удалении.
+  const desiredBySlug = new Map(
+    entries.map((entry) => [
+      entry.id,
+      localizeItemSource(
+        buildFamiliarSource(entry, systemId()),
+        "familiar-abilities",
+        entry,
+      ),
+    ]),
+  );
+  let upgraded = 0;
+  for (const item of all) {
+    const source = desiredBySlug.get(item.system?.slug);
+    if (!source || !familiarCanRemove(item, owner, familiar)) continue;
+    // Целевое состояние сохраняет поля схемы, которых нет в фабрике
+    // (description.gm, traits.otherTags, deathNote и т.п.): иначе снимок не
+    // совпал бы с записанным Item и копия считалась бы «изменённой».
+    const target = item.toObject();
+    target.name = source.name;
+    target.img = source.img;
+    target.effects = source.effects ?? [];
+    const sys = target.system;
+    sys.slug = source.system.slug;
+    sys.category = source.system.category;
+    sys.actionType = source.system.actionType;
+    sys.actions = source.system.actions;
+    sys.publication = source.system.publication;
+    sys.rules = source.system.rules;
+    sys.description = { ...sys.description, value: source.system.description.value };
+    sys.traits = { ...sys.traits, value: source.system.traits.value };
+    if (familiarFingerprint(item) === familiarFingerprint(target)) continue;
+    // Содержимое и снимок пишутся одним update: прерванная запись не оставит
+    // копию с новым содержимым и старым снимком, которую менеджер счёл бы
+    // «изменённой» и больше не смог ни снять, ни обновить.
+    await item.update({
+      name: target.name,
+      img: target.img,
+      system: target.system,
+      effects: target.effects,
+      flags: {
+        core: source.flags.core,
+        [MODULE_ID]: {
+          ...item.flags[MODULE_ID],
+          ...source.flags[MODULE_ID],
+          familiarManaged: {
+            controllerActorId: owner.id,
+            fingerprint: familiarFingerprint(target),
+          },
+        },
+      },
+    });
+    upgraded++;
+  }
   return {
     created: created.length,
     removed: obsolete.length,
     protected: protectedItems.length,
+    upgraded,
   };
 }
 export async function setInnateFamiliarItems(familiar, ids) {

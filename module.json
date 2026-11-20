@@ -2,7 +2,7 @@
   "id": "sf2e-missing-tech-pets",
   "title": "SF2e Missing Tech Pets",
   "description": "Tech Core robot companions, native familiar management and mechanic exocortex tools for SF2e and PF2e. Companion Compendia supplies robot base classes; PF2e mechanic tools require SF2e Anachronism.",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "authors": [
     {
       "name": "Huxtuntios",
@@ -152,6 +152,38 @@
       "path": "packs/pf2e-robot-customizations",
       "type": "Item", "system": "pf2e",
       "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "minibot-creature",
+      "label": "Tech Pets: Minibot Creature (SF2e)",
+      "path": "packs/minibot-creature",
+      "type": "Actor",
+      "system": "sf2e",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "minibots",
+      "label": "Tech Pets: Minibots (SF2e)",
+      "path": "packs/minibots",
+      "type": "Item",
+      "system": "sf2e",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "pf2e-minibot-creature",
+      "label": "Tech Pets: Minibot Creature (PF2e)",
+      "path": "packs/pf2e-minibot-creature",
+      "type": "Actor",
+      "system": "pf2e",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
+    },
+    {
+      "name": "pf2e-minibots",
+      "label": "Tech Pets: Minibots (PF2e)",
+      "path": "packs/pf2e-minibots",
+      "type": "Item",
+      "system": "pf2e",
+      "ownership": { "PLAYER": "OBSERVER", "ASSISTANT": "OWNER" }
     }
   ],
   "packFolders": [
@@ -168,7 +200,11 @@
         "pf2e-robot-advanced-maneuvers",
         "pf2e-robot-support",
         "pf2e-familiar-abilities",
-        "pf2e-robot-customizations"
+        "pf2e-robot-customizations",
+        "minibot-creature",
+        "minibots",
+        "pf2e-minibot-creature",
+        "pf2e-minibots"
       ]
     }
   ],
@@ -176,7 +212,7 @@
   "readme": "README.md",
   "url": "https://github.com/Huxtuntios/sf2e-missing-tech-pets",
   "manifest": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/latest/download/module.json",
-  "download": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/download/v1.7.0/module.zip",
+  "download": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/releases/download/v1.8.0/module.zip",
   "bugs": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/issues",
   "changelog": "https://github.com/Huxtuntios/sf2e-missing-tech-pets/blob/main/CHANGELOG.md"
 }

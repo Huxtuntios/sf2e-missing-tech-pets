@@ -1,0 +1,67 @@
+{
+  "name": "Camerabot (Advanced)",
+  "type": "equipment",
+  "img": "icons/commodities/tech/electronics-tech-sensor-orange-teal.webp",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "baseItem": null,
+    "bulk": {
+      "value": 1
+    },
+    "containerId": null,
+    "description": {
+      "value": "<p>A favorite of celebrities, musicians, and streamers alike, this round floating minibot rotates around its user while recording or streaming audio or video. The user of this minibot can perform the Livestream exploration activity at the same time as another exploration activity. A camerabot only takes 1 charge per hour it remains active.</p>\n<p>A tactical camerabot has a built-in flashlight and can be directed to record others, including specific creatures or locations. It must remain within 100 feet of its owner, or it immediately attempts to recall itself back to its owner.</p><p>An advanced camerabot can record within 1,000 feet and has darkvision, allowing it to record without a light source.</p>"
+    },
+    "hardness": 0,
+    "hp": {
+      "max": 0,
+      "value": 0
+    },
+    "level": {
+      "value": 4
+    },
+    "material": {
+      "grade": null,
+      "type": null
+    },
+    "price": {
+      "value": {
+        "sp": 1000
+      }
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "quantity": 1,
+    "rules": [],
+    "size": "med",
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "minibot",
+        "tech"
+      ]
+    },
+    "usage": {
+      "value": "held-in-one-hand"
+    },
+    "slug": "camerabot-advanced",
+    "equipped": {
+      "carryType": "held"
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "minibot": true,
+      "group": "camerabot"
+    }
+  },
+  "_id": "afb15a75b8f371de"
+}

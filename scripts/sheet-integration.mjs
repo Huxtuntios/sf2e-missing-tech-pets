@@ -1,5 +1,7 @@
 import { t } from "./i18n.mjs";
 import { openCatalogSource } from "./catalog-sources.mjs";
+import { abilityRow, bindAbilityRows } from "./ability-row.mjs";
+import { enrichRowBodies } from "./rich-text.mjs";
 import { displayField } from "./content-localization.mjs";
 import { unmetCustomizationRequirements } from "./exocortex-rules.mjs";
 import {
@@ -261,7 +263,14 @@ export function registerSheetIntegration(services) {
               : !familiar && locked
                 ? t("InlineGradeLocked")
                 : "";
-          return `<details class="sfmtp-inline-entry" data-sfmtp-entry="${esc(`${entry.name} ${detail}`.toLocaleLowerCase())}"><summary><label>${control} ${esc(entry.name)}</label><small>${esc(detail)} ${esc(status)}</small></summary><p class="sfmtp-rules-text">${esc(entry.description ?? t("InlineRulesOnSource"))}</p><button type="button" data-sfmtp-source="${esc(entry.id)}">${esc(t("SourcePage"))}</button></details>`;
+          return abilityRow({
+            rowId: entry.id,
+            name: entry.name,
+            meta: [esc(detail), ...(status ? [esc(status)] : [])],
+            controls: control,
+            body: `<div class="sfmtp-rules-text" data-sfmtp-enrich>${esc(entry.description ?? t("InlineRulesOnSource"))}</div><button type="button" data-sfmtp-source="${esc(entry.id)}">${esc(t("SourcePage"))}</button>`,
+            rowAttrs: `data-sfmtp-entry="${esc(`${entry.name} ${detail}`.toLocaleLowerCase())}"`,
+          });
         })
         .join(
           "",
@@ -352,6 +361,8 @@ export function registerSheetIntegration(services) {
             button.disabled = false;
           }
         });
+      bindAbilityRows(panel);
+      void enrichRowBodies(panel);
       target.append(panel);
     } catch (error) {
       console.error(`${ID} | Не удалось встроить выбор способностей`, error);

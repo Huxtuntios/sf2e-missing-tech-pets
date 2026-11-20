@@ -4,6 +4,8 @@ import {
 } from "./customization-sources.mjs";
 import { initializeDailiesIntegration } from "./dailies.mjs";
 import { openCatalogSource } from "./catalog-sources.mjs";
+import { abilityRow, bindAbilityRows } from "./ability-row.mjs";
+import { enrichRowBodies } from "./rich-text.mjs";
 import "./babele.mjs";
 import { localizeCatalog, localizeItemSource, displayField, displayTerm } from "./content-localization.mjs";
 import {
@@ -48,6 +50,7 @@ import {
   ownPackName,
   companionPackKey,
   companionClassUuid,
+  registerMinibotEquipmentTrait,
 } from "./system-context.mjs";
 
 const MODULE_ID = "sf2e-missing-tech-pets";
@@ -986,15 +989,31 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
     const visible = entries.slice(0, 100);
     const rows = visible
       .map((entry) => {
-        const detail =
-          config.type === "chassis"
-            ? chassisStatLine(entry)
-            : `${entry.grade ? t(`Grade.${entry.grade}`) : t(`Category.${entry.category}`) || entry.category || ""}${entry.repeatable ? ` · ${t("Repeatable")}` : ""}`;
-        const extra =
-          config.type === "chassis"
-            ? `${entry.special ? `<p class="sfmtp-rules-text">${esc(entry.special)}</p>` : ""}<p class="sfmtp-rules-text"><strong>${esc(t("Support"))}:</strong> ${esc(entry.supportBenefit ?? "")}</p><p class="sfmtp-rules-text"><strong>${esc(entry.advancedManeuver ?? "")}:</strong> ${esc(entry.advancedManeuverDescription ?? "")}</p><p>${esc(entry.rulesNote ?? "")}</p>`
-            : "";
-        return `<div class="sfmtp-catalog-row"><div><details><summary><strong>${esc(entry.name)}</strong><small>${esc(detail)}</small></summary>${entry.description ? `<p class="sfmtp-rules-text">${esc(entry.description)}</p>` : ""}${extra}</details></div><div><button type="button" data-source-index="${esc(entry.id)}">${esc(t("SourcePage"))}</button>${config.type === "chassis" ? "" : `<button type="button" data-select-index="${esc(entry.id)}">${esc(t("AddSelection"))}</button>`}</div></div>`;
+        const isChassis = config.type === "chassis";
+        const meta = isChassis
+          ? []
+          : [
+              entry.grade ? esc(t(`Grade.${entry.grade}`)) : esc(t(`Category.${entry.category}`) || entry.category || ""),
+              ...(entry.repeatable ? [esc(t("Repeatable"))] : []),
+            ];
+        const controls = `<button type="button" data-source-index="${esc(entry.id)}">${esc(t("SourcePage"))}</button>${isChassis ? "" : `<button type="button" data-select-index="${esc(entry.id)}">${esc(t("AddSelection"))}</button>`}`;
+        const statLine = isChassis
+          ? `<p class="sfmtp-rules-text">${esc(chassisStatLine(entry))}</p>`
+          : "";
+        const extra = isChassis
+          ? `${entry.special ? `<p class="sfmtp-rules-text">${esc(entry.special)}</p>` : ""}<p class="sfmtp-rules-text"><strong>${esc(t("Support"))}:</strong> ${esc(entry.supportBenefit ?? "")}</p><p class="sfmtp-rules-text"><strong>${esc(entry.advancedManeuver ?? "")}:</strong> ${esc(entry.advancedManeuverDescription ?? "")}</p><p>${esc(entry.rulesNote ?? "")}</p>`
+          : "";
+        const desc = entry.description
+          ? `<p class="sfmtp-rules-text">${esc(entry.description)}</p>`
+          : "";
+        return abilityRow({
+          rowId: entry.id,
+          name: entry.name,
+          meta,
+          controls,
+          body: statLine + desc + extra,
+          enrich: true,
+        });
       })
       .join("");
     return rows || `<p>${esc(t("NoEntries"))}</p>`;
@@ -1009,7 +1028,10 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
         close: { label: t("Close") },
       },
       render: (html) => {
-        const redraw = () =>
+        const root = html.nodes[0];
+        bindAbilityRows(root);
+        void enrichRowBodies(root);
+        const redraw = () => {
           html
             .find(".sfmtp-catalog-list")
             .html(
@@ -1017,6 +1039,8 @@ async function openCuratedCatalog(actor, catalogType, query = "") {
                 String(html.find('[name="sfmtp-catalog-query"]').val() ?? ""),
               ),
             );
+          void enrichRowBodies(root);
+        };
         html.find('[name="sfmtp-catalog-query"]').on("input", redraw);
         html.on("click", "[data-open-chassis-pack]", () =>
           game.packs.get(ownPackId("robot-chassis"))?.render(true),
@@ -2376,6 +2400,7 @@ class TechPetsSettingsMenu extends Dialog {
 }
 
 Hooks.once("init", () => {
+  registerMinibotEquipmentTrait();
   game.settings.registerMenu(MODULE_ID, "tools", {
     name: "SFMTP.ToolsMenu",
     label: "SFMTP.ToolsMenuOpen",

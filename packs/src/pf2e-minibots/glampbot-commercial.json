@@ -1,0 +1,67 @@
+{
+  "name": "Glampbot (Commercial)",
+  "type": "equipment",
+  "img": "icons/commodities/tech/electronics-tech-sensor-orange-teal.webp",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "baseItem": null,
+    "bulk": {
+      "value": 1
+    },
+    "containerId": null,
+    "description": {
+      "value": "<p>The glampbot, a must-have for outdoor influencers, makes camping in the wilderness as comfortable and effortless as possible. Its primary function is to safely guide you back to civilization. Other glampbots can assemble a tent, start small fires, calculate weather forecasts, and even synthesize food using UPBs. Glampbots use solar panels to recharge their internal batteries, allowing them to stay active as long as they get at least 6 hours of sunlight for every 24 hours they remain activated.</p>\n<p><strong>Activate—Glamp On!</strong> <span class=\"action-glyph\">2</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You command the glampbot to guide you back to a specific location. If you’re on a planet without GPS satellites, it can only return you to locations the glampbot has physically been before.</p>"
+    },
+    "hardness": 0,
+    "hp": {
+      "max": 0,
+      "value": 0
+    },
+    "level": {
+      "value": 1
+    },
+    "material": {
+      "grade": null,
+      "type": null
+    },
+    "price": {
+      "value": {
+        "sp": 100
+      }
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "quantity": 1,
+    "rules": [],
+    "size": "med",
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "minibot",
+        "tech"
+      ]
+    },
+    "usage": {
+      "value": "held-in-one-hand"
+    },
+    "slug": "glampbot-commercial",
+    "equipped": {
+      "carryType": "held"
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "minibot": true,
+      "group": "glampbot"
+    }
+  },
+  "_id": "a0baea9fe25b3937"
+}

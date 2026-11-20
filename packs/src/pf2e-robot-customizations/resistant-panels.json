@@ -30,14 +30,58 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Choose acid, bludgeoning, cold, fire, piercing, slashing or sonic. Gain resistance to that damage equal to half the robot’s level, rounded up. This customization can be selected more than once.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
+      "value": "<p>Choose acid, bludgeoning, cold, fire, piercing, slashing or sonic. Gain resistance to that damage equal to half the robot’s level, rounded up. This customization can be selected more than once.</p><p>@Localize[SFMTP.CustomRulesHint]</p>"
     },
     "traits": {
       "rarity": "common",
       "value": [],
       "otherTags": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ChoiceSet",
+        "flag": "resistantPanels",
+        "adjustName": false,
+        "prompt": "SFMTP.ResistantPanelsPrompt",
+        "choices": [
+          {
+            "label": "PF2E.TraitAcid",
+            "value": "acid"
+          },
+          {
+            "label": "PF2E.TraitBludgeoning",
+            "value": "bludgeoning"
+          },
+          {
+            "label": "PF2E.TraitCold",
+            "value": "cold"
+          },
+          {
+            "label": "PF2E.TraitFire",
+            "value": "fire"
+          },
+          {
+            "label": "PF2E.TraitPiercing",
+            "value": "piercing"
+          },
+          {
+            "label": "PF2E.TraitSlashing",
+            "value": "slashing"
+          },
+          {
+            "label": "PF2E.TraitSonic",
+            "value": "sonic"
+          }
+        ]
+      },
+      {
+        "key": "Resistance",
+        "type": [
+          "{item|flags.pf2e.rulesSelections.resistantPanels}"
+        ],
+        "value": "(@actor.level + 1) / 2"
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -48,7 +92,7 @@
       "robotCustomization": true,
       "catalogId": "resistant-panels",
       "customizationGrade": "advanced",
-      "automation": "manual"
+      "automation": "rules"
     }
   }
 }
