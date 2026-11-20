@@ -77,11 +77,11 @@ test("Aquatic Adaptation даёт swim 20; Speakers остаётся описа�
   assert.match(byId("speakers").system.description.value, /CustomManualHint/);
   assert.equal(
     catalog.entries.filter((e) => e.automation === "rules").length,
-    10,
+    11,
   );
   assert.equal(
     catalog.entries.filter((e) => e.automation === "manual").length,
-    26,
+    25,
   );
 });
 test("Armored Plates: нативный выбор +1/+2 и item-бонус AC, не зависящий от лимита каталога", () => {
@@ -98,6 +98,26 @@ test("Armored Plates: нативный выбор +1/+2 и item-бонус AC, �
     bonus.value,
     "{item|flags.sf2e.rulesSelections.armoredPlatesBonus}",
   );
+});
+test("Resistant Panels: нативный выбор типа урона и сопротивление ceil(level/2)", () => {
+  const [choice, resistance] = byId("resistant-panels").system.rules;
+  assert.equal(choice.key, "ChoiceSet");
+  assert.deepEqual(
+    choice.choices.map((c) => c.value),
+    ["acid", "bludgeoning", "cold", "fire", "piercing", "slashing", "sonic"],
+  );
+  assert.equal(resistance.key, "Resistance");
+  assert.deepEqual(resistance.type, [
+    "{item|flags.sf2e.rulesSelections.resistantPanels}",
+  ]);
+  assert.equal(resistance.value, "(@actor.level + 1) / 2");
+  const pf2e = buildCustomizationSource(
+    catalog.entries.find((e) => e.id === "resistant-panels"),
+    "pf2e",
+  );
+  assert.deepEqual(pf2e.system.rules[1].type, [
+    "{item|flags.pf2e.rulesSelections.resistantPanels}",
+  ]);
 });
 test("Роботские Climber и Flier используют скорости 20, не одноимённые способности фамильяра", () => {
   assert.deepEqual(byId("climber").system.rules, [

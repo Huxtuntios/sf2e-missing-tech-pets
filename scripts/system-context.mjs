@@ -23,3 +23,12 @@ export function matchesNativeUuid(origin, uuid) {
   const resolved = nativeUuid(uuid);
   return Boolean(resolved && (origin === resolved || origin === uuid));
 }
+
+// Реестр equipmentTraits SF2e/PF2e не содержит minibot (он зарегистрирован в
+// shieldTraits), поэтому схема equipment отфильтровывает его из traits.value.
+// Регистрируем признак для equipment, чтобы предметы Minibot сохраняли и
+// отображали его. Вызывается в init до загрузки паков; не перезаписывает существующее.
+export function registerMinibotEquipmentTrait(config = globalThis.CONFIG) {
+  const traits = config?.PF2E?.equipmentTraits;
+  if (traits && !("minibot" in traits)) traits.minibot = "PF2E.TraitMinibot";
+}

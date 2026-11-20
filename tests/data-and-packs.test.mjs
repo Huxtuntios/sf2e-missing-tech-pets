@@ -55,10 +55,10 @@ test("Манифест v14/PF2e/SF2e, необязательная интегр�
     manifest.relationships.recommends[0].compatibility.minimum,
     "7.6.3",
   );
-  assert.equal(manifest.packs.length, 10);
+  assert.equal(manifest.packs.length, 14);
   for (const pack of manifest.packs) {
     assert.equal(pack.system, pack.name.startsWith("pf2e-") ? "pf2e" : "sf2e");
-    assert.equal(pack.type, "Item");
+    assert.equal(pack.type, pack.name.endsWith("minibot-creature") ? "Actor" : "Item");
     assert.equal(pack.path, `packs/${pack.name}`);
     assert.equal(pack.ownership.PLAYER, "OBSERVER");
   }
@@ -316,7 +316,7 @@ test("Ключи локализации разрешаются по пути Fou
           : leaves(entry, fullKey);
       });
     const entries = leaves(translations.SFMTP);
-    assert.equal(entries.length, 370);
+    assert.equal(entries.length, 371);
     for (const [key, value] of entries) {
       assert.equal(typeof value, "string");
       assert.ok(lookup(translations, `SFMTP.${key}`));

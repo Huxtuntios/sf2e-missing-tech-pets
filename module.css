@@ -102,6 +102,11 @@
 .sfmtp-exocortex p {
   line-height: 1.45;
 }
+.sfmtp-exocortex .sfmtp-stat {
+  display: inline-block;
+  margin: 0 0.9rem 0.35rem 0;
+  line-height: 1.4;
+}
 .sfmtp-exocortex label {
   display: flex;
   flex-wrap: wrap;
@@ -132,9 +137,8 @@
 .sfmtp-sources td input[type="number"] {
   width: 3.5rem;
 }
-.sfmtp-sources .sfmtp-pet-ability {
-  display: block;
-  padding: 0.2rem 0;
+.sfmtp-sources .sfmtp-pet-abilities {
+  margin: 0.4rem 0;
 }
 
 /* Только список родословных: компендиум и штатный drag-and-drop не скрываются. */
@@ -216,4 +220,107 @@
   white-space: pre-line;
   overflow-wrap: anywhere;
   max-height: none;
+}
+
+/* Единая строка действия/способности: заголовок кликабелен целиком. */
+.sfmtp-row {
+  border-bottom: 1px solid var(--color-border-light-2, #888);
+}
+.sfmtp-row[hidden] {
+  display: none;
+}
+.sfmtp-row-select {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+}
+.sfmtp-row-header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.35rem 0.4rem;
+  cursor: pointer;
+  border-radius: 3px;
+  text-align: left;
+}
+.sfmtp-row-header:hover {
+  background: var(--color-hover-bg, rgba(0, 0, 0, 0.06));
+}
+.sfmtp-row-header:focus-visible {
+  outline: 2px solid var(--color-focus-outline, #5b8dd9);
+  outline-offset: -2px;
+}
+.sfmtp-row-expanded > .sfmtp-row-header {
+  background: var(--color-hover-bg, rgba(0, 0, 0, 0.05));
+}
+.sfmtp-row-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  object-fit: contain;
+  border: none;
+}
+.sfmtp-row-name {
+  font-weight: 600;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.sfmtp-row-meta {
+  font-size: var(--font-size-12, 0.78rem);
+  opacity: 0.85;
+  padding: 0.05rem 0.4rem;
+  border-radius: 8px;
+  background: var(--color-border-light-2, rgba(0, 0, 0, 0.08));
+  white-space: nowrap;
+}
+.sfmtp-row-meta:empty {
+  display: none;
+}
+.sfmtp-row-spacer {
+  flex: 1 1 0;
+}
+.sfmtp-row-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+.sfmtp-row-controls button {
+  height: auto;
+  min-height: 1.6rem;
+  line-height: 1.2;
+  padding: 0.15rem 0.5rem;
+  white-space: nowrap;
+}
+.sfmtp-row-controls input[type="checkbox"] {
+  margin: 0;
+}
+.sfmtp-row-chevron {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.45;
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+  margin-left: 0.1rem;
+}
+.sfmtp-row-expanded > .sfmtp-row-header .sfmtp-row-chevron {
+  transform: rotate(-135deg);
+}
+.sfmtp-row-body {
+  padding: 0.2rem 0.5rem 0.5rem 0.5rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.sfmtp-row-body[hidden] {
+  display: none;
+}
+.sfmtp-row-body p {
+  margin: 0.3rem 0;
+}
+.sfmtp-row-body .sfmtp-rules-text {
+  white-space: normal;
 }

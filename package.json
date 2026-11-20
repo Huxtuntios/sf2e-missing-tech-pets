@@ -1,6 +1,6 @@
 {
   "name": "sf2e-missing-tech-pets",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "private": true,
   "type": "module",
   "description": "Tech Core robot companions, native familiar management and mechanic exocortex tools for SF2e and PF2e. Optional Companion Compendia integration supplies robot base classes.",

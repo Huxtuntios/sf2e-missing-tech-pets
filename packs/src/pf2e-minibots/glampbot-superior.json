@@ -1,0 +1,67 @@
+{
+  "name": "Glampbot (Superior)",
+  "type": "equipment",
+  "img": "icons/commodities/tech/electronics-tech-sensor-orange-teal.webp",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "baseItem": null,
+    "bulk": {
+      "value": 1
+    },
+    "containerId": null,
+    "description": {
+      "value": "<p>The glampbot, a must-have for outdoor influencers, makes camping in the wilderness as comfortable and effortless as possible. Its primary function is to safely guide you back to civilization. Other glampbots can assemble a tent, start small fires, calculate weather forecasts, and even synthesize food using UPBs. Glampbots use solar panels to recharge their internal batteries, allowing them to stay active as long as they get at least 6 hours of sunlight for every 24 hours they remain activated.</p>\n<p><strong>Activate—Glamp On!</strong> <span class=\"action-glyph\">2</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You command the glampbot to guide you back to a specific location. If you’re on a planet without GPS satellites, it can only return you to locations the glampbot has physically been before.</p>\n<p>A tactical glampbot can help build a camp, providing a +1 item bonus to Survival checks to Subsist when building a shelter. It can also synthesize an edible meal with enough sustenance for a creature for 1 day by using 1 UPB.</p><p>As tactical, but an advanced glampbot can also synthesize more complex ingredients to provide a higher-end meal equivalent to fine dining for one creature by using 5 UPB. It also helps point out threats caused by dangerous environments, granting you a +1 item bonus to Perception checks to find environmental hazards.</p><p>As advanced, but the sensors of a superior glampbot are constantly scanning for suspect shifts in the environment, allowing you to attempt a check to find environmental hazards that normally require you to be Searching. You still need to meet any other requirements to find the hazard.</p>"
+    },
+    "hardness": 0,
+    "hp": {
+      "max": 0,
+      "value": 0
+    },
+    "level": {
+      "value": 10
+    },
+    "material": {
+      "grade": null,
+      "type": null
+    },
+    "price": {
+      "value": {
+        "sp": 10000
+      }
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "quantity": 1,
+    "rules": [],
+    "size": "med",
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "minibot",
+        "tech"
+      ]
+    },
+    "usage": {
+      "value": "held-in-one-hand"
+    },
+    "slug": "glampbot-superior",
+    "equipped": {
+      "carryType": "held"
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "minibot": true,
+      "group": "glampbot"
+    }
+  },
+  "_id": "53e73135861cd662"
+}

@@ -1,0 +1,67 @@
+{
+  "name": "Grabot (Commercial)",
+  "type": "equipment",
+  "img": "icons/commodities/tech/electronics-tech-sensor-orange-teal.webp",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "baseItem": null,
+    "bulk": {
+      "value": 1
+    },
+    "containerId": null,
+    "description": {
+      "value": "<p>Grabots are advertised as “your reason to never get up from the couch!” They resemble flying cylinders with a claw suspended on a retractable cable it can use to carefully pick up and drop items on command. All commercially sold grabots have at least one line in their terms of service against using the minibot for burglary, but this hasn’t stopped enterprising criminals from using them to infiltrate homes and businesses.</p>\n<p><strong>Activate—Grab On</strong> <span class=\"action-glyph\">1</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You command the minibot to Interact to pick up an unattended object of Light bulk or less up to 10 feet below it.</p>"
+    },
+    "hardness": 0,
+    "hp": {
+      "max": 0,
+      "value": 0
+    },
+    "level": {
+      "value": 2
+    },
+    "material": {
+      "grade": null,
+      "type": null
+    },
+    "price": {
+      "value": {
+        "sp": 250
+      }
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "quantity": 1,
+    "rules": [],
+    "size": "med",
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "minibot",
+        "tech"
+      ]
+    },
+    "usage": {
+      "value": "held-in-one-hand"
+    },
+    "slug": "grabot-commercial",
+    "equipped": {
+      "carryType": "held"
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "minibot": true,
+      "group": "grabot"
+    }
+  },
+  "_id": "f45ceb1a1ab1da80"
+}

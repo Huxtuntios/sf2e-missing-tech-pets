@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
   ownPackName, companionPackKey, companionClassUuid, nativeUuid, matchesNativeUuid,
+  registerMinibotEquipmentTrait,
 } from "../scripts/system-context.mjs";
 import { buildChassisSource, buildSupportSource, buildManeuverSource, applyChassisChoices } from "../scripts/item-sources.mjs";
 import { buildCustomizationSource, preserveCustomizationChoices } from "../scripts/customization-sources.mjs";
@@ -103,4 +104,15 @@ test("Повреждённые данные атаки шасси дают по�
   const entry = structuredClone((await json("data/robot-chassis.json")).entries[0]);
   entry.attacks = [{ name: "Broken", damage: "lots of damage" }];
   assert.throws(() => buildChassisSource(entry), /Invalid chassis attack data/);
+});
+test("registerMinibotEquipmentTrait добавляет minibot в equipmentTraits и не перезаписывает", () => {
+  const config = { PF2E: { equipmentTraits: { tech: "PF2E.TraitTech" } } };
+  registerMinibotEquipmentTrait(config);
+  assert.equal(config.PF2E.equipmentTraits.minibot, "PF2E.TraitMinibot");
+  assert.equal(config.PF2E.equipmentTraits.tech, "PF2E.TraitTech");
+  config.PF2E.equipmentTraits.minibot = "Custom.Label";
+  registerMinibotEquipmentTrait(config);
+  assert.equal(config.PF2E.equipmentTraits.minibot, "Custom.Label");
+  registerMinibotEquipmentTrait({ PF2E: {} });
+  registerMinibotEquipmentTrait(undefined);
 });

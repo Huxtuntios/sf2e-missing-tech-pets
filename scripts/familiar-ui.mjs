@@ -1,5 +1,7 @@
 import { t } from "./i18n.mjs";
 import { openCatalogSource } from "./catalog-sources.mjs";
+import { abilityRow, bindAbilityRows } from "./ability-row.mjs";
+import { enrichRowBodies } from "./rich-text.mjs";
 import {
   dailiesState,
   dailiesControls,
@@ -53,9 +55,14 @@ export async function openFamiliarManager(actor, chosenId = "") {
     ["str", "dex", "con", "int", "wis", "cha"].includes(key),
   );
   const installed = all
-    .map(
-      (item) =>
-        `<div class="sfmtp-mod-row"><label><input type="checkbox" data-innate="${esc(item.id)}" ${innate.includes(item.id) ? "checked" : ""}> ${esc(t("FamiliarInnate"))}</label><span>${esc(item.name)}</span><button type="button" data-familiar-item="${esc(item.id)}">${esc(t("FamiliarOpenItem"))}</button><button type="button" data-familiar-chat="${esc(item.id)}">${esc(t("SendToChat"))}</button></div>`,
+    .map((item) =>
+      abilityRow({
+        rowId: item.id,
+        icon: item.img,
+        name: item.name,
+        controls: `<label class="sfmtp-row-select"><input type="checkbox" data-innate="${esc(item.id)}" ${innate.includes(item.id) ? "checked" : ""} aria-label="${esc(t("FamiliarInnate"))}"></label><button type="button" data-familiar-item="${esc(item.id)}">${esc(t("FamiliarOpenItem"))}</button><button type="button" data-familiar-chat="${esc(item.id)}">${esc(t("SendToChat"))}</button>`,
+        body: `<div class="sfmtp-rules-text" data-sfmtp-enrich data-sfmtp-relative="${esc(item.uuid)}">${item.system?.description?.value ?? ""}</div>`,
+      }),
     )
     .join("");
   const visibleCatalog = catalog.map((entry) => ({ ...entry, ...entry.display }));
@@ -65,7 +72,24 @@ export async function openFamiliarManager(actor, chosenId = "") {
       const protectedItem = matches.some(
         (item) => !familiarCanRemove(item, owner, familiar),
       );
-      return `<details data-familiar-row="${esc(entry.name.toLowerCase())}" class="sfmtp-familiar-entry"><summary><label><input type="checkbox" name="familiar-selection" value="${esc(entry.id)}" ${matches.length ? "checked" : ""} ${protectedItem || !familiar ? "disabled" : ""}> ${esc(entry.name)}</label> <small>${esc(t(`Category.${entry.category}`))} · ${esc(t(entry.automation === "rules" ? "FamiliarRulesShort" : "FamiliarManualShort"))}${protectedItem ? ` · ${esc(t("FamiliarProtected"))}` : ""}</small></summary><p>${esc(entry.description)}</p><p>${esc(t(entry.automation === "rules" ? "FamiliarRules" : "FamiliarManual"))}</p>${entry.prerequisites.length ? `<p>${esc(t("FamiliarRequires"))}: ${entry.prerequisites.map((id) => esc(visibleCatalog.find((e) => e.id === id)?.name ?? id)).join(", ")}</p>` : ""}<button type="button" data-familiar-source="${esc(entry.id)}">${esc(t("SourcePage"))}</button></details>`;
+      const meta = [
+        esc(t(`Category.${entry.category}`)),
+        esc(t(entry.automation === "rules" ? "FamiliarRulesShort" : "FamiliarManualShort")),
+        ...(protectedItem ? [esc(t("FamiliarProtected"))] : []),
+      ];
+      const controls = `<label class="sfmtp-row-select"><input type="checkbox" name="familiar-selection" value="${esc(entry.id)}" ${matches.length ? "checked" : ""} ${protectedItem || !familiar ? "disabled" : ""} aria-label="${esc(entry.name)}"></label>`;
+      const prereq = entry.prerequisites.length
+        ? `<p>${esc(t("FamiliarRequires"))}: ${entry.prerequisites.map((id) => esc(visibleCatalog.find((e) => e.id === id)?.name ?? id)).join(", ")}</p>`
+        : "";
+      const body = `<div class="sfmtp-rules-text" data-sfmtp-enrich>${esc(entry.description)}</div><p class="hint">${esc(t(entry.automation === "rules" ? "FamiliarRules" : "FamiliarManual"))}</p>${prereq}<button type="button" data-familiar-source="${esc(entry.id)}">${esc(t("SourcePage"))}</button>`;
+      return abilityRow({
+        rowId: entry.id,
+        name: entry.name,
+        meta,
+        controls,
+        body,
+        rowAttrs: `data-familiar-row="${esc(entry.name.toLowerCase())}"`,
+      });
     })
     .join("");
   const content = `<div class="sfmtp-familiars"><h3>${esc(owner.name)}</h3><p>${esc(t("FamiliarNativeHint"))}</p><button type="button" data-companion-sources>${esc(t("SourceTitle"))}</button>${sourceWarnings(
@@ -125,6 +149,8 @@ export async function openFamiliarManager(actor, chosenId = "") {
             );
         });
         const root = html.nodes[0];
+        bindAbilityRows(root);
+        void enrichRowBodies(root, { secrets: familiar?.isOwner !== false });
         const run = async (fn) => {
           try {
             await fn();

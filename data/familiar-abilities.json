@@ -67,9 +67,19 @@
       "prerequisites": [
         "tough"
       ],
-      "automation": "manual",
+      "automation": "rules",
       "repeatable": false,
-      "rules": [],
+      "rules": [
+        {
+          "add": [
+            "construct"
+          ],
+          "key": "ActorTraits",
+          "remove": [
+            "animal"
+          ]
+        }
+      ],
       "itemId": "38be3c70dc9e9049"
     },
     {

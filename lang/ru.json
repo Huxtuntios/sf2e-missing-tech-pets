@@ -383,6 +383,7 @@
     "CustomArmorPrompt": "Armored Plates: выберите бонус согласно фактическому развитию робота.",
     "CustomArmorNormal": "Обычный робот: предметный бонус КД +1",
     "CustomArmorSuperior": "Superior-робот: предметный бонус КД +2",
+    "ResistantPanelsPrompt": "Resistant Panels: выберите тип урона, к которому робот получает сопротивление.",
     "CustomManualSelections": "Предметы кастомизаций добавлены как описания; требуется ручное применение"
   }
 }

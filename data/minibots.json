@@ -1,0 +1,533 @@
+{
+  "creature": {
+    "name": "Minibot",
+    "slug": "minibot",
+    "level": -1,
+    "rarity": "common",
+    "size": "tiny",
+    "traits": [
+      "construct",
+      "robot",
+      "tech"
+    ],
+    "perception": {
+      "mod": 0,
+      "senses": [
+        {
+          "type": "darkvision"
+        }
+      ]
+    },
+    "languages": [
+      "common"
+    ],
+    "skills": {
+      "acrobatics": 6
+    },
+    "abilities": {
+      "str": -4,
+      "dex": 3,
+      "con": 0,
+      "int": -5,
+      "wis": 0,
+      "cha": 0
+    },
+    "ac": 14,
+    "saves": {
+      "fortitude": 0,
+      "reflex": 4,
+      "will": 0
+    },
+    "hp": 4,
+    "immunities": [
+      {
+        "type": "area-damage"
+      },
+      {
+        "type": "bleed"
+      },
+      {
+        "type": "death-effects"
+      },
+      {
+        "type": "disease"
+      },
+      {
+        "type": "doomed"
+      },
+      {
+        "type": "drained"
+      },
+      {
+        "type": "fatigued"
+      },
+      {
+        "type": "healing"
+      },
+      {
+        "type": "mental"
+      },
+      {
+        "type": "nonlethal-attacks"
+      },
+      {
+        "type": "paralyzed"
+      },
+      {
+        "type": "poison"
+      },
+      {
+        "type": "sickened"
+      },
+      {
+        "type": "spirit"
+      },
+      {
+        "type": "unconscious"
+      },
+      {
+        "type": "vitality"
+      },
+      {
+        "type": "void"
+      }
+    ],
+    "weaknesses": [
+      {
+        "type": "electricity",
+        "value": 1
+      }
+    ],
+    "speed": {
+      "value": 0,
+      "otherSpeeds": [
+        {
+          "type": "fly",
+          "value": 30
+        }
+      ]
+    },
+    "description": "<p>A minibot is a Tiny construct robot that assists its owner with a specialized task. Different types of minibots are described in the Minibots compendium.</p>",
+    "source": "Starfinder Tech Core",
+    "page": "128",
+    "nameRu": "Минибот",
+    "descriptionRu": "<p>Минибот — это крошечный конструкт-робот, который помогает владельцу в специализированной задаче. Разные типы миниботов описаны в компендиуме «Миниботы».</p>"
+  },
+  "equipment": [
+    {
+      "name": "Camerabot (Commercial)",
+      "slug": "camerabot-commercial",
+      "level": 0,
+      "price": 100,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>A favorite of celebrities, musicians, and streamers alike, this round floating minibot rotates around its user while recording or streaming audio or video. The user of this minibot can perform the Livestream exploration activity at the same time as another exploration activity. A camerabot only takes 1 charge per hour it remains active.</p>",
+      "group": "camerabot",
+      "nameRu": "Камеработ (коммерческий)",
+      "descriptionRu": "<p>Любимец знаменитостей, музыкантов и стримеров: этот круглый парящий минибот вращается вокруг владельца, записывая или транслируя звук либо видео. Владелец этого минибота может выполнять активность исследования «Прямой эфир» одновременно с другой активностью исследования. Камеработ расходует лишь 1 заряд за каждый час активности.</p>"
+    },
+    {
+      "name": "Camerabot (Tactical)",
+      "slug": "camerabot-tactical",
+      "level": 2,
+      "price": 250,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>A favorite of celebrities, musicians, and streamers alike, this round floating minibot rotates around its user while recording or streaming audio or video. The user of this minibot can perform the Livestream exploration activity at the same time as another exploration activity. A camerabot only takes 1 charge per hour it remains active.</p>\n<p>A tactical camerabot has a built-in flashlight and can be directed to record others, including specific creatures or locations. It must remain within 100 feet of its owner, or it immediately attempts to recall itself back to its owner.</p>",
+      "group": "camerabot",
+      "nameRu": "Камеработ (тактический)",
+      "descriptionRu": "<p>Любимец знаменитостей, музыкантов и стримеров: этот круглый парящий минибот вращается вокруг владельца, записывая или транслируя звук либо видео. Владелец этого минибота может выполнять активность исследования «Прямой эфир» одновременно с другой активностью исследования. Камеработ расходует лишь 1 заряд за каждый час активности.</p>\n<p>Тактический камеработ оснащён встроенным фонариком, и его можно направить на запись других, включая конкретных существ или места. Он должен оставаться в пределах 100 футов от владельца, иначе немедленно пытается вернуться к нему.</p>"
+    },
+    {
+      "name": "Camerabot (Advanced)",
+      "slug": "camerabot-advanced",
+      "level": 4,
+      "price": 1000,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>A favorite of celebrities, musicians, and streamers alike, this round floating minibot rotates around its user while recording or streaming audio or video. The user of this minibot can perform the Livestream exploration activity at the same time as another exploration activity. A camerabot only takes 1 charge per hour it remains active.</p>\n<p>A tactical camerabot has a built-in flashlight and can be directed to record others, including specific creatures or locations. It must remain within 100 feet of its owner, or it immediately attempts to recall itself back to its owner.</p><p>An advanced camerabot can record within 1,000 feet and has darkvision, allowing it to record without a light source.</p>",
+      "group": "camerabot",
+      "nameRu": "Камеработ (продвинутый)",
+      "descriptionRu": "<p>Любимец знаменитостей, музыкантов и стримеров: этот круглый парящий минибот вращается вокруг владельца, записывая или транслируя звук либо видео. Владелец этого минибота может выполнять активность исследования «Прямой эфир» одновременно с другой активностью исследования. Камеработ расходует лишь 1 заряд за каждый час активности.</p>\n<p>Тактический камеработ оснащён встроенным фонариком, и его можно направить на запись других, включая конкретных существ или места. Он должен оставаться в пределах 100 футов от владельца, иначе немедленно пытается вернуться к нему.</p><p>Продвинутый камеработ может записывать в пределах 1000 футов и обладает тёмным зрением, что позволяет записывать без источника света.</p>"
+    },
+    {
+      "name": "Medbot (Commercial)",
+      "slug": "medbot-commercial",
+      "level": 2,
+      "price": 250,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Medbots can be found across the galaxy assisting first responders and nurses, standing by in public venues and sporting events, or even following medics on the battlefield. The medbot has an integrated medkit that can be used even when it isn’t activated (but it can’t be worn).</p>",
+      "group": "medbot",
+      "nameRu": "Медбот (коммерческий)",
+      "descriptionRu": "<p>Медботы встречаются по всей галактике: они помогают спасателям и медсёстрам, дежурят в общественных местах и на спортивных мероприятиях и даже следуют за медиками на поле боя. У медбота есть встроенная аптечка, которой можно пользоваться, даже когда он не активирован (но её нельзя носить).</p>"
+    },
+    {
+      "name": "Medbot (Tactical)",
+      "slug": "medbot-tactical",
+      "level": 4,
+      "price": 700,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Medbots can be found across the galaxy assisting first responders and nurses, standing by in public venues and sporting events, or even following medics on the battlefield. The medbot has an integrated medkit that can be used even when it isn’t activated (but it can’t be worn).</p>\n<p>The tactical medbot has an integrated tactical medkit.</p>",
+      "group": "medbot",
+      "nameRu": "Медбот (тактический)",
+      "descriptionRu": "<p>Медботы встречаются по всей галактике: они помогают спасателям и медсёстрам, дежурят в общественных местах и на спортивных мероприятиях и даже следуют за медиками на поле боя. У медбота есть встроенная аптечка, которой можно пользоваться, даже когда он не активирован (но её нельзя носить).</p>\n<p>У тактического медбота встроенная тактическая аптечка.</p>"
+    },
+    {
+      "name": "Petbot",
+      "slug": "petbot",
+      "level": 0,
+      "price": 50,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Petbots resemble specific Tiny animals, despite clearly being robots. It’s possible to hide an object of light Bulk in a petbot, but it takes 1 minute to access the compartment. You gain a +1 item bonus to Stealth checks to Conceal an Object in a petbot.</p>",
+      "group": "petbot",
+      "nameRu": "Петбот",
+      "descriptionRu": "<p>Петботы напоминают конкретных крошечных животных, хотя очевидно являются роботами. В петботе можно спрятать предмет лёгкой Нагрузки, но доступ к отсеку занимает 1 минуту. Вы получаете предметный бонус +1 к проверкам Скрытности, чтобы Спрятать предмет в петботе.</p>"
+    },
+    {
+      "name": "Beatbot (Commercial)",
+      "slug": "beatbot-commercial",
+      "level": 1,
+      "price": 100,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Regularly seen accompanying vid streamers who like ambient music to make their livestreams more engaging on location, a beatbot consists of several parts. A floating “docking station” provides a charging pad for several small levitating speakers. The minibot uses these speakers to create a dynamic soundscape centered around the dock.</p>\n<p><strong>Activate—Drop the Beat</strong> <span class=\"action-glyph\">1</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You Command the minibot to play some music or generate a personal soundtrack tailored to whatever you’re doing, shifting reactively to your behavior and dialogue. You take a –4 penalty to Stealth checks while the music is playing. You can Dismiss this effect.</p>",
+      "group": "beatbot",
+      "nameRu": "Битбот (коммерческий)",
+      "descriptionRu": "<p>Битботов часто можно увидеть рядом с видеостримерами, которые любят фоновую музыку, чтобы сделать свои выездные эфиры интереснее. Битбот состоит из нескольких частей: парящая «док-станция» служит зарядной площадкой для нескольких маленьких левитирующих динамиков. Минибот использует эти динамики, чтобы создавать динамичное звуковое сопровождение вокруг дока.</p>\n<p><strong>Активация—Врубить бит</strong> <span class=\"action-glyph\">1</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы отдаёте миниботу Команду играть музыку или создавать персональный саундтрек под то, чем вы занимаетесь, реактивно подстраиваясь под ваше поведение и диалоги. Пока играет музыка, вы получаете штраф –4 к проверкам Скрытности. Вы можете Отменить этот эффект.</p>"
+    },
+    {
+      "name": "Beatbot (Tactical)",
+      "slug": "beatbot-tactical",
+      "level": 3,
+      "price": 500,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Regularly seen accompanying vid streamers who like ambient music to make their livestreams more engaging on location, a beatbot consists of several parts. A floating “docking station” provides a charging pad for several small levitating speakers. The minibot uses these speakers to create a dynamic soundscape centered around the dock.</p>\n<p><strong>Activate—Drop the Beat</strong> <span class=\"action-glyph\">1</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You Command the minibot to play some music or generate a personal soundtrack tailored to whatever you’re doing, shifting reactively to your behavior and dialogue. You take a –4 penalty to Stealth checks while the music is playing. You can Dismiss this effect.</p>\n<p>Drop the Beat provides a +1 item bonus to Performance checks. During your daily preparations, you can use 5 charges of the beatbot’s battery to set it to record 24 hours of audio that it can recall on command.</p>",
+      "group": "beatbot",
+      "nameRu": "Битбот (тактический)",
+      "descriptionRu": "<p>Битботов часто можно увидеть рядом с видеостримерами, которые любят фоновую музыку, чтобы сделать свои выездные эфиры интереснее. Битбот состоит из нескольких частей: парящая «док-станция» служит зарядной площадкой для нескольких маленьких левитирующих динамиков. Минибот использует эти динамики, чтобы создавать динамичное звуковое сопровождение вокруг дока.</p>\n<p><strong>Активация—Врубить бит</strong> <span class=\"action-glyph\">1</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы отдаёте миниботу Команду играть музыку или создавать персональный саундтрек под то, чем вы занимаетесь, реактивно подстраиваясь под ваше поведение и диалоги. Пока играет музыка, вы получаете штраф –4 к проверкам Скрытности. Вы можете Отменить этот эффект.</p>\n<p>«Врубить бит» даёт предметный бонус +1 к проверкам Выступления. Во время ежедневных приготовлений вы можете потратить 5 зарядов батареи битбота, чтобы настроить его на запись 24 часов аудио, которое он может воспроизвести по команде.</p>"
+    },
+    {
+      "name": "Bellbot (Commercial)",
+      "slug": "bellbot-commercial",
+      "level": 1,
+      "price": 150,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Bellbots are effectively suitcases with legs, wheels, or tracks that can follow their owners around workplaces and spaceports. They have basic danger avoidance protocols to avoid hazardous terrain and environments that could damage their payloads, though they can be commanded to ignore these protocols. A commercial bellbot has a Speed of 25 feet (but no fly Speed) and holds up to 4 Bulk of items, and the first 2 Bulk don’t apply to the Bulk of a bellbot.</p>\n<p><strong>Activate—Bellhop</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Effect</strong> The bellbot follows you until deactivated. This lasts 1 hour and expends 1 battery charge.</p>",
+      "group": "bellbot",
+      "nameRu": "Беллбот (коммерческий)",
+      "descriptionRu": "<p>Беллботы — это, по сути, чемоданы на ногах, колёсах или гусеницах, которые могут следовать за владельцем по рабочим местам и космопортам. У них есть базовые протоколы избегания опасностей, чтобы обходить опасную местность и среды, которые могут повредить их груз, хотя им можно приказать игнорировать эти протоколы. Коммерческий беллбот имеет Скорость 25 футов (но без Скорости полёта) и вмещает до 4 Нагрузки предметов, причём первые 2 Нагрузки не учитываются в Нагрузке беллбота.</p>\n<p><strong>Активация—Носильщик</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Эффект</strong> Беллбот следует за вами, пока не будет деактивирован. Это длится 1 час и расходует 1 заряд батареи.</p>"
+    },
+    {
+      "name": "Bellbot (Tactical)",
+      "slug": "bellbot-tactical",
+      "level": 5,
+      "price": 1150,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Bellbots are effectively suitcases with legs, wheels, or tracks that can follow their owners around workplaces and spaceports. They have basic danger avoidance protocols to avoid hazardous terrain and environments that could damage their payloads, though they can be commanded to ignore these protocols. A commercial bellbot has a Speed of 25 feet (but no fly Speed) and holds up to 4 Bulk of items, and the first 2 Bulk don’t apply to the Bulk of a bellbot.</p>\n<p><strong>Activate—Bellhop</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Effect</strong> The bellbot follows you until deactivated. This lasts 1 hour and expends 1 battery charge.</p>\n<p>A tactical bellbot has a fly Speed of 30 feet and an integrated <em>commercial null space chamber</em>.</p>",
+      "group": "bellbot",
+      "nameRu": "Беллбот (тактический)",
+      "descriptionRu": "<p>Беллботы — это, по сути, чемоданы на ногах, колёсах или гусеницах, которые могут следовать за владельцем по рабочим местам и космопортам. У них есть базовые протоколы избегания опасностей, чтобы обходить опасную местность и среды, которые могут повредить их груз, хотя им можно приказать игнорировать эти протоколы. Коммерческий беллбот имеет Скорость 25 футов (но без Скорости полёта) и вмещает до 4 Нагрузки предметов, причём первые 2 Нагрузки не учитываются в Нагрузке беллбота.</p>\n<p><strong>Активация—Носильщик</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Эффект</strong> Беллбот следует за вами, пока не будет деактивирован. Это длится 1 час и расходует 1 заряд батареи.</p>\n<p>Тактический беллбот имеет Скорость полёта 30 футов и встроенную <em>коммерческую камеру нулевого пространства</em>.</p>"
+    },
+    {
+      "name": "Bellbot (Advanced)",
+      "slug": "bellbot-advanced",
+      "level": 8,
+      "price": 4150,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Bellbots are effectively suitcases with legs, wheels, or tracks that can follow their owners around workplaces and spaceports. They have basic danger avoidance protocols to avoid hazardous terrain and environments that could damage their payloads, though they can be commanded to ignore these protocols. A commercial bellbot has a Speed of 25 feet (but no fly Speed) and holds up to 4 Bulk of items, and the first 2 Bulk don’t apply to the Bulk of a bellbot.</p>\n<p><strong>Activate—Bellhop</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Effect</strong> The bellbot follows you until deactivated. This lasts 1 hour and expends 1 battery charge.</p>\n<p>A tactical bellbot has a fly Speed of 30 feet and an integrated <em>commercial null space chamber</em>.</p><p>An advanced bellbot has a fly Speed of 30 feet and an integrated <em>tactical null space chamber</em>.</p>",
+      "group": "bellbot",
+      "nameRu": "Беллбот (продвинутый)",
+      "descriptionRu": "<p>Беллботы — это, по сути, чемоданы на ногах, колёсах или гусеницах, которые могут следовать за владельцем по рабочим местам и космопортам. У них есть базовые протоколы избегания опасностей, чтобы обходить опасную местность и среды, которые могут повредить их груз, хотя им можно приказать игнорировать эти протоколы. Коммерческий беллбот имеет Скорость 25 футов (но без Скорости полёта) и вмещает до 4 Нагрузки предметов, причём первые 2 Нагрузки не учитываются в Нагрузке беллбота.</p>\n<p><strong>Активация—Носильщик</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Эффект</strong> Беллбот следует за вами, пока не будет деактивирован. Это длится 1 час и расходует 1 заряд батареи.</p>\n<p>Тактический беллбот имеет Скорость полёта 30 футов и встроенную <em>коммерческую камеру нулевого пространства</em>.</p><p>Продвинутый беллбот имеет Скорость полёта 30 футов и встроенную <em>тактическую камеру нулевого пространства</em>.</p>"
+    },
+    {
+      "name": "Bellbot (Superior)",
+      "slug": "bellbot-superior",
+      "level": 12,
+      "price": 16150,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Bellbots are effectively suitcases with legs, wheels, or tracks that can follow their owners around workplaces and spaceports. They have basic danger avoidance protocols to avoid hazardous terrain and environments that could damage their payloads, though they can be commanded to ignore these protocols. A commercial bellbot has a Speed of 25 feet (but no fly Speed) and holds up to 4 Bulk of items, and the first 2 Bulk don’t apply to the Bulk of a bellbot.</p>\n<p><strong>Activate—Bellhop</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Effect</strong> The bellbot follows you until deactivated. This lasts 1 hour and expends 1 battery charge.</p>\n<p>A tactical bellbot has a fly Speed of 30 feet and an integrated <em>commercial null space chamber</em>.</p><p>An advanced bellbot has a fly Speed of 30 feet and an integrated <em>tactical null space chamber</em>.</p><p>A superior bellbot has a fly Speed of 30 feet and an integrated <em>advanced null space chamber</em>.</p>",
+      "group": "bellbot",
+      "nameRu": "Беллбот (превосходный)",
+      "descriptionRu": "<p>Беллботы — это, по сути, чемоданы на ногах, колёсах или гусеницах, которые могут следовать за владельцем по рабочим местам и космопортам. У них есть базовые протоколы избегания опасностей, чтобы обходить опасную местность и среды, которые могут повредить их груз, хотя им можно приказать игнорировать эти протоколы. Коммерческий беллбот имеет Скорость 25 футов (но без Скорости полёта) и вмещает до 4 Нагрузки предметов, причём первые 2 Нагрузки не учитываются в Нагрузке беллбота.</p>\n<p><strong>Активация—Носильщик</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Эффект</strong> Беллбот следует за вами, пока не будет деактивирован. Это длится 1 час и расходует 1 заряд батареи.</p>\n<p>Тактический беллбот имеет Скорость полёта 30 футов и встроенную <em>коммерческую камеру нулевого пространства</em>.</p><p>Продвинутый беллбот имеет Скорость полёта 30 футов и встроенную <em>тактическую камеру нулевого пространства</em>.</p><p>Превосходный беллбот имеет Скорость полёта 30 футов и встроенную <em>продвинутую камеру нулевого пространства</em>.</p>"
+    },
+    {
+      "name": "Bellbot (Elite)",
+      "slug": "bellbot-elite",
+      "level": 14,
+      "price": 36150,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Bellbots are effectively suitcases with legs, wheels, or tracks that can follow their owners around workplaces and spaceports. They have basic danger avoidance protocols to avoid hazardous terrain and environments that could damage their payloads, though they can be commanded to ignore these protocols. A commercial bellbot has a Speed of 25 feet (but no fly Speed) and holds up to 4 Bulk of items, and the first 2 Bulk don’t apply to the Bulk of a bellbot.</p>\n<p><strong>Activate—Bellhop</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Effect</strong> The bellbot follows you until deactivated. This lasts 1 hour and expends 1 battery charge.</p>\n<p>A tactical bellbot has a fly Speed of 30 feet and an integrated <em>commercial null space chamber</em>.</p><p>An advanced bellbot has a fly Speed of 30 feet and an integrated <em>tactical null space chamber</em>.</p><p>A superior bellbot has a fly Speed of 30 feet and an integrated <em>advanced null space chamber</em>.</p><p>An elite bellbot has a fly Speed of 30 feet and an integrated <em>superior null space chamber</em>.</p>",
+      "group": "bellbot",
+      "nameRu": "Беллбот (элитный)",
+      "descriptionRu": "<p>Беллботы — это, по сути, чемоданы на ногах, колёсах или гусеницах, которые могут следовать за владельцем по рабочим местам и космопортам. У них есть базовые протоколы избегания опасностей, чтобы обходить опасную местность и среды, которые могут повредить их груз, хотя им можно приказать игнорировать эти протоколы. Коммерческий беллбот имеет Скорость 25 футов (но без Скорости полёта) и вмещает до 4 Нагрузки предметов, причём первые 2 Нагрузки не учитываются в Нагрузке беллбота.</p>\n<p><strong>Активация—Носильщик</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Эффект</strong> Беллбот следует за вами, пока не будет деактивирован. Это длится 1 час и расходует 1 заряд батареи.</p>\n<p>Тактический беллбот имеет Скорость полёта 30 футов и встроенную <em>коммерческую камеру нулевого пространства</em>.</p><p>Продвинутый беллбот имеет Скорость полёта 30 футов и встроенную <em>тактическую камеру нулевого пространства</em>.</p><p>Превосходный беллбот имеет Скорость полёта 30 футов и встроенную <em>продвинутую камеру нулевого пространства</em>.</p><p>Элитный беллбот имеет Скорость полёта 30 футов и встроенную <em>превосходную камеру нулевого пространства</em>.</p>"
+    },
+    {
+      "name": "Butlerbot (Commercial)",
+      "slug": "butlerbot-commercial",
+      "level": 4,
+      "price": 1000,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Butlerbots diligently follow their owner around and help with all those pesky little things like keeping your appearance top notch, reminding you to hydrate, and helping you find a missing access card if you can’t remember where you left it. Butlerbots are something of a status symbol among the elite and come in a variety of colors and materials, depending on how much one wants to spend.</p>\n<p><strong>Activate—Buttle</strong> <span class=\"action-glyph\">2</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You order your butlerbot to perform one of the following core functions.</p><p><strong>Clean</strong> Clean an object of light Bulk or less.</p><p><strong>Find</strong> Recall for you the location of an object. If the butlerbot doesn’t know where the object is, it can help you Seek the object, giving you a +1 item bonus to your Perception check to Search for the object.</p><p><strong>Remind</strong> The butlerbot gives any number of verbal reminders you’ve set during your daily preparations. If you set a reminder for a specific time, it reactivates to remind you at that time, up to 24 hours after you use this action.</p>",
+      "group": "butlerbot",
+      "nameRu": "Батлербот (коммерческий)",
+      "descriptionRu": "<p>Батлерботы усердно следуют за владельцем и помогают со всеми этими досадными мелочами: поддерживать ваш безупречный вид, напоминать пить воду и помогать найти пропавшую карту доступа, если вы не помните, где её оставили. Батлерботы — своего рода символ статуса среди элиты; они выпускаются в разных цветах и материалах, в зависимости от того, сколько кто хочет потратить.</p>\n<p><strong>Активация—Услуги дворецкого</strong> <span class=\"action-glyph\">2</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы приказываете батлерботу выполнить одну из следующих базовых функций.</p><p><strong>Уборка</strong> Очистить предмет лёгкой Нагрузки или меньше.</p><p><strong>Поиск</strong> Вспомнить для вас расположение предмета. Если батлербот не знает, где предмет, он может помочь вам Искать его, давая предметный бонус +1 к вашей проверке Восприятия для Поиска предмета.</p><p><strong>Напоминание</strong> Батлербот озвучивает любое количество голосовых напоминаний, которые вы задали во время ежедневных приготовлений. Если вы задали напоминание на конкретное время, он повторно активируется, чтобы напомнить вам в это время, вплоть до 24 часов после использования этого действия.</p>"
+    },
+    {
+      "name": "Butlerbot (Tactical)",
+      "slug": "butlerbot-tactical",
+      "level": 10,
+      "price": 10000,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Butlerbots diligently follow their owner around and help with all those pesky little things like keeping your appearance top notch, reminding you to hydrate, and helping you find a missing access card if you can’t remember where you left it. Butlerbots are something of a status symbol among the elite and come in a variety of colors and materials, depending on how much one wants to spend.</p>\n<p><strong>Activate—Buttle</strong> <span class=\"action-glyph\">2</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You order your butlerbot to perform one of the following core functions.</p><p><strong>Clean</strong> Clean an object of light Bulk or less.</p><p><strong>Find</strong> Recall for you the location of an object. If the butlerbot doesn’t know where the object is, it can help you Seek the object, giving you a +1 item bonus to your Perception check to Search for the object.</p><p><strong>Remind</strong> The butlerbot gives any number of verbal reminders you’ve set during your daily preparations. If you set a reminder for a specific time, it reactivates to remind you at that time, up to 24 hours after you use this action.</p>\n<p>A tactical butlerbot is crafted by an artisan with exquisite material and uses 5 charges of its battery each day to constantly scan local infospheres for friendly reminders it takes the liberty of transmitting (verbally or directly to your comm unit) when you’re about to commit a social faux pas, including forgetting someone’s name or telling an inappropriate joke. This grants you a +1 item bonus to Diplomacy checks to Make an Impression and to Society checks to Recall Knowledge about important personalities, societal structures, and local etiquette.</p>",
+      "group": "butlerbot",
+      "nameRu": "Батлербот (тактический)",
+      "descriptionRu": "<p>Батлерботы усердно следуют за владельцем и помогают со всеми этими досадными мелочами: поддерживать ваш безупречный вид, напоминать пить воду и помогать найти пропавшую карту доступа, если вы не помните, где её оставили. Батлерботы — своего рода символ статуса среди элиты; они выпускаются в разных цветах и материалах, в зависимости от того, сколько кто хочет потратить.</p>\n<p><strong>Активация—Услуги дворецкого</strong> <span class=\"action-glyph\">2</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы приказываете батлерботу выполнить одну из следующих базовых функций.</p><p><strong>Уборка</strong> Очистить предмет лёгкой Нагрузки или меньше.</p><p><strong>Поиск</strong> Вспомнить для вас расположение предмета. Если батлербот не знает, где предмет, он может помочь вам Искать его, давая предметный бонус +1 к вашей проверке Восприятия для Поиска предмета.</p><p><strong>Напоминание</strong> Батлербот озвучивает любое количество голосовых напоминаний, которые вы задали во время ежедневных приготовлений. Если вы задали напоминание на конкретное время, он повторно активируется, чтобы напомнить вам в это время, вплоть до 24 часов после использования этого действия.</p>\n<p>Тактический батлербот изготовлен мастером из изысканных материалов и каждый день расходует 5 зарядов батареи, чтобы постоянно сканировать локальные инфосферы на предмет дружеских напоминаний, которые он позволяет себе передавать (голосом или прямо на ваш комм-юнит), когда вы вот-вот совершите социальную оплошность, включая забывание чьего-то имени или неуместную шутку. Это даёт вам предметный бонус +1 к проверкам Дипломатии, чтобы Произвести впечатление, и к проверкам Общества, чтобы Вспомнить знания о важных персонах, социальных структурах и местном этикете.</p>"
+    },
+    {
+      "name": "Firebot (Commercial)",
+      "slug": "firebot-commercial",
+      "level": 4,
+      "price": 1050,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>The modern era doesn't reduce the risk of being set on fire, and with laser fire happening more often in certain kinds of professions, firebots help with maintaining safety. A firebot uses an integrated commercial fire extinguisher and can hold twice as much chem as any fire extinguisher it has installed. A firebot has resistance 12 to fire damage.</p>\n<p><strong>Activate—Extinguish</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Effect</strong> You order the firebot to Fly and use its integrated fire extinguisher.</p>",
+      "group": "firebot",
+      "nameRu": "Файрбот (коммерческий)",
+      "descriptionRu": "<p>Современная эпоха не снижает риска быть подожжённым, а поскольку лазерные пожары случаются чаще в некоторых профессиях, файрботы помогают поддерживать безопасность. Файрбот использует встроенный коммерческий огнетушитель и может вместить вдвое больше химии, чем любой установленный в нём огнетушитель. Файрбот имеет сопротивление 12 к урону огнём.</p>\n<p><strong>Активация—Тушение</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Эффект</strong> Вы приказываете файрботу Летать и использовать его встроенный огнетушитель.</p>"
+    },
+    {
+      "name": "Firebot (Tactical)",
+      "slug": "firebot-tactical",
+      "level": 9,
+      "price": 5750,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>The modern era doesn't reduce the risk of being set on fire, and with laser fire happening more often in certain kinds of professions, firebots help with maintaining safety. A firebot uses an integrated commercial fire extinguisher and can hold twice as much chem as any fire extinguisher it has installed. A firebot has resistance 12 to fire damage.</p>\n<p><strong>Activate—Extinguish</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Effect</strong> You order the firebot to Fly and use its integrated fire extinguisher.</p>\n<p>The fire resistance is 24, and the fire extinguisher is tactical.</p>",
+      "group": "firebot",
+      "nameRu": "Файрбот (тактический)",
+      "descriptionRu": "<p>Современная эпоха не снижает риска быть подожжённым, а поскольку лазерные пожары случаются чаще в некоторых профессиях, файрботы помогают поддерживать безопасность. Файрбот использует встроенный коммерческий огнетушитель и может вместить вдвое больше химии, чем любой установленный в нём огнетушитель. Файрбот имеет сопротивление 12 к урону огнём.</p>\n<p><strong>Активация—Тушение</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Эффект</strong> Вы приказываете файрботу Летать и использовать его встроенный огнетушитель.</p>\n<p>Сопротивление огню равно 24, а огнетушитель — тактический.</p>"
+    },
+    {
+      "name": "Firebot (Advanced)",
+      "slug": "firebot-advanced",
+      "level": 14,
+      "price": 36050,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>The modern era doesn't reduce the risk of being set on fire, and with laser fire happening more often in certain kinds of professions, firebots help with maintaining safety. A firebot uses an integrated commercial fire extinguisher and can hold twice as much chem as any fire extinguisher it has installed. A firebot has resistance 12 to fire damage.</p>\n<p><strong>Activate—Extinguish</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Effect</strong> You order the firebot to Fly and use its integrated fire extinguisher.</p>\n<p>The fire resistance is 24, and the fire extinguisher is tactical.</p><p>The fire resistance is 36, and the fire extinguisher is advanced.</p>",
+      "group": "firebot",
+      "nameRu": "Файрбот (продвинутый)",
+      "descriptionRu": "<p>Современная эпоха не снижает риска быть подожжённым, а поскольку лазерные пожары случаются чаще в некоторых профессиях, файрботы помогают поддерживать безопасность. Файрбот использует встроенный коммерческий огнетушитель и может вместить вдвое больше химии, чем любой установленный в нём огнетушитель. Файрбот имеет сопротивление 12 к урону огнём.</p>\n<p><strong>Активация—Тушение</strong> <span class=\"action-glyph\">1</span></p><hr /><p><strong>Эффект</strong> Вы приказываете файрботу Летать и использовать его встроенный огнетушитель.</p>\n<p>Сопротивление огню равно 24, а огнетушитель — тактический.</p><p>Сопротивление огню равно 36, а огнетушитель — продвинутый.</p>"
+    },
+    {
+      "name": "Glampbot (Commercial)",
+      "slug": "glampbot-commercial",
+      "level": 1,
+      "price": 100,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>The glampbot, a must-have for outdoor influencers, makes camping in the wilderness as comfortable and effortless as possible. Its primary function is to safely guide you back to civilization. Other glampbots can assemble a tent, start small fires, calculate weather forecasts, and even synthesize food using UPBs. Glampbots use solar panels to recharge their internal batteries, allowing them to stay active as long as they get at least 6 hours of sunlight for every 24 hours they remain activated.</p>\n<p><strong>Activate—Glamp On!</strong> <span class=\"action-glyph\">2</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You command the glampbot to guide you back to a specific location. If you’re on a planet without GPS satellites, it can only return you to locations the glampbot has physically been before.</p>",
+      "group": "glampbot",
+      "nameRu": "Глэмпбот (коммерческий)",
+      "descriptionRu": "<p>Глэмпбот, обязательная вещь для инфлюенсеров на природе, делает кемпинг в дикой местности максимально комфортным и необременительным. Его основная функция — безопасно привести вас обратно к цивилизации. Другие глэмпботы могут собирать палатку, разводить небольшие костры, рассчитывать прогнозы погоды и даже синтезировать еду из УПБ. Глэмпботы используют солнечные панели для подзарядки внутренних батарей, что позволяет им оставаться активными, пока они получают хотя бы 6 часов солнечного света на каждые 24 часа активности.</p>\n<p><strong>Активация—Глэмп, вперёд!</strong> <span class=\"action-glyph\">2</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы приказываете глэмпботу привести вас обратно в конкретное место. Если вы на планете без GPS-спутников, он может вернуть вас только в места, где глэмпбот физически бывал раньше.</p>"
+    },
+    {
+      "name": "Glampbot (Tactical)",
+      "slug": "glampbot-tactical",
+      "level": 3,
+      "price": 450,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>The glampbot, a must-have for outdoor influencers, makes camping in the wilderness as comfortable and effortless as possible. Its primary function is to safely guide you back to civilization. Other glampbots can assemble a tent, start small fires, calculate weather forecasts, and even synthesize food using UPBs. Glampbots use solar panels to recharge their internal batteries, allowing them to stay active as long as they get at least 6 hours of sunlight for every 24 hours they remain activated.</p>\n<p><strong>Activate—Glamp On!</strong> <span class=\"action-glyph\">2</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You command the glampbot to guide you back to a specific location. If you’re on a planet without GPS satellites, it can only return you to locations the glampbot has physically been before.</p>\n<p>A tactical glampbot can help build a camp, providing a +1 item bonus to Survival checks to Subsist when building a shelter. It can also synthesize an edible meal with enough sustenance for a creature for 1 day by using 1 UPB.</p>",
+      "group": "glampbot",
+      "nameRu": "Глэмпбот (тактический)",
+      "descriptionRu": "<p>Глэмпбот, обязательная вещь для инфлюенсеров на природе, делает кемпинг в дикой местности максимально комфортным и необременительным. Его основная функция — безопасно привести вас обратно к цивилизации. Другие глэмпботы могут собирать палатку, разводить небольшие костры, рассчитывать прогнозы погоды и даже синтезировать еду из УПБ. Глэмпботы используют солнечные панели для подзарядки внутренних батарей, что позволяет им оставаться активными, пока они получают хотя бы 6 часов солнечного света на каждые 24 часа активности.</p>\n<p><strong>Активация—Глэмп, вперёд!</strong> <span class=\"action-glyph\">2</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы приказываете глэмпботу привести вас обратно в конкретное место. Если вы на планете без GPS-спутников, он может вернуть вас только в места, где глэмпбот физически бывал раньше.</p>\n<p>Тактический глэмпбот может помочь разбить лагерь, давая предметный бонус +1 к проверкам Выживания, чтобы Прокормиться при строительстве укрытия. Он также может синтезировать съестную порцию с достаточным питанием для одного существа на 1 день, используя 1 УПБ.</p>"
+    },
+    {
+      "name": "Glampbot (Advanced)",
+      "slug": "glampbot-advanced",
+      "level": 6,
+      "price": 2500,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>The glampbot, a must-have for outdoor influencers, makes camping in the wilderness as comfortable and effortless as possible. Its primary function is to safely guide you back to civilization. Other glampbots can assemble a tent, start small fires, calculate weather forecasts, and even synthesize food using UPBs. Glampbots use solar panels to recharge their internal batteries, allowing them to stay active as long as they get at least 6 hours of sunlight for every 24 hours they remain activated.</p>\n<p><strong>Activate—Glamp On!</strong> <span class=\"action-glyph\">2</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You command the glampbot to guide you back to a specific location. If you’re on a planet without GPS satellites, it can only return you to locations the glampbot has physically been before.</p>\n<p>A tactical glampbot can help build a camp, providing a +1 item bonus to Survival checks to Subsist when building a shelter. It can also synthesize an edible meal with enough sustenance for a creature for 1 day by using 1 UPB.</p><p>As tactical, but an advanced glampbot can also synthesize more complex ingredients to provide a higher-end meal equivalent to fine dining for one creature by using 5 UPB. It also helps point out threats caused by dangerous environments, granting you a +1 item bonus to Perception checks to find environmental hazards.</p>",
+      "group": "glampbot",
+      "nameRu": "Глэмпбот (продвинутый)",
+      "descriptionRu": "<p>Глэмпбот, обязательная вещь для инфлюенсеров на природе, делает кемпинг в дикой местности максимально комфортным и необременительным. Его основная функция — безопасно привести вас обратно к цивилизации. Другие глэмпботы могут собирать палатку, разводить небольшие костры, рассчитывать прогнозы погоды и даже синтезировать еду из УПБ. Глэмпботы используют солнечные панели для подзарядки внутренних батарей, что позволяет им оставаться активными, пока они получают хотя бы 6 часов солнечного света на каждые 24 часа активности.</p>\n<p><strong>Активация—Глэмп, вперёд!</strong> <span class=\"action-glyph\">2</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы приказываете глэмпботу привести вас обратно в конкретное место. Если вы на планете без GPS-спутников, он может вернуть вас только в места, где глэмпбот физически бывал раньше.</p>\n<p>Тактический глэмпбот может помочь разбить лагерь, давая предметный бонус +1 к проверкам Выживания, чтобы Прокормиться при строительстве укрытия. Он также может синтезировать съестную порцию с достаточным питанием для одного существа на 1 день, используя 1 УПБ.</p><p>Как тактический, но продвинутый глэмпбот также может синтезировать более сложные ингредиенты, чтобы обеспечить изысканную еду уровня ресторанного ужина для одного существа, используя 5 УПБ. Он также помогает указывать на угрозы, вызванные опасной средой, давая вам предметный бонус +1 к проверкам Восприятия для обнаружения опасных факторов среды.</p>"
+    },
+    {
+      "name": "Glampbot (Superior)",
+      "slug": "glampbot-superior",
+      "level": 10,
+      "price": 10000,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>The glampbot, a must-have for outdoor influencers, makes camping in the wilderness as comfortable and effortless as possible. Its primary function is to safely guide you back to civilization. Other glampbots can assemble a tent, start small fires, calculate weather forecasts, and even synthesize food using UPBs. Glampbots use solar panels to recharge their internal batteries, allowing them to stay active as long as they get at least 6 hours of sunlight for every 24 hours they remain activated.</p>\n<p><strong>Activate—Glamp On!</strong> <span class=\"action-glyph\">2</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You command the glampbot to guide you back to a specific location. If you’re on a planet without GPS satellites, it can only return you to locations the glampbot has physically been before.</p>\n<p>A tactical glampbot can help build a camp, providing a +1 item bonus to Survival checks to Subsist when building a shelter. It can also synthesize an edible meal with enough sustenance for a creature for 1 day by using 1 UPB.</p><p>As tactical, but an advanced glampbot can also synthesize more complex ingredients to provide a higher-end meal equivalent to fine dining for one creature by using 5 UPB. It also helps point out threats caused by dangerous environments, granting you a +1 item bonus to Perception checks to find environmental hazards.</p><p>As advanced, but the sensors of a superior glampbot are constantly scanning for suspect shifts in the environment, allowing you to attempt a check to find environmental hazards that normally require you to be Searching. You still need to meet any other requirements to find the hazard.</p>",
+      "group": "glampbot",
+      "nameRu": "Глэмпбот (превосходный)",
+      "descriptionRu": "<p>Глэмпбот, обязательная вещь для инфлюенсеров на природе, делает кемпинг в дикой местности максимально комфортным и необременительным. Его основная функция — безопасно привести вас обратно к цивилизации. Другие глэмпботы могут собирать палатку, разводить небольшие костры, рассчитывать прогнозы погоды и даже синтезировать еду из УПБ. Глэмпботы используют солнечные панели для подзарядки внутренних батарей, что позволяет им оставаться активными, пока они получают хотя бы 6 часов солнечного света на каждые 24 часа активности.</p>\n<p><strong>Активация—Глэмп, вперёд!</strong> <span class=\"action-glyph\">2</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы приказываете глэмпботу привести вас обратно в конкретное место. Если вы на планете без GPS-спутников, он может вернуть вас только в места, где глэмпбот физически бывал раньше.</p>\n<p>Тактический глэмпбот может помочь разбить лагерь, давая предметный бонус +1 к проверкам Выживания, чтобы Прокормиться при строительстве укрытия. Он также может синтезировать съестную порцию с достаточным питанием для одного существа на 1 день, используя 1 УПБ.</p><p>Как тактический, но продвинутый глэмпбот также может синтезировать более сложные ингредиенты, чтобы обеспечить изысканную еду уровня ресторанного ужина для одного существа, используя 5 УПБ. Он также помогает указывать на угрозы, вызванные опасной средой, давая вам предметный бонус +1 к проверкам Восприятия для обнаружения опасных факторов среды.</p><p>Как продвинутый, но сенсоры превосходного глэмпбота постоянно сканируют подозрительные изменения в среде, позволяя вам пытаться проверить обнаружение опасных факторов среды, которое обычно требует, чтобы вы выполняли Поиск. Вы всё ещё должны соответствовать любым другим требованиям для обнаружения опасности.</p>"
+    },
+    {
+      "name": "Grabot (Commercial)",
+      "slug": "grabot-commercial",
+      "level": 2,
+      "price": 250,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Grabots are advertised as “your reason to never get up from the couch!” They resemble flying cylinders with a claw suspended on a retractable cable it can use to carefully pick up and drop items on command. All commercially sold grabots have at least one line in their terms of service against using the minibot for burglary, but this hasn’t stopped enterprising criminals from using them to infiltrate homes and businesses.</p>\n<p><strong>Activate—Grab On</strong> <span class=\"action-glyph\">1</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You command the minibot to Interact to pick up an unattended object of Light bulk or less up to 10 feet below it.</p>",
+      "group": "grabot",
+      "nameRu": "Гработ (коммерческий)",
+      "descriptionRu": "<p>Гработы рекламируются как «ваша причина никогда не вставать с дивана!» Они напоминают летающие цилиндры с клешнёй на убирающемся тросе, которой можно аккуратно поднимать и бросать предметы по команде. Все коммерчески продаваемые гработы имеют хотя бы одну строку в условиях использования против применения минибота для краж со взломом, но это не остановило предприимчивых преступников от использования их для проникновения в дома и предприятия.</p>\n<p><strong>Активация—Захват</strong> <span class=\"action-glyph\">1</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы приказываете миниботу Взаимодействовать, чтобы поднять ничейный предмет лёгкой Нагрузки или меньше в пределах 10 футов под ним.</p>"
+    },
+    {
+      "name": "Grabot (Tactical)",
+      "slug": "grabot-tactical",
+      "level": 3,
+      "price": 500,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Grabots are advertised as “your reason to never get up from the couch!” They resemble flying cylinders with a claw suspended on a retractable cable it can use to carefully pick up and drop items on command. All commercially sold grabots have at least one line in their terms of service against using the minibot for burglary, but this hasn’t stopped enterprising criminals from using them to infiltrate homes and businesses.</p>\n<p><strong>Activate—Grab On</strong> <span class=\"action-glyph\">1</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You command the minibot to Interact to pick up an unattended object of Light bulk or less up to 10 feet below it.</p>\n<p>The minibot can Grab On to an object of 1 Bulk or less up to 20 feet below it.</p>",
+      "group": "grabot",
+      "nameRu": "Гработ (тактический)",
+      "descriptionRu": "<p>Гработы рекламируются как «ваша причина никогда не вставать с дивана!» Они напоминают летающие цилиндры с клешнёй на убирающемся тросе, которой можно аккуратно поднимать и бросать предметы по команде. Все коммерчески продаваемые гработы имеют хотя бы одну строку в условиях использования против применения минибота для краж со взломом, но это не остановило предприимчивых преступников от использования их для проникновения в дома и предприятия.</p>\n<p><strong>Активация—Захват</strong> <span class=\"action-glyph\">1</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы приказываете миниботу Взаимодействовать, чтобы поднять ничейный предмет лёгкой Нагрузки или меньше в пределах 10 футов под ним.</p>\n<p>Минибот может использовать Захват на предмете 1 Нагрузки или меньше в пределах 20 футов под ним.</p>"
+    },
+    {
+      "name": "Grabot (Advanced)",
+      "slug": "grabot-advanced",
+      "level": 4,
+      "price": 750,
+      "bulk": 1,
+      "traits": [
+        "minibot",
+        "tech"
+      ],
+      "usage": "held-in-one-hand",
+      "description": "<p>Grabots are advertised as “your reason to never get up from the couch!” They resemble flying cylinders with a claw suspended on a retractable cable it can use to carefully pick up and drop items on command. All commercially sold grabots have at least one line in their terms of service against using the minibot for burglary, but this hasn’t stopped enterprising criminals from using them to infiltrate homes and businesses.</p>\n<p><strong>Activate—Grab On</strong> <span class=\"action-glyph\">1</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You command the minibot to Interact to pick up an unattended object of Light bulk or less up to 10 feet below it.</p>\n<p>The minibot can Grab On to an object of 1 Bulk or less up to 20 feet below it.</p><p>The minibot can Grab On to an object of 2 Bulk or less up to 50 feet below it.</p>",
+      "group": "grabot",
+      "nameRu": "Гработ (продвинутый)",
+      "descriptionRu": "<p>Гработы рекламируются как «ваша причина никогда не вставать с дивана!» Они напоминают летающие цилиндры с клешнёй на убирающемся тросе, которой можно аккуратно поднимать и бросать предметы по команде. Все коммерчески продаваемые гработы имеют хотя бы одну строку в условиях использования против применения минибота для краж со взломом, но это не остановило предприимчивых преступников от использования их для проникновения в дома и предприятия.</p>\n<p><strong>Активация—Захват</strong> <span class=\"action-glyph\">1</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы приказываете миниботу Взаимодействовать, чтобы поднять ничейный предмет лёгкой Нагрузки или меньше в пределах 10 футов под ним.</p>\n<p>Минибот может использовать Захват на предмете 1 Нагрузки или меньше в пределах 20 футов под ним.</p><p>Минибот может использовать Захват на предмете 2 Нагрузки или меньше в пределах 50 футов под ним.</p>"
+    }
+  ],
+  "actions": [
+    {
+      "name": "Direct Minibot",
+      "slug": "direct-minibot",
+      "actionType": "action",
+      "actions": 1,
+      "traits": [
+        "manipulate"
+      ],
+      "frequency": "once per hour",
+      "description": "<p><strong>Frequency</strong> once per hour</p><p>You turn some dials and flick some levers to activate the linked minibot. You Activate Minibot for the linked minibot.</p>",
+      "nameRu": "Управление миниботом",
+      "descriptionRu": "<p><strong>Частота</strong> раз в час</p><p>Вы поворачиваете несколько циферблатов и щёлкаете рычагами, чтобы активировать связанный минибот. Вы выполняете Активацию минибота для связанного минибота.</p>"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "name": "Butlerbot (Tactical)",
+  "type": "equipment",
+  "img": "icons/commodities/tech/electronics-tech-sensor-orange-teal.webp",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "baseItem": null,
+    "bulk": {
+      "value": 1
+    },
+    "containerId": null,
+    "description": {
+      "value": "<p>Butlerbots diligently follow their owner around and help with all those pesky little things like keeping your appearance top notch, reminding you to hydrate, and helping you find a missing access card if you can’t remember where you left it. Butlerbots are something of a status symbol among the elite and come in a variety of colors and materials, depending on how much one wants to spend.</p>\n<p><strong>Activate—Buttle</strong> <span class=\"action-glyph\">2</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You order your butlerbot to perform one of the following core functions.</p><p><strong>Clean</strong> Clean an object of light Bulk or less.</p><p><strong>Find</strong> Recall for you the location of an object. If the butlerbot doesn’t know where the object is, it can help you Seek the object, giving you a +1 item bonus to your Perception check to Search for the object.</p><p><strong>Remind</strong> The butlerbot gives any number of verbal reminders you’ve set during your daily preparations. If you set a reminder for a specific time, it reactivates to remind you at that time, up to 24 hours after you use this action.</p>\n<p>A tactical butlerbot is crafted by an artisan with exquisite material and uses 5 charges of its battery each day to constantly scan local infospheres for friendly reminders it takes the liberty of transmitting (verbally or directly to your comm unit) when you’re about to commit a social faux pas, including forgetting someone’s name or telling an inappropriate joke. This grants you a +1 item bonus to Diplomacy checks to Make an Impression and to Society checks to Recall Knowledge about important personalities, societal structures, and local etiquette.</p>"
+    },
+    "hardness": 0,
+    "hp": {
+      "max": 0,
+      "value": 0
+    },
+    "level": {
+      "value": 10
+    },
+    "material": {
+      "grade": null,
+      "type": null
+    },
+    "price": {
+      "value": {
+        "sp": 10000
+      }
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "quantity": 1,
+    "rules": [],
+    "size": "med",
+    "traits": {
+      "rarity": "common",
+      "value": [
+        "minibot",
+        "tech"
+      ]
+    },
+    "usage": {
+      "value": "held-in-one-hand"
+    },
+    "slug": "butlerbot-tactical",
+    "equipped": {
+      "carryType": "held"
+    }
+  },
+  "flags": {
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "minibot": true,
+      "group": "butlerbot"
+    }
+  },
+  "_id": "4e0c4ac5bd5541e8"
+}

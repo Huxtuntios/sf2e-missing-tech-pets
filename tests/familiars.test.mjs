@@ -154,7 +154,7 @@ test("38 полных SF2e Action Items с неизменяемыми уника
   }
   assert.equal(
     catalog.entries.filter((e) => e.automation === "rules").length,
-    10,
+    11,
   );
 });
 test("В Rule Elements только сверенные пассивные схемы; стоимость Familiar Focus — 2 действия", () => {
@@ -336,6 +336,14 @@ test("Превышение лимита и неизвестные записи �
     "FamiliarSelectionInvalid",
   );
   assert.equal(familiar.writes.created, 0);
+});
+test("Construct автоматизируется через ActorTraits; иммунитеты выводит система из признака", () => {
+  const entry = catalog.entries.find((e) => e.id === "construct");
+  assert.equal(entry.automation, "rules");
+  assert.deepEqual(entry.rules, [
+    { key: "ActorTraits", add: ["construct"], remove: ["animal"] },
+  ]);
+  assert.deepEqual(entry.prerequisites, ["tough"]);
 });
 test("Tough/Construct и другие prerequisites проверяются до записи", async () => {
   const { owner, familiar } = setup();

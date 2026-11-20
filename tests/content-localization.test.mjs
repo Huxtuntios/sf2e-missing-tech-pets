@@ -81,26 +81,29 @@ for (const system of ["sf2e", "pf2e"]) {
     }
   });
 }
-test("Ten Babele translation files use stable IDs and primitive display-only mappings", async () => {
+test("Fourteen Babele translation files use stable IDs and primitive display-only mappings", async () => {
   const manifest = await json("module.json");
   let count = 0;
   for (const pack of manifest.packs) {
+    const isCreature = pack.type === "Actor";
+    const descPath = isCreature ? "system.details.publicNotes" : "system.description.value";
     const payload = await json(`lang/babele/ru/${manifest.id}.${pack.name}.json`);
     const rows = (await readFile(new URL(`packs/${pack.name}.db`, root), "utf8")).trim().split("\n").map(JSON.parse);
-    assert.deepEqual(payload.mapping, { name: "name", description: "system.description.value" });
+    assert.deepEqual(payload.mapping, { name: "name", description: descPath });
     assert.deepEqual(Object.keys(payload.entries).sort(), rows.map(item => item._id).sort());
     for (const item of rows) {
       const entry = payload.entries[item._id];
+      const description = isCreature ? item.system.details.publicNotes : item.system.description.value;
       assert.deepEqual(Object.keys(entry).sort(), ["description", "name"]);
       assert.match(entry.name, /[А-Яа-яЁё]/);
       assert.match(entry.description, /[А-Яа-яЁё]/);
-      assert.deepEqual(uuids(entry.description), uuids(item.system.description.value));
+      assert.deepEqual(uuids(entry.description), uuids(description));
       assert.doesNotMatch(item.name, /[А-Яа-яЁё]/);
-      assert.doesNotMatch(item.system.description.value, /[А-Яа-яЁё]/);
+      assert.doesNotMatch(description, /[А-Яа-яЁё]/);
       count++;
     }
   }
-  assert.equal(count, 178);
+  assert.equal(count, 232);
 });
 test("Content translation preserves action costs, manual status and conditional thresholds", () => {
   const focus = translations["familiar-abilities"].entries["familiar-focus"];
