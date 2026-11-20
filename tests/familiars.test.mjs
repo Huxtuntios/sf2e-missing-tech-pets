@@ -39,6 +39,9 @@ class Item {
     // Имитируем дополнение отсутствующих полей схемой при создании.
     this.source.system._migration = { version: 1 };
     this.source.system.deathNote = "";
+    this.source.system.description = { gm: "", ...this.source.system.description };
+    this.source.system.traits = { otherTags: [], ...this.source.system.traits };
+    delete this.source.system.traits.rarity;
   }
   get flags() {
     return this.source.flags ?? {};

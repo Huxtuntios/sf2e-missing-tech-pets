@@ -321,13 +321,22 @@ async function syncNow(owner, familiar, selectedIds) {
   for (const item of all) {
     const source = desiredBySlug.get(item.system?.slug);
     if (!source || !familiarCanRemove(item, owner, familiar)) continue;
-    // Целевое состояние сохраняет поля схемы (например deathNote), которых нет
-    // в фабрике, иначе сравнение срабатывало бы на каждой неизменённой копии.
+    // Целевое состояние сохраняет поля схемы, которых нет в фабрике
+    // (description.gm, traits.otherTags, deathNote и т.п.): иначе снимок не
+    // совпал бы с записанным Item и копия считалась бы «изменённой».
     const target = item.toObject();
     target.name = source.name;
     target.img = source.img;
-    target.system = { ...target.system, ...source.system };
     target.effects = source.effects ?? [];
+    const sys = target.system;
+    sys.slug = source.system.slug;
+    sys.category = source.system.category;
+    sys.actionType = source.system.actionType;
+    sys.actions = source.system.actions;
+    sys.publication = source.system.publication;
+    sys.rules = source.system.rules;
+    sys.description = { ...sys.description, value: source.system.description.value };
+    sys.traits = { ...sys.traits, value: source.system.traits.value };
     if (familiarFingerprint(item) === familiarFingerprint(target)) continue;
     // Содержимое и снимок пишутся одним update: прерванная запись не оставит
     // копию с новым содержимым и старым снимком, которую менеджер счёл бы
