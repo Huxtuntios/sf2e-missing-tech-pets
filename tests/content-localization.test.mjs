@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
-import { localizeCatalog, localizeItemSource } from "../scripts/content-localization.mjs";
+import { localizeCatalog, localizeItemSource, displayField } from "../scripts/content-localization.mjs";
 import { buildChassisSource, buildSupportSource, buildManeuverSource } from "../scripts/item-sources.mjs";
 import { buildCustomizationSource } from "../scripts/customization-sources.mjs";
 import { buildFamiliarSource } from "../scripts/familiar-sources.mjs";
@@ -37,6 +37,20 @@ test("Russian catalog coverage is exact; display fields do not replace mechanica
     assert.deepEqual(catalog, before);
     assert.equal(localizeCatalog(catalog, name, { language: "en", translations }), catalog);
   }
+});
+test("display.description локализованного каталогов доступен через displayField для строк UI", () => {
+  for (const name of ["familiar-abilities", "robot-customizations"]) {
+    const localized = localizeCatalog(catalogs[name], name, { language: "ru", translations });
+    for (const entry of localized.entries) {
+      assert.match(displayField(entry, "description"), /[А-Яа-яЁё]/, `${name}/${entry.id}`);
+      assert.equal(displayField(entry, "description"), entry.display.description);
+    }
+  }
+  const flier = localizeCatalog(catalogs["familiar-abilities"], "familiar-abilities", { language: "ru", translations })
+    .entries.find((entry) => entry.id === "flier");
+  assert.match(displayField(flier, "description"), /Скорость полёта 25 футов/);
+  const en = catalogs["familiar-abilities"].entries.find((entry) => entry.id === "flier");
+  assert.equal(displayField(en, "description"), "It gains a fly Speed of 25 feet.");
 });
 for (const system of ["sf2e", "pf2e"]) {
   test(`${system}: all 89 documents translate without changing mechanics, flags or UUIDs`, () => {

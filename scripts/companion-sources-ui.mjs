@@ -45,7 +45,7 @@ export async function openCompanionSources(owner) {
         name: displayField(entry, "name"),
         meta: [esc(t(`Category.${entry.category}`))],
         controls: `<input type="checkbox" name="pet-ability" value="${esc(entry.id)}" ${(pet.abilities ?? []).includes(entry.id) ? "checked" : ""} aria-label="${esc(displayField(entry, "name"))}">`,
-        body: `<div class="sfmtp-rules-text" data-sfmtp-enrich>${esc(entry.description ?? "")}</div><button type="button" data-pet-source="${esc(entry.id)}">${esc(t("SourcePage"))}</button>`,
+        body: `<div class="sfmtp-rules-text" data-sfmtp-enrich>${esc(displayField(entry, "description") ?? "")}</div><button type="button" data-pet-source="${esc(entry.id)}">${esc(t("SourcePage"))}</button>`,
       }),
     )
     .join("");

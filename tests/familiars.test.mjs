@@ -56,6 +56,15 @@ class Item {
     this.source.flags[scope] ??= {};
     this.source.flags[scope][key] = structuredClone(value);
   }
+  async update(data) {
+    for (const [key, value] of Object.entries(data)) {
+      const parts = key.split(".");
+      let cursor = this.source;
+      for (const part of parts.slice(0, -1)) cursor = cursor[part] ??= {};
+      cursor[parts.at(-1)] = structuredClone(value);
+    }
+    return this;
+  }
 }
 class MockActor {
   constructor(id, type = "character", master = null) {
@@ -289,7 +298,7 @@ test("Повторная синхронизация не создаёт копи
   const { owner, familiar } = setup();
   assert.deepEqual(
     await syncFamiliarAbilities(owner, familiar, ["flier", "darkvision"]),
-    { created: 2, removed: 0, protected: 0 },
+    { created: 2, removed: 0, protected: 0, upgraded: 0 },
   );
   const ids = [...familiar.items.keys()];
   assert.deepEqual(
@@ -298,13 +307,13 @@ test("Повторная синхронизация не создаёт копи
       "darkvision",
       "flier",
     ]),
-    { created: 0, removed: 0, protected: 0 },
+    { created: 0, removed: 0, protected: 0, upgraded: 0 },
   );
   assert.deepEqual([...familiar.items.keys()], ids);
   assert.equal(familiar.writes.created, 2);
   assert.deepEqual(
     await syncFamiliarAbilities(owner, familiar, ["climber", "darkvision"]),
-    { created: 1, removed: 1, protected: 0 },
+    { created: 1, removed: 1, protected: 0, upgraded: 0 },
   );
   assert.equal(familiar.items.size, 2);
   assert.equal(familiar.writes.deleted, 1);
@@ -313,6 +322,7 @@ test("Повторная синхронизация не создаёт копи
     created: 0,
     removed: 2,
     protected: 0,
+    upgraded: 0,
   });
   assert.deepEqual(familiar.writes, { created: 3, deleted: 3 });
 });
@@ -385,6 +395,48 @@ test("Изменённые и вручную добавленные Items не �
   await syncFamiliarAbilities(owner, familiar, ["flier", "tough"]);
   assert.equal(familiar.items.size, 2);
 });
+test("Неизменённая управляемая копия Construct получает ActorTraits при повторном сохранении", async () => {
+  const { owner, familiar } = setup();
+  await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]);
+  const construct = [...familiar.items].find(
+    (item) => item.system.slug === "construct",
+  );
+  // Копия 1.7.0: правила пусты, снимок соответствует её текущему состоянию.
+  construct.source.system.rules = [];
+  await construct.setFlag(ID, "familiarManaged", {
+    controllerActorId: owner.id,
+    fingerprint: familiarFingerprint(construct),
+  });
+  assert.deepEqual(
+    await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]),
+    { created: 0, removed: 0, protected: 0, upgraded: 1 },
+  );
+  assert.deepEqual(construct.system.rules, [
+    { key: "ActorTraits", add: ["construct"], remove: ["animal"] },
+  ]);
+  assert.deepEqual(
+    await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]),
+    { created: 0, removed: 0, protected: 0, upgraded: 0 },
+  );
+});
+test("Изменённая игроком копия Construct не обновляется и остаётся защищённой", async () => {
+  const { owner, familiar } = setup();
+  await syncFamiliarAbilities(owner, familiar, ["tough", "construct"]);
+  const construct = [...familiar.items].find(
+    (item) => item.system.slug === "construct",
+  );
+  construct.source.name = "Player edited Construct";
+  const result = await syncFamiliarAbilities(owner, familiar, [
+    "tough",
+    "construct",
+  ]);
+  assert.equal(result.upgraded, 0);
+  assert.equal(result.protected, 1);
+  assert.equal(construct.source.name, "Player edited Construct");
+  assert.deepEqual(construct.system.rules, [
+    { key: "ActorTraits", add: ["construct"], remove: ["animal"] },
+  ]);
+});
 test("Отказ загрузки источника и неправильная связь ничего не очищают", async () => {
   const { owner, familiar } = setup();
   await syncFamiliarAbilities(owner, familiar, ["flier"]);
@@ -430,7 +482,7 @@ for (const count of [0, 1]) {
     assert.deepEqual(original.toObject(), snapshot);
     familiar.createEmbeddedDocuments = create;
     const result = await syncFamiliarAbilities(owner, familiar, ["darkvision"]);
-    assert.deepEqual(result, { created: 1, removed: 1, protected: 0 });
+    assert.deepEqual(result, { created: 1, removed: 1, protected: 0, upgraded: 0 });
   });
 }
 test("Ошибка сохранения снимка откатывает только новый набор", async () => {
