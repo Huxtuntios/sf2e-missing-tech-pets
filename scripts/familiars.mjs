@@ -493,15 +493,15 @@ async function promptUnselectedFamiliarChoices(item) {
           }
           // Проверяем выборы перед сохранением: невалидный набор не пишем.
           const options = optionsWithSelections(actor, pending, selections);
-          const invalid = pending.some(
-            ({ rule }) =>
-              !choicePredicatePasses(
-                (rule.choices ?? []).find(
-                  (c) => c.value === selections[rule.flag],
-                )?.predicate,
-                options,
-              ) || selections[rule.flag] == null,
-          );
+          const invalid = pending.some(({ rule }) => {
+            const value = selections[rule.flag];
+            const choice = (rule.choices ?? []).find((c) => c.value === value);
+            return (
+              value == null ||
+              !choice ||
+              !choicePredicatePasses(choice.predicate, options)
+            );
+          });
           if (invalid) {
             refresh(dlg.element);
             ui.notifications.warn(localize("SFMTP.FamiliarNewChoiceInvalid"));
