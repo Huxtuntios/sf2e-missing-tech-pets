@@ -383,6 +383,49 @@ async function syncNow(owner, familiar, selectedIds) {
     upgraded,
   };
 }
+function choiceClausePasses(clause, options) {
+  if (typeof clause === "string") return options.has(clause);
+  if (!clause || typeof clause !== "object") return true;
+  if ("not" in clause) return !choiceClausePasses(clause.not, options);
+  if ("or" in clause) return clause.or.some((c) => choiceClausePasses(c, options));
+  if ("and" in clause)
+    return clause.and.every((c) => choiceClausePasses(c, options));
+  for (const [op, fn] of [
+    ["gte", (a, b) => a >= b],
+    ["lte", (a, b) => a <= b],
+    ["gt", (a, b) => a > b],
+    ["lt", (a, b) => a < b],
+  ]) {
+    if (op in clause) {
+      const [key, bound] = clause[op];
+      const prefix = `${key}:`;
+      return [...options]
+        .filter((o) => o.startsWith(prefix))
+        .map((o) => Number(o.slice(prefix.length)))
+        .filter((n) => !Number.isNaN(n))
+        .some((n) => fn(n, bound));
+    }
+  }
+  return true;
+}
+export function choicePredicatePasses(predicate, options) {
+  if (!predicate) return true;
+  const clauses = Array.isArray(predicate) ? predicate : [predicate];
+  return clauses.every((c) => choiceClausePasses(c, options));
+}
+export function optionsWithSelections(actor, pending, selections) {
+  const options = new Set(actor?.getRollOptions?.() ?? []);
+  for (const { rule } of pending)
+    if (rule.rollOption && selections[rule.flag] != null)
+      options.add(`${rule.rollOption}:${selections[rule.flag]}`);
+  return options;
+}
+export function validChoicesFor(rule, actor, pending, selections) {
+  const options = optionsWithSelections(actor, pending, selections);
+  return (rule.choices ?? []).filter((c) =>
+    choicePredicatePasses(c.predicate, options),
+  );
+}
 async function promptUnselectedFamiliarChoices(item) {
   const DialogV2 = globalThis.foundry?.applications?.api?.DialogV2;
   if (!DialogV2 || !globalThis.game?.i18n) return;
@@ -391,6 +434,7 @@ async function promptUnselectedFamiliarChoices(item) {
     .map((rule, index) => ({ rule, index }))
     .filter(({ rule }) => rule.key === "ChoiceSet" && rule.flag && !rule.selection);
   if (!pending.length) return;
+  const actor = item.actor;
   const localize = (key) => game.i18n.localize(key);
   const escape = (value) =>
     String(value)
@@ -398,51 +442,106 @@ async function promptUnselectedFamiliarChoices(item) {
       .replaceAll("<", "&lt;")
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;");
+  //Defaults: первый допустимый вариант с учётом уже сделанных выборов, чтобы
+  //пары с rollOption-исключением не стартовали с одного и того же значения.
+  const selections = {};
+  for (const { rule } of pending) {
+    const valid = validChoicesFor(rule, actor, pending, selections);
+    if (valid.length) selections[rule.flag] = valid[0].value;
+  }
+  const optionsHtml = (rule) =>
+    validChoicesFor(rule, actor, pending, selections)
+      .map(
+        (c) =>
+          `<option value="${escape(c.value)}"${selections[rule.flag] === c.value ? " selected" : ""}>${escape(localize(c.label ?? c.value))}</option>`,
+      )
+      .join("");
   const content =
     `<p>${localize("SFMTP.FamiliarNewChoiceHint")}</p>` +
     pending
-      .map(({ rule }) => {
-        const options = (rule.choices ?? [])
-          .map(
-            (choice) =>
-              `<option value="${escape(choice.value)}">${escape(localize(choice.label ?? choice.value))}</option>`,
-          )
-          .join("");
-        return `<div class="form-group"><label>${escape(localize(rule.prompt ?? rule.label ?? rule.flag))}</label><select name="${escape(rule.flag)}">${options}</select></div>`;
-      })
+      .map(
+        ({ rule }) =>
+          `<div class="form-group"><label>${escape(localize(rule.prompt ?? rule.label ?? rule.flag))}</label><select name="${escape(rule.flag)}">${optionsHtml(rule)}</select></div>`,
+      )
       .join("");
-  const selections = await DialogV2.wait({
+  let settle;
+  const done = new Promise((resolve) => (settle = resolve));
+  const refresh = (element) => {
+    for (const { rule } of pending) {
+      const field = element.querySelector(`select[name="${rule.flag}"]`);
+      if (!field) continue;
+      const valid = validChoicesFor(rule, actor, pending, selections);
+      if (!valid.some((c) => c.value === selections[rule.flag]))
+        selections[rule.flag] = valid[0]?.value;
+      field.innerHTML = optionsHtml(rule);
+      if (selections[rule.flag] != null) field.value = selections[rule.flag];
+    }
+  };
+  const dialog = new DialogV2({
     window: { title: localize("SFMTP.FamiliarNewChoiceTitle") },
     content,
     buttons: [
       {
         action: "ok",
         label: localize("SFMTP.Save"),
-        callback: (_event, _button, dialog) => {
-          const out = {};
+        callback: (_event, _button, dlg) => {
           for (const { rule } of pending) {
-            const field = dialog.element.querySelector(
+            const field = dlg.element.querySelector(
               `select[name="${rule.flag}"]`,
             );
-            if (field) out[rule.flag] = field.value;
+            if (field) selections[rule.flag] = field.value;
           }
-          return out;
+          // Проверяем выборы перед сохранением: невалидный набор не пишем.
+          const options = optionsWithSelections(actor, pending, selections);
+          const invalid = pending.some(
+            ({ rule }) =>
+              !choicePredicatePasses(
+                (rule.choices ?? []).find(
+                  (c) => c.value === selections[rule.flag],
+                )?.predicate,
+                options,
+              ) || selections[rule.flag] == null,
+          );
+          if (invalid) {
+            refresh(dlg.element);
+            ui.notifications.warn(localize("SFMTP.FamiliarNewChoiceInvalid"));
+            return false;
+          }
+          settle({ ...selections });
+          return { ...selections };
         },
       },
-      { action: "cancel", label: localize("SFMTP.Cancel"), callback: () => null },
+      {
+        action: "cancel",
+        label: localize("SFMTP.Cancel"),
+        callback: () => {
+          settle(null);
+          return null;
+        },
+      },
     ],
   });
-  if (!selections) return;
+  dialog.addEventListener("close", () => settle(null));
+  await dialog.render(true);
+  for (const { rule } of pending) {
+    const field = dialog.element.querySelector(`select[name="${rule.flag}"]`);
+    field?.addEventListener("change", () => {
+      selections[rule.flag] = field.value;
+      refresh(dialog.element);
+    });
+  }
+  const chosen = await done;
+  if (!chosen) return;
   const rules = (item.system.rules ?? []).map((rule) =>
-    rule.key === "ChoiceSet" && selections[rule.flag] !== undefined
-      ? { ...rule, selection: selections[rule.flag] }
+    rule.key === "ChoiceSet" && chosen[rule.flag] !== undefined
+      ? { ...rule, selection: chosen[rule.flag] }
       : rule,
   );
   await item.update({
     "system.rules": rules,
     [`flags.${system}.rulesSelections`]: {
       ...(item.flags[system]?.rulesSelections ?? {}),
-      ...selections,
+      ...chosen,
     },
   });
   await item.update({

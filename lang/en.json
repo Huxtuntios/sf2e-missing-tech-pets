@@ -162,6 +162,7 @@
     "FamiliarSaved": "Familiar abilities saved. Protected items were retained.",
     "FamiliarNewChoiceTitle": "New choices required",
     "FamiliarNewChoiceHint": "An upgraded ability gained new options. Choose values so its rules apply; cancel to decide later.",
+    "FamiliarNewChoiceInvalid": "Some choices are not valid for this familiar (missing Speed or duplicate exclusion). Adjust the selection.",
     "FamiliarAttributes": {
       "str": "Strength",
       "dex": "Dexterity",

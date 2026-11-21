@@ -8,6 +8,7 @@ import { buildCustomizationSource } from "../scripts/customization-sources.mjs";
 import { buildEffectSource } from "../scripts/effect-sources.mjs";
 import { buildMinibotEquipmentSource, buildMinibotActionSource } from "../scripts/minibot-sources.mjs";
 import { choiceVariants, preserveRuleChoices } from "../scripts/choice-variants.mjs";
+import { choicePredicatePasses, validChoicesFor } from "../scripts/familiars.mjs";
 
 globalThis.foundry = { utils: { deepClone: structuredClone } };
 
@@ -197,4 +198,28 @@ test("choiceVariants и preserveRuleChoices сохраняют допустим�
   const clean = customization("optimized-avoidance");
   preserveRuleChoices(clean, bad, "sf2e");
   assert.equal(clean.system.rules[0].selection, undefined);
+});
+
+test("Диалог выборов фамильяра фильтрует варианты по predicate и rollOption-исключению", () => {
+  const fast = familiar("fast-movement").system.rules[0];
+  const actor = { getRollOptions: () => ["speed:land", "speed:swim"] };
+  assert.deepEqual(
+    validChoicesFor(fast, actor, [{ rule: fast }], {}).map((c) => c.value),
+    ["land", "swim"],
+  );
+  const [one, two] = familiar("resistance").system.rules;
+  const pending = [{ rule: one }, { rule: two }];
+  const empty = { getRollOptions: () => [] };
+  const allOne = validChoicesFor(one, empty, pending, {}).map((c) => c.value);
+  const withAcid = validChoicesFor(two, empty, pending, {
+    resistanceOne: "acid",
+  }).map((c) => c.value);
+  assert.ok(allOne.includes("acid"));
+  assert.ok(!withAcid.includes("acid"));
+  assert.equal(withAcid.length, allOne.length - 1);
+  const opts = new Set(["skill:acrobatics:rank:2"]);
+  assert.equal(choicePredicatePasses([{ gte: ["skill:acrobatics:rank", 1] }], opts), true);
+  assert.equal(choicePredicatePasses([{ gte: ["skill:acrobatics:rank", 3] }], opts), false);
+  assert.equal(choicePredicatePasses(["speed:fly"], opts), false);
+  assert.equal(choicePredicatePasses([{ not: "speed:fly" }], opts), true);
 });
