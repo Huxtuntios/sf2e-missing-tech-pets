@@ -133,7 +133,7 @@
       "description": "Shed bright light within 20 feet and dim light for 20 feet beyond that. Switch the light on or off with one action.",
       "rules": [
         { "key": "RollOption", "option": "light-mounts", "toggleable": true, "label": "SFMTP.LightMountsToggle" },
-        { "key": "TokenLight", "predicate": ["light-mounts"], "value": { "bright": 20, "dim": 20 } }
+        { "key": "TokenLight", "predicate": ["light-mounts"], "value": { "bright": 20, "dim": 40 } }
       ],
       "automation": "rules",
       "itemId": "014028713a67b53a"

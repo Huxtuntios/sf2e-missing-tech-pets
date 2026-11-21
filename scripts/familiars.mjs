@@ -348,28 +348,33 @@ async function syncNow(owner, familiar, selectedIds) {
     // Сохраняем подтверждённые выборы ChoiceSet, чтобы обновление не сбрасывало
     // выбор и не делало неизменённую копию «изменённой» на каждой синхронизации.
     preserveRuleChoices(target, previous, systemId());
-    if (familiarFingerprint(item) === familiarFingerprint(target)) continue;
-    // Содержимое и снимок пишутся одним update: прерванная запись не оставит
-    // копию с новым содержимым и старым снимком, которую менеджер счёл бы
-    // «изменённой» и больше не смог ни снять, ни обновить.
-    await item.update({
-      name: target.name,
-      img: target.img,
-      system: target.system,
-      effects: target.effects,
-      flags: {
-        core: source.flags.core,
-        [MODULE_ID]: {
-          ...item.flags[MODULE_ID],
-          ...source.flags[MODULE_ID],
-          familiarManaged: {
-            controllerActorId: owner.id,
-            fingerprint: familiarFingerprint(target),
+    if (familiarFingerprint(item) !== familiarFingerprint(target)) {
+      // Содержимое и снимок пишутся одним update: прерванная запись не оставит
+      // копию с новым содержимым и старым снимком, которую менеджер счёл бы
+      // «изменённой» и больше не смог ни снять, ни обновить.
+      await item.update({
+        name: target.name,
+        img: target.img,
+        system: target.system,
+        effects: target.effects,
+        flags: {
+          core: source.flags.core,
+          [MODULE_ID]: {
+            ...item.flags[MODULE_ID],
+            ...source.flags[MODULE_ID],
+            familiarManaged: {
+              controllerActorId: owner.id,
+              fingerprint: familiarFingerprint(target),
+            },
           },
         },
-      },
-    });
-    upgraded++;
+      });
+      upgraded++;
+    }
+    // Система промптит ChoiceSet только при создании Item. Старая неизменённая
+    // копия, получившая новые ChoiceSet при обновлении, осталась бы без выбора,
+    // поэтому спрашиваем недостающие выборы отдельно (и при повторном сохранении).
+    await promptUnselectedFamiliarChoices(item);
   }
   return {
     created: created.length,
@@ -378,6 +383,75 @@ async function syncNow(owner, familiar, selectedIds) {
     upgraded,
   };
 }
+async function promptUnselectedFamiliarChoices(item) {
+  const DialogV2 = globalThis.foundry?.applications?.api?.DialogV2;
+  if (!DialogV2 || !globalThis.game?.i18n) return;
+  const system = systemId();
+  const pending = (item.system.rules ?? [])
+    .map((rule, index) => ({ rule, index }))
+    .filter(({ rule }) => rule.key === "ChoiceSet" && rule.flag && !rule.selection);
+  if (!pending.length) return;
+  const localize = (key) => game.i18n.localize(key);
+  const escape = (value) =>
+    String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  const content =
+    `<p>${localize("SFMTP.FamiliarNewChoiceHint")}</p>` +
+    pending
+      .map(({ rule }) => {
+        const options = (rule.choices ?? [])
+          .map(
+            (choice) =>
+              `<option value="${escape(choice.value)}">${escape(localize(choice.label ?? choice.value))}</option>`,
+          )
+          .join("");
+        return `<div class="form-group"><label>${escape(localize(rule.prompt ?? rule.label ?? rule.flag))}</label><select name="${escape(rule.flag)}">${options}</select></div>`;
+      })
+      .join("");
+  const selections = await DialogV2.wait({
+    window: { title: localize("SFMTP.FamiliarNewChoiceTitle") },
+    content,
+    buttons: [
+      {
+        action: "ok",
+        label: localize("SFMTP.Save"),
+        callback: (_event, _button, dialog) => {
+          const out = {};
+          for (const { rule } of pending) {
+            const field = dialog.element.querySelector(
+              `select[name="${rule.flag}"]`,
+            );
+            if (field) out[rule.flag] = field.value;
+          }
+          return out;
+        },
+      },
+      { action: "cancel", label: localize("SFMTP.Cancel"), callback: () => null },
+    ],
+  });
+  if (!selections) return;
+  const rules = (item.system.rules ?? []).map((rule) =>
+    rule.key === "ChoiceSet" && selections[rule.flag] !== undefined
+      ? { ...rule, selection: selections[rule.flag] }
+      : rule,
+  );
+  await item.update({
+    "system.rules": rules,
+    [`flags.${system}.rulesSelections`]: {
+      ...(item.flags[system]?.rulesSelections ?? {}),
+      ...selections,
+    },
+  });
+  await item.update({
+    [`flags.${MODULE_ID}.familiarManaged.fingerprint`]: familiarFingerprint(
+      item.toObject(),
+    ),
+  });
+}
+
 export async function setInnateFamiliarItems(familiar, ids) {
   assertFamiliarAccess(familiar);
   if (

@@ -29,12 +29,15 @@
       {
         "key": "BaseSpeed",
         "selector": "land",
-        "value": 25
+        "value": "max(25, @actor.system.movement.speeds.swim.value)",
+        "predicate": [
+          "speed:swim"
+        ]
       },
       {
         "key": "BaseSpeed",
         "selector": "swim",
-        "value": 25
+        "value": "max(25, @actor.system.movement.speeds.land.value)"
       },
       {
         "key": "ActorTraits",

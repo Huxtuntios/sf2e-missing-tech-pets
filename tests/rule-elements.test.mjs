@@ -26,6 +26,13 @@ const keys = (source) => source.system.rules.map((r) => r.key);
 test("Фамильяры: шесть новых пассивных способностей используют нативные RE", () => {
   assert.deepEqual(keys(familiar("amphibious")), ["BaseSpeed", "BaseSpeed", "ActorTraits"]);
   assert.deepEqual(familiar("amphibious").system.rules[2].add, ["amphibious"]);
+  // Обе скорости выводятся из большей (land/swim), а не фиксированных 25:
+  // комбинация с Fast Movement должна поднимать обе до 40. land читаем только
+  // при наличии swim (иначе null), swim всегда читаем из land (не null).
+  const amph = familiar("amphibious").system.rules;
+  assert.equal(amph[0].value, "max(25, @actor.system.movement.speeds.swim.value)");
+  assert.deepEqual(amph[0].predicate, ["speed:swim"]);
+  assert.equal(amph[1].value, "max(25, @actor.system.movement.speeds.land.value)");
 
   assert.deepEqual(keys(familiar("damage-avoidance")), ["ChoiceSet", "Note"]);
   assert.deepEqual(familiar("damage-avoidance").system.rules[0].choices.map((c) => c.value), ["fortitude", "reflex", "will"]);
@@ -84,7 +91,7 @@ test("Кастомизации: модули навыка/экспертност
 test("Кастомизации: свет, языки, условное мастерство и Харизма", () => {
   assert.deepEqual(keys(customization("light-mounts")), ["RollOption", "TokenLight"]);
   assert.equal(customization("light-mounts").system.rules[0].toggleable, true);
-  assert.deepEqual(customization("light-mounts").system.rules[1].value, { bright: 20, dim: 20 });
+  assert.deepEqual(customization("light-mounts").system.rules[1].value, { bright: 20, dim: 40 });
   assert.deepEqual(customization("light-mounts").system.rules[1].predicate, ["light-mounts"]);
 
   assert.deepEqual(customization("linguistic-upload").system.rules, [

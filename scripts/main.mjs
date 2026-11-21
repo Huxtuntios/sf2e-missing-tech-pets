@@ -1913,18 +1913,50 @@ async function syncAutomationNow(ownerActor) {
       // Безопасно заменяем старый неверный источник (например, одноимённую
       // способность фамильяра), но только у неизменённого собственного Item.
       const metadata = sameGenerated.getFlag(FLAG, AUTOMATION_FLAG);
+      // Целевое состояние строим от записанного Item, сохраняя поля схемы
+      // (description.gm, traits.otherTags), и накладываем фабричные механические
+      // листья: сравнение raw-источника с записанным Item давало бы вечный дрейф.
+      const replacement = sameGenerated.toObject();
+      if (found.source) {
+        replacement.name = found.source.name;
+        replacement.img = found.source.img;
+        replacement.type = found.source.type;
+        replacement.system = {
+          ...replacement.system,
+          ...found.source.system,
+          description: {
+            ...replacement.system.description,
+            value: found.source.system.description.value,
+          },
+          traits: {
+            ...replacement.system.traits,
+            value: found.source.system.traits.value,
+          },
+        };
+      }
+      preserveCustomizationChoices(replacement, sameGenerated);
+      // Выбор может храниться только в flags или только в rules.selection:
+      // нормализуем обе стороны одинаково, иначе снимки расходились бы без
+      // реального механического изменения.
+      const ownedProjected = sameGenerated.toObject();
+      preserveCustomizationChoices(ownedProjected, sameGenerated);
+      // Обновляем не только при смене источника/типа/имени/описания, но и при
+      // дрейфе принадлежащих фабрике механических полей (rules, frequency,
+      // selfEffect): иначе новые счётчики и эффекты не доходят до старых копий.
+      const drifted =
+        metadata.sourceUuid !== found.uuid ||
+        sameGenerated.type !== "feat" ||
+        (Boolean(found.source) &&
+          (sameGenerated.name !== found.source.name ||
+            sameGenerated.system.description.value !==
+              found.source.system.description.value ||
+            itemFingerprint(replacement) !== itemFingerprint(ownedProjected)));
       if (
         selection.kind === "robot-customization" &&
         found.entry &&
-        (metadata.sourceUuid !== found.uuid || sameGenerated.type !== "feat" ||
-          sameGenerated.name !== found.source.name ||
-          sameGenerated.system.description.value !== found.source.system.description.value) &&
+        drifted &&
         canReplaceManagedItem(sameGenerated)
       ) {
-        const replacement = found.source
-          ? foundry.utils.deepClone(found.source)
-          : found.document.toObject();
-        preserveCustomizationChoices(replacement, sameGenerated);
         replacement.flags ??= {};
         replacement.flags[FLAG] ??= {};
         // Foundry объединяет flags при update: прежний familiar-маркер

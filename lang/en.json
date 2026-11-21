@@ -160,6 +160,8 @@
     "FamiliarSelectionHint": "Choose a daily set, then save. Changing the set spends no actions automatically. Check prerequisites and choices in each description. Skilled can be repeated with different skills by native drag-and-drop and manual configuration; the panel selects one copy.",
     "FamiliarSaveDaily": "Save daily abilities",
     "FamiliarSaved": "Familiar abilities saved. Protected items were retained.",
+    "FamiliarNewChoiceTitle": "New choices required",
+    "FamiliarNewChoiceHint": "An upgraded ability gained new options. Choose values so its rules apply; cancel to decide later.",
     "FamiliarAttributes": {
       "str": "Strength",
       "dex": "Dexterity",
