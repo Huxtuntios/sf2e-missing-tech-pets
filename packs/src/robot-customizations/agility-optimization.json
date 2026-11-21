@@ -12,6 +12,8 @@
     "actions": {
       "value": null
     },
+    "frequency": null,
+    "selfEffect": null,
     "category": "bonus",
     "location": null,
     "level": {
@@ -30,14 +32,21 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>The robot’s movement does not trigger reactions. Acrobatics becomes expert, or master if already expert.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
+      "value": "<p>The robot’s movement does not trigger reactions. Acrobatics becomes expert, or master if already expert.</p><p>@Localize[SFMTP.CustomRulesHint]</p>"
     },
     "traits": {
       "rarity": "common",
       "value": [],
       "otherTags": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ActiveEffectLike",
+        "mode": "upgrade",
+        "path": "system.skills.acrobatics.rank",
+        "value": "min(3, max(2, @actor.system.skills.acrobatics.rank + 1))"
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -48,7 +57,7 @@
       "robotCustomization": true,
       "catalogId": "agility-optimization",
       "customizationGrade": "superior",
-      "automation": "manual"
+      "automation": "rules"
     }
   }
 }

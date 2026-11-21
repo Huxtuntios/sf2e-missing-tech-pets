@@ -12,6 +12,8 @@
     "actions": {
       "value": null
     },
+    "frequency": null,
+    "selfEffect": null,
     "category": "bonus",
     "location": null,
     "level": {
@@ -30,14 +32,132 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Choose two of Disarm, Grapple, Reposition, Shove or Trip. Gain a +1 circumstance bonus to those actions, or +2 if superior. Repeat selections must choose different actions.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
+      "value": "<p>Choose two of Disarm, Grapple, Reposition, Shove or Trip. Gain a +1 circumstance bonus to those actions, or +2 if superior. Repeat selections must choose different actions.</p><p>@Localize[SFMTP.CustomRulesHint]</p>"
     },
     "traits": {
       "rarity": "common",
       "value": [],
       "otherTags": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ChoiceSet",
+        "flag": "maneuverOne",
+        "adjustName": false,
+        "rollOption": "maneuver",
+        "prompt": "SFMTP.ManeuverModulePrompt",
+        "choices": [
+          {
+            "label": "SFMTP.ManeuverDisarm",
+            "value": "disarm"
+          },
+          {
+            "label": "SFMTP.ManeuverGrapple",
+            "value": "grapple"
+          },
+          {
+            "label": "SFMTP.ManeuverReposition",
+            "value": "reposition"
+          },
+          {
+            "label": "SFMTP.ManeuverShove",
+            "value": "shove"
+          },
+          {
+            "label": "SFMTP.ManeuverTrip",
+            "value": "trip"
+          }
+        ]
+      },
+      {
+        "key": "ChoiceSet",
+        "flag": "maneuverTwo",
+        "adjustName": false,
+        "rollOption": "maneuver",
+        "prompt": "SFMTP.ManeuverModulePrompt",
+        "choices": [
+          {
+            "label": "SFMTP.ManeuverDisarm",
+            "value": "disarm",
+            "predicate": [
+              {
+                "not": "maneuver:disarm"
+              }
+            ]
+          },
+          {
+            "label": "SFMTP.ManeuverGrapple",
+            "value": "grapple",
+            "predicate": [
+              {
+                "not": "maneuver:grapple"
+              }
+            ]
+          },
+          {
+            "label": "SFMTP.ManeuverReposition",
+            "value": "reposition",
+            "predicate": [
+              {
+                "not": "maneuver:reposition"
+              }
+            ]
+          },
+          {
+            "label": "SFMTP.ManeuverShove",
+            "value": "shove",
+            "predicate": [
+              {
+                "not": "maneuver:shove"
+              }
+            ]
+          },
+          {
+            "label": "SFMTP.ManeuverTrip",
+            "value": "trip",
+            "predicate": [
+              {
+                "not": "maneuver:trip"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "ChoiceSet",
+        "flag": "maneuverBonus",
+        "adjustName": false,
+        "prompt": "SFMTP.ManeuverBonusPrompt",
+        "choices": [
+          {
+            "label": "SFMTP.ManeuverBonusNormal",
+            "value": 1
+          },
+          {
+            "label": "SFMTP.ManeuverBonusSuperior",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "key": "FlatModifier",
+        "selector": "athletics",
+        "type": "circumstance",
+        "value": "{item|flags.sf2e.rulesSelections.maneuverBonus}",
+        "predicate": [
+          "action:{item|flags.sf2e.rulesSelections.maneuverOne}"
+        ]
+      },
+      {
+        "key": "FlatModifier",
+        "selector": "athletics",
+        "type": "circumstance",
+        "value": "{item|flags.sf2e.rulesSelections.maneuverBonus}",
+        "predicate": [
+          "action:{item|flags.sf2e.rulesSelections.maneuverTwo}"
+        ]
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -48,7 +168,7 @@
       "robotCustomization": true,
       "catalogId": "maneuver-module",
       "customizationGrade": "advanced",
-      "automation": "manual"
+      "automation": "rules"
     }
   }
 }

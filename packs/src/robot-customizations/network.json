@@ -12,6 +12,8 @@
     "actions": {
       "value": 1
     },
+    "frequency": null,
+    "selfEffect": null,
     "category": "bonus",
     "location": null,
     "level": {

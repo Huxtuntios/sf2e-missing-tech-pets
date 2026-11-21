@@ -1,19 +1,7 @@
 // Собственные SF2e Items устраняют зависимость от совпадений имён в чужих паках.
 // Каталог хранит правила и признаки автоматизации; сборка и runtime используют одну фабрику.
-import { MODULE_ID, escapeHTML as esc } from "./item-sources.mjs";
+import { MODULE_ID, escapeHTML as esc, adaptRulesToSystem } from "./item-sources.mjs";
 import { ownPackName, systemId } from "./system-context.mjs";
-// Ссылки на выбор игрока хранятся в namespace системы: flags.sf2e → flags.pf2e.
-// Заменяем во всех строках правила (value, path, type и вложенные поля).
-const localizeRuleRefs = (node, system) => {
-  if (typeof node === "string")
-    return node.replaceAll("flags.sf2e.", `flags.${system}.`);
-  if (Array.isArray(node)) return node.map((child) => localizeRuleRefs(child, system));
-  if (node && typeof node === "object")
-    return Object.fromEntries(
-      Object.entries(node).map(([key, value]) => [key, localizeRuleRefs(value, system)]),
-    );
-  return node;
-};
 export function buildCustomizationSource(entry, system = "sf2e") {
   const active = [
     "light-mounts",
@@ -21,6 +9,11 @@ export function buildCustomizationSource(entry, system = "sf2e") {
     "emergency-repair",
     "recharge",
   ].includes(entry.id);
+  const hintKey = entry.selfEffectId
+    ? "CustomSelfEffectHint"
+    : entry.automation === "rules"
+      ? "CustomRulesHint"
+      : "CustomManualHint";
   return {
     _id: entry.itemId,
     name: entry.name,
@@ -31,6 +24,13 @@ export function buildCustomizationSource(entry, system = "sf2e") {
       slug: entry.id,
       actionType: { value: active ? "action" : "passive" },
       actions: { value: active ? 1 : null },
+      frequency: entry.frequency ? { ...entry.frequency } : null,
+      selfEffect: entry.selfEffectId
+        ? {
+            uuid: `Compendium.${MODULE_ID}.${ownPackName("robot-customizations", system)}.Item.${entry.selfEffectId}`,
+            name: entry.selfEffectName,
+          }
+        : null,
       category: "bonus",
       location: null,
       level: { value: 1, taken: 1 },
@@ -44,16 +44,14 @@ export function buildCustomizationSource(entry, system = "sf2e") {
         remaster: true,
       },
       description: {
-        value: `<p>${esc(entry.description)}</p><p>@Localize[SFMTP.${entry.automation === "rules" ? "CustomRulesHint" : "CustomManualHint"}]</p>`,
+        value: `<p>${esc(entry.description)}</p><p>@Localize[SFMTP.${hintKey}]</p>`,
       },
       traits: {
         rarity: "common",
         value: entry.id === "recharge" ? ["concentrate"] : [],
         otherTags: [],
       },
-      rules: structuredClone(entry.rules ?? []).map((rule) =>
-        localizeRuleRefs(rule, system),
-      ),
+      rules: adaptRulesToSystem(entry.rules, system),
     },
     flags: {
       core: {

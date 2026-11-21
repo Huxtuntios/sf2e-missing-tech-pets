@@ -24,6 +24,7 @@ import {
 
 import { buildCustomizationSource } from "./customization-sources.mjs";
 import { buildFamiliarSource } from "./familiar-sources.mjs";
+import { buildEffectSource } from "./effect-sources.mjs";
 import { ownPackName } from "./system-context.mjs";
 import { localizeItemSource } from "./content-localization.mjs";
 
@@ -38,6 +39,7 @@ const customizations = JSON.parse(
   await readFile(path.join(root, "data/robot-customizations.json"), "utf8"),
 );
 const translations = JSON.parse(await readFile(path.join(root, "data/ru-content.json"), "utf8"));
+const itemEffects = JSON.parse(await readFile(path.join(root, "data/item-effects.json"), "utf8"));
 const translationDir = path.join(root, "lang/babele/ru");
 await mkdir(translationDir, { recursive: true });
 const temporary = await mkdtemp(path.join(tmpdir(), "sfmtp-build-"));
@@ -71,7 +73,7 @@ for (const { system, definition } of ["sf2e", "pf2e"].flatMap((system) =>
   const name = ownPackName(definition.name, system);
   const sourceDir = path.join(root, "packs/src", name);
   await mkdir(sourceDir, { recursive: true });
-  const items = entries.map((entry) => {
+  const entryItems = entries.map((entry) => {
     if (
       !["familiar", "customization"].includes(prefix) &&
       (!entry.advancedManeuverId || !entry.advancedManeuverDescription)
@@ -86,15 +88,25 @@ for (const { system, definition } of ["sf2e", "pf2e"].flatMap((system) =>
       .slice(0, 16);
     return source;
   });
-  if (new Set(items.map((item) => item._id)).size !== entries.length)
+  // Временные Effect Items живут в том же паке, что и источник, но отдельными
+  // документами: Recharge в robot-customizations, поддержки в robot-support.
+  const packEffects = itemEffects.effects.filter((effect) => effect.pack === definition.name);
+  const effectItems = packEffects.map((effect) => buildEffectSource(effect, system));
+  const items = [...entryItems, ...effectItems];
+  if (new Set(items.map((item) => item._id)).size !== items.length)
     throw new Error(`Повторяющиеся ID: ${name}`);
   const family = ["robot-support", "robot-advanced-maneuvers"].includes(definition.name) ? "robot-chassis" : definition.name;
   const label = definition.name === "robot-support" ? translations[family].supportLabel
     : definition.name === "robot-advanced-maneuvers" ? translations[family].maneuverLabel : translations[family].label;
-  const translatedItems = Object.fromEntries(items.map((item, index) => {
+  const translatedEntries = Object.fromEntries(entryItems.map((item, index) => {
     const translated = localizeItemSource(item, definition.name, entries[index], { language: "ru", translations });
     return [item._id, { name: translated.name, description: translated.system.description.value }];
   }));
+  const translatedEffects = Object.fromEntries(effectItems.map((item, index) => {
+    const effect = packEffects[index];
+    return [item._id, { name: effect.nameRu, description: effect.descriptionRu }];
+  }));
+  const translatedItems = { ...translatedEntries, ...translatedEffects };
   await writeFile(path.join(translationDir, `sf2e-missing-tech-pets.${name}.json`), JSON.stringify({
     label, mapping: { name: "name", description: "system.description.value" }, entries: translatedItems,
   }, null, 2) + "\n");

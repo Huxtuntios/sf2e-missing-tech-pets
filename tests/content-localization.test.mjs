@@ -117,7 +117,7 @@ test("Fourteen Babele translation files use stable IDs and primitive display-onl
       count++;
     }
   }
-  assert.equal(count, 232);
+  assert.equal(count, 238);
 });
 test("Content translation preserves action costs, manual status and conditional thresholds", () => {
   const focus = translations["familiar-abilities"].entries["familiar-focus"];

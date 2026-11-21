@@ -78,7 +78,7 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
   assert set(payload['entries'])==ids,'Не совпали ID переводов'
  assert 'data/ru-content.json' in names,'Отсутствует русский каталог'
  for script in manifest['esmodules']:assert script in names,'Отсутствует entrypoint'
- for script in ['content-localization.mjs','babele.mjs','customization-sources.mjs','dailies.mjs','sheet-integration.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs','ability-row.mjs','rich-text.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
+ for script in ['content-localization.mjs','babele.mjs','customization-sources.mjs','choice-variants.mjs','dailies.mjs','sheet-integration.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs','ability-row.mjs','rich-text.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
  for language in manifest['languages']:assert language['path'] in names,'Отсутствует язык'
  for name in names:
   if pathlib.PurePosixPath(name).suffix in ['.json','.db','.mjs','.md','.txt','.css','.html','.svg']:
@@ -93,7 +93,7 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
  for language in manifest['languages']:
   translations=json.loads(archive.read(language['path']))
   assert isinstance(translations.get('SFMTP',{}).get('ManualActionHint'),str),'Не разрешается ключ Foundry SFMTP.ManualActionHint'
- assert len([p for p in names if p.startswith('packs/src/') and p.endswith('.json')])==232,'Неполные источники'
+ assert len([p for p in names if p.startswith('packs/src/') and p.endswith('.json')])==238,'Неполные источники'
  assert not any(p.startswith(('node_modules/','.git/','.github/','tests/','tools/')) for p in names),'В ZIP попали файлы разработки'
  assert not any(pathlib.PurePosixPath(p).name in ['LOG','LOG.old','LOCK'] or p.endswith(('.dbtmp','-wal','-shm')) for p in names),'В ZIP попали временные файлы базы'
  assert 'docs/AUDIT-1.8.0.md' in names,'Отсутствует отчёт проверки кандидата'
@@ -104,5 +104,5 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
   { stdio: "pipe" },
 );
 console.log(
-  "Проверены SHA256, версия/тег, манифест, ZIP, четырнадцать LevelDB-паков и 232 исходника.",
+  "Проверены SHA256, версия/тег, манифест, ZIP, четырнадцать LevelDB-паков и 238 исходников.",
 );

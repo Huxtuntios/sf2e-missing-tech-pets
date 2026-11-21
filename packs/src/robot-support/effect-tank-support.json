@@ -1,0 +1,75 @@
+{
+  "_id": "16508c1a18d8f627",
+  "name": "Effect: Tank Support",
+  "type": "effect",
+  "img": "icons/svg/aura.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "effect-tank-support",
+    "description": {
+      "value": "<p>Apply to the owner. While active, your next Strike against a foe within the robot’s melee reach gains a +1 circumstance bonus. Toggle off after the Strike; the effect ends at the start of your next turn. Resolve reach and targeting manually.</p>",
+      "gm": ""
+    },
+    "duration": {
+      "value": 1,
+      "unit": "rounds",
+      "expiry": "turn-start",
+      "sustained": false
+    },
+    "fromSpell": false,
+    "level": {
+      "value": 1
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "start": {
+      "initiative": null,
+      "value": 0
+    },
+    "tokenIcon": {
+      "show": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    },
+    "unidentified": false,
+    "badge": null,
+    "context": null,
+    "rules": [
+      {
+        "key": "RollOption",
+        "option": "tank-support",
+        "toggleable": true,
+        "label": "SFMTP.TankSupportToggle"
+      },
+      {
+        "key": "FlatModifier",
+        "selector": "strike-attack-roll",
+        "type": "circumstance",
+        "value": 1,
+        "predicate": [
+          "tank-support"
+        ]
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.robot-support.Item.16508c1a18d8f627"
+    },
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "itemEffect": true,
+      "effectId": "effect-tank-support"
+    }
+  }
+}

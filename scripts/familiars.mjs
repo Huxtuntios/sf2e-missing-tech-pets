@@ -5,6 +5,7 @@ import { sourceFamiliarAllowance } from "./companion-sources.mjs";
 // Нативный familiar SF2e отвечает за характеристики. Здесь только связь и выбор Items.
 import { MODULE_ID } from "./item-sources.mjs";
 import { buildFamiliarSource } from "./familiar-sources.mjs";
+import { choiceVariants, preserveRuleChoices } from "./choice-variants.mjs";
 const queues = new Map();
 
 const fail = (key) => {
@@ -146,13 +147,19 @@ function managed(item, owner) {
   );
 }
 export function familiarCanRemove(item, owner, familiar) {
+  if (
+    !managed(item, owner) ||
+    (familiar.getFlag(MODULE_ID, "innateFamiliarItems") ?? []).includes(item.id)
+  )
+    return false;
+  const fingerprint = item.flags[MODULE_ID].familiarManaged.fingerprint;
+  const source = item.toObject();
+  // Допустимый выбор ChoiceSet — не ручная правка: сверяем и варианты выбора.
   return (
-    managed(item, owner) &&
-    !(familiar.getFlag(MODULE_ID, "innateFamiliarItems") ?? []).includes(
-      item.id,
-    ) &&
-    item.flags[MODULE_ID].familiarManaged.fingerprint ===
-      familiarFingerprint(item)
+    fingerprint === familiarFingerprint(source) ||
+    choiceVariants(source).some(
+      (variant) => familiarFingerprint(variant) === fingerprint,
+    )
   );
 }
 export async function familiarCatalog() {
@@ -325,6 +332,7 @@ async function syncNow(owner, familiar, selectedIds) {
     // (description.gm, traits.otherTags, deathNote и т.п.): иначе снимок не
     // совпал бы с записанным Item и копия считалась бы «изменённой».
     const target = item.toObject();
+    const previous = item.toObject();
     target.name = source.name;
     target.img = source.img;
     target.effects = source.effects ?? [];
@@ -337,28 +345,36 @@ async function syncNow(owner, familiar, selectedIds) {
     sys.rules = source.system.rules;
     sys.description = { ...sys.description, value: source.system.description.value };
     sys.traits = { ...sys.traits, value: source.system.traits.value };
-    if (familiarFingerprint(item) === familiarFingerprint(target)) continue;
-    // Содержимое и снимок пишутся одним update: прерванная запись не оставит
-    // копию с новым содержимым и старым снимком, которую менеджер счёл бы
-    // «изменённой» и больше не смог ни снять, ни обновить.
-    await item.update({
-      name: target.name,
-      img: target.img,
-      system: target.system,
-      effects: target.effects,
-      flags: {
-        core: source.flags.core,
-        [MODULE_ID]: {
-          ...item.flags[MODULE_ID],
-          ...source.flags[MODULE_ID],
-          familiarManaged: {
-            controllerActorId: owner.id,
-            fingerprint: familiarFingerprint(target),
+    // Сохраняем подтверждённые выборы ChoiceSet, чтобы обновление не сбрасывало
+    // выбор и не делало неизменённую копию «изменённой» на каждой синхронизации.
+    preserveRuleChoices(target, previous, systemId());
+    if (familiarFingerprint(item) !== familiarFingerprint(target)) {
+      // Содержимое и снимок пишутся одним update: прерванная запись не оставит
+      // копию с новым содержимым и старым снимком, которую менеджер счёл бы
+      // «изменённой» и больше не смог ни снять, ни обновить.
+      await item.update({
+        name: target.name,
+        img: target.img,
+        system: target.system,
+        effects: target.effects,
+        flags: {
+          core: source.flags.core,
+          [MODULE_ID]: {
+            ...item.flags[MODULE_ID],
+            ...source.flags[MODULE_ID],
+            familiarManaged: {
+              controllerActorId: owner.id,
+              fingerprint: familiarFingerprint(target),
+            },
           },
         },
-      },
-    });
-    upgraded++;
+      });
+      upgraded++;
+    }
+    // Система промптит ChoiceSet только при создании Item. Старая неизменённая
+    // копия, получившая новые ChoiceSet при обновлении, осталась бы без выбора,
+    // поэтому спрашиваем недостающие выборы отдельно (и при повторном сохранении).
+    await promptUnselectedFamiliarChoices(item);
   }
   return {
     created: created.length,
@@ -367,6 +383,174 @@ async function syncNow(owner, familiar, selectedIds) {
     upgraded,
   };
 }
+function choiceClausePasses(clause, options) {
+  if (typeof clause === "string") return options.has(clause);
+  if (!clause || typeof clause !== "object") return true;
+  if ("not" in clause) return !choiceClausePasses(clause.not, options);
+  if ("or" in clause) return clause.or.some((c) => choiceClausePasses(c, options));
+  if ("and" in clause)
+    return clause.and.every((c) => choiceClausePasses(c, options));
+  for (const [op, fn] of [
+    ["gte", (a, b) => a >= b],
+    ["lte", (a, b) => a <= b],
+    ["gt", (a, b) => a > b],
+    ["lt", (a, b) => a < b],
+  ]) {
+    if (op in clause) {
+      const [key, bound] = clause[op];
+      const prefix = `${key}:`;
+      return [...options]
+        .filter((o) => o.startsWith(prefix))
+        .map((o) => Number(o.slice(prefix.length)))
+        .filter((n) => !Number.isNaN(n))
+        .some((n) => fn(n, bound));
+    }
+  }
+  return true;
+}
+export function choicePredicatePasses(predicate, options) {
+  if (!predicate) return true;
+  const clauses = Array.isArray(predicate) ? predicate : [predicate];
+  return clauses.every((c) => choiceClausePasses(c, options));
+}
+export function optionsWithSelections(actor, pending, selections) {
+  const options = new Set(actor?.getRollOptions?.() ?? []);
+  for (const { rule } of pending)
+    if (rule.rollOption && selections[rule.flag] != null)
+      options.add(`${rule.rollOption}:${selections[rule.flag]}`);
+  return options;
+}
+export function validChoicesFor(rule, actor, pending, selections) {
+  const options = optionsWithSelections(actor, pending, selections);
+  return (rule.choices ?? []).filter((c) =>
+    choicePredicatePasses(c.predicate, options),
+  );
+}
+async function promptUnselectedFamiliarChoices(item) {
+  const DialogV2 = globalThis.foundry?.applications?.api?.DialogV2;
+  if (!DialogV2 || !globalThis.game?.i18n) return;
+  const system = systemId();
+  const pending = (item.system.rules ?? [])
+    .map((rule, index) => ({ rule, index }))
+    .filter(({ rule }) => rule.key === "ChoiceSet" && rule.flag && !rule.selection);
+  if (!pending.length) return;
+  const actor = item.actor;
+  const localize = (key) => game.i18n.localize(key);
+  const escape = (value) =>
+    String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  //Defaults: первый допустимый вариант с учётом уже сделанных выборов, чтобы
+  //пары с rollOption-исключением не стартовали с одного и того же значения.
+  const selections = {};
+  for (const { rule } of pending) {
+    const valid = validChoicesFor(rule, actor, pending, selections);
+    if (valid.length) selections[rule.flag] = valid[0].value;
+  }
+  const optionsHtml = (rule) =>
+    validChoicesFor(rule, actor, pending, selections)
+      .map(
+        (c) =>
+          `<option value="${escape(c.value)}"${selections[rule.flag] === c.value ? " selected" : ""}>${escape(localize(c.label ?? c.value))}</option>`,
+      )
+      .join("");
+  const content =
+    `<p>${localize("SFMTP.FamiliarNewChoiceHint")}</p>` +
+    pending
+      .map(
+        ({ rule }) =>
+          `<div class="form-group"><label>${escape(localize(rule.prompt ?? rule.label ?? rule.flag))}</label><select name="${escape(rule.flag)}">${optionsHtml(rule)}</select></div>`,
+      )
+      .join("");
+  let settle;
+  const done = new Promise((resolve) => (settle = resolve));
+  const refresh = (element) => {
+    for (const { rule } of pending) {
+      const field = element.querySelector(`select[name="${rule.flag}"]`);
+      if (!field) continue;
+      const valid = validChoicesFor(rule, actor, pending, selections);
+      if (!valid.some((c) => c.value === selections[rule.flag]))
+        selections[rule.flag] = valid[0]?.value;
+      field.innerHTML = optionsHtml(rule);
+      if (selections[rule.flag] != null) field.value = selections[rule.flag];
+    }
+  };
+  const dialog = new DialogV2({
+    window: { title: localize("SFMTP.FamiliarNewChoiceTitle") },
+    content,
+    buttons: [
+      {
+        action: "ok",
+        label: localize("SFMTP.Save"),
+        callback: (_event, _button, dlg) => {
+          for (const { rule } of pending) {
+            const field = dlg.element.querySelector(
+              `select[name="${rule.flag}"]`,
+            );
+            if (field) selections[rule.flag] = field.value;
+          }
+          // Проверяем выборы перед сохранением: невалидный набор не пишем.
+          const options = optionsWithSelections(actor, pending, selections);
+          const invalid = pending.some(({ rule }) => {
+            const value = selections[rule.flag];
+            const choice = (rule.choices ?? []).find((c) => c.value === value);
+            return (
+              value == null ||
+              !choice ||
+              !choicePredicatePasses(choice.predicate, options)
+            );
+          });
+          if (invalid) {
+            refresh(dlg.element);
+            ui.notifications.warn(localize("SFMTP.FamiliarNewChoiceInvalid"));
+            return false;
+          }
+          settle({ ...selections });
+          return { ...selections };
+        },
+      },
+      {
+        action: "cancel",
+        label: localize("SFMTP.Cancel"),
+        callback: () => {
+          settle(null);
+          return null;
+        },
+      },
+    ],
+  });
+  dialog.addEventListener("close", () => settle(null));
+  await dialog.render(true);
+  for (const { rule } of pending) {
+    const field = dialog.element.querySelector(`select[name="${rule.flag}"]`);
+    field?.addEventListener("change", () => {
+      selections[rule.flag] = field.value;
+      refresh(dialog.element);
+    });
+  }
+  const chosen = await done;
+  if (!chosen) return;
+  const rules = (item.system.rules ?? []).map((rule) =>
+    rule.key === "ChoiceSet" && chosen[rule.flag] !== undefined
+      ? { ...rule, selection: chosen[rule.flag] }
+      : rule,
+  );
+  await item.update({
+    "system.rules": rules,
+    [`flags.${system}.rulesSelections`]: {
+      ...(item.flags[system]?.rulesSelections ?? {}),
+      ...chosen,
+    },
+  });
+  await item.update({
+    [`flags.${MODULE_ID}.familiarManaged.fingerprint`]: familiarFingerprint(
+      item.toObject(),
+    ),
+  });
+}
+
 export async function setInnateFamiliarItems(familiar, ids) {
   assertFamiliarAccess(familiar);
   if (

@@ -12,6 +12,10 @@ import {
   buildMinibotEquipmentSource,
   buildMinibotActionSource,
 } from "../scripts/minibot-sources.mjs";
+import {
+  registerMinibotEquipmentTrait,
+  registerMinibotCreatureTrait,
+} from "../scripts/system-context.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const json = async (file) =>
@@ -27,7 +31,7 @@ test("Существо Minibot: точный стат-блок Tech Core и на
   const c = data.creature;
   assert.equal(c.level, -1);
   assert.equal(c.size, "tiny");
-  assert.deepEqual(c.traits, ["construct", "robot", "tech"]);
+  assert.deepEqual(c.traits, ["construct", "robot", "tech", "minibot"]);
   assert.equal(c.ac, 14);
   assert.equal(c.hp, 4);
   assert.deepEqual(c.saves, { fortitude: 0, reflex: 4, will: 0 });
@@ -50,6 +54,7 @@ test("Существо Minibot: точный стат-блок Tech Core и на
   assert.equal(source.system.attributes.speed.otherSpeeds[0].type, "fly");
   assert.equal(source.system.details.level.value, -1);
   assert.equal(source.system.traits.size.value, "tiny");
+  assert.deepEqual(source.system.traits.value, ["construct", "robot", "tech", "minibot"]);
   assert.deepEqual(source.system.skills, { acrobatics: { base: 6 } });
   assert.equal(source.system.perception.senses[0].type, "darkvision");
 });
@@ -74,12 +79,51 @@ test("25 предметов minibot: без Independent Obstructobot, натив
     assert.equal(source.system.level.value, item.level);
     assert.equal(source.system.bulk.value, 1);
     assert.deepEqual(source.system.traits.value, ["minibot", "tech"]);
-    assert.deepEqual(source.system.rules, []);
+    assert.deepEqual(source.system.rules, item.rules ?? []);
     assert.equal(source.system.slug, item.slug);
     assert.equal(source.system.description.value, item.description);
   }
   // Independent Obstructobot уже поставляется системой sf2e — не дублируем.
   assert.ok(!data.equipment.some((i) => i.group === "independent-obstructobot"));
+});
+
+test("Свойства бота гейтятся self:trait:minibot; бонусы владельца — без гейта", () => {
+  const botFacing = ["firebot-commercial", "firebot-tactical", "firebot-advanced", "bellbot-commercial", "bellbot-tactical", "bellbot-advanced", "bellbot-superior", "bellbot-elite"];
+  for (const slug of botFacing) {
+    const entry = data.equipment.find((e) => e.slug === slug);
+    assert.ok(entry.rules?.length, slug);
+    for (const rule of entry.rules) {
+      assert.ok(rule.predicate?.includes("self:trait:minibot"), `${slug}/${rule.key}`);
+      assert.equal(rule.requiresEquipped, false, slug);
+    }
+  }
+  const firebot = buildMinibotEquipmentSource(data.equipment.find((e) => e.slug === "firebot-tactical"));
+  assert.deepEqual(firebot.system.rules, [
+    { key: "Resistance", type: ["fire"], value: 24, requiresEquipped: false, predicate: ["self:trait:minibot"] },
+  ]);
+  // Эффекты владельца («You») дают бонусы по условию/переключателю, без гейта на минибота.
+  for (const slug of ["petbot", "beatbot-commercial", "beatbot-tactical"]) {
+    const entry = data.equipment.find((e) => e.slug === slug);
+    for (const rule of entry.rules ?? []) {
+      assert.ok(!rule.predicate?.includes("self:trait:minibot"), slug);
+    }
+  }
+  const petbot = buildMinibotEquipmentSource(data.equipment.find((e) => e.slug === "petbot"));
+  assert.deepEqual(petbot.system.rules[0].predicate, ["action:conceal-an-object"]);
+});
+
+test("Регистрация признака minibot для equipment и creature не перезаписывает существующее", () => {
+  const config = { PF2E: { equipmentTraits: { existing: "X" }, creatureTraits: { existing: "X" } } };
+  registerMinibotEquipmentTrait(config);
+  registerMinibotCreatureTrait(config);
+  assert.equal(config.PF2E.equipmentTraits.minibot, "PF2E.TraitMinibot");
+  assert.equal(config.PF2E.creatureTraits.minibot, "PF2E.TraitMinibot");
+  assert.equal(config.PF2E.equipmentTraits.existing, "X");
+  const preset = { PF2E: { equipmentTraits: { minibot: "Custom" }, creatureTraits: { minibot: "Custom" } } };
+  registerMinibotEquipmentTrait(preset);
+  registerMinibotCreatureTrait(preset);
+  assert.equal(preset.PF2E.equipmentTraits.minibot, "Custom");
+  assert.equal(preset.PF2E.creatureTraits.minibot, "Custom");
 });
 
 test("Действие Direct Minibot: нативная стоимость/признак, эффект ручной", () => {
@@ -95,6 +139,7 @@ test("Действие Direct Minibot: нативная стоимость/пр�
   assert.equal(source.system.actionType.value, "action");
   assert.deepEqual(source.system.traits.value, ["manipulate"]);
   assert.deepEqual(source.system.rules, []);
+  assert.deepEqual(source.system.frequency, { max: 1, per: "PT1H" });
   assert.match(source.system.description.value, /SFMTP.ManualActionHint/);
 });
 

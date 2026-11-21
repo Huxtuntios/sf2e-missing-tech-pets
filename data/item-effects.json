@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "note": "Temporary Effect Items applied separately from the permanent source Item. Recharge is self-applied by the robot via the action's native selfEffect; support benefits are applied to the owner manually (Companion Compendia pattern) and toggled while active. Conditions such as reach and 'next Strike' remain manual.",
+  "effects": [
+    {
+      "itemId": "8a4adcb39a007962",
+      "slug": "effect-recharge",
+      "pack": "robot-customizations",
+      "name": "Effect: Recharge",
+      "nameRu": "Эффект: Перезарядка",
+      "level": 1,
+      "duration": { "value": 1, "unit": "rounds", "expiry": "turn-end", "sustained": false },
+      "description": "<p>The robot recharges a touched battery and becomes clumsy 1 for 1 round.</p>",
+      "descriptionRu": "<p>Робот перезаряжает батарею касанием и получает состояние «неуклюжесть 1» на 1 раунд.</p>",
+      "rules": [
+        {
+          "key": "GrantItem",
+          "uuid": "Compendium.sf2e.conditions.Item.i3OJZU2nk64Df3xm",
+          "alterations": [{ "mode": "override", "property": "badge-value", "value": 1 }],
+          "onDeleteActions": { "grantee": "cascade" }
+        }
+      ]
+    },
+    {
+      "itemId": "16508c1a18d8f627",
+      "slug": "effect-tank-support",
+      "pack": "robot-support",
+      "name": "Effect: Tank Support",
+      "nameRu": "Эффект: поддержка танкового шасси",
+      "level": 1,
+      "duration": { "value": 1, "unit": "rounds", "expiry": "turn-start", "sustained": false },
+      "description": "<p>Apply to the owner. While active, your next Strike against a foe within the robot’s melee reach gains a +1 circumstance bonus. Toggle off after the Strike; the effect ends at the start of your next turn. Resolve reach and targeting manually.</p>",
+      "descriptionRu": "<p>Примените к владельцу. Пока эффект активен, ваш следующий Удар по врагу в досягаемости робота получает бонус обстоятельства +1. Выключите переключатель после Удара; эффект заканчивается в начале вашего следующего хода. Досягаемость и выбор цели определяйте вручную.</p>",
+      "rules": [
+        { "key": "RollOption", "option": "tank-support", "toggleable": true, "label": "SFMTP.TankSupportToggle" },
+        { "key": "FlatModifier", "selector": "strike-attack-roll", "type": "circumstance", "value": 1, "predicate": ["tank-support"] }
+      ]
+    },
+    {
+      "itemId": "5540938c40c07162",
+      "slug": "effect-powerful-support",
+      "pack": "robot-support",
+      "name": "Effect: Powerful Support",
+      "nameRu": "Эффект: поддержка мощного шасси",
+      "level": 1,
+      "duration": { "value": 1, "unit": "rounds", "expiry": "turn-start", "sustained": false },
+      "description": "<p>Apply to the owner. While active, your Strikes that damage creatures within the robot’s melee reach also deal persistent bleed damage: 1d6, or 2d6 if the robot is burly or deft. The effect ends at the start of your next turn. Resolve reach and which Strikes qualify manually.</p>",
+      "descriptionRu": "<p>Примените к владельцу. Пока эффект активен, ваши Удары, наносящие урон существам в досягаемости робота, также наносят продолжительный урон кровотечением: 1d6, либо 2d6, если робот мощный (burly) или ловкий (deft). Эффект заканчивается в начале вашего следующего хода. Досягаемость и подходящие Удары определяйте вручную.</p>",
+      "rules": [
+        { "key": "RollOption", "option": "powerful-support", "toggleable": true, "label": "SFMTP.PowerfulSupportToggle" },
+        {
+          "key": "ChoiceSet",
+          "flag": "bleedDice",
+          "adjustName": false,
+          "prompt": "SFMTP.PowerfulSupportPrompt",
+          "choices": [
+            { "label": "SFMTP.PowerfulSupportNormal", "value": 1 },
+            { "label": "SFMTP.PowerfulSupportSuperior", "value": 2 }
+          ]
+        },
+        { "key": "DamageDice", "selector": "strike-damage", "category": "persistent", "damageType": "bleed", "diceNumber": "{item|flags.sf2e.rulesSelections.bleedDice}", "dieSize": "d6", "predicate": ["powerful-support"] }
+      ]
+    }
+  ]
+}

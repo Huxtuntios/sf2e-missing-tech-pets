@@ -39,7 +39,19 @@
       "remaster": true
     },
     "quantity": 1,
-    "rules": [],
+    "rules": [
+      {
+        "key": "Resistance",
+        "type": [
+          "fire"
+        ],
+        "value": 12,
+        "requiresEquipped": false,
+        "predicate": [
+          "self:trait:minibot"
+        ]
+      }
+    ],
     "size": "med",
     "traits": {
       "rarity": "common",

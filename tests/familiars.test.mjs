@@ -167,14 +167,14 @@ test("38 полных SF2e Action Items с неизменяемыми уника
   }
   assert.equal(
     catalog.entries.filter((e) => e.automation === "rules").length,
-    11,
+    17,
   );
 });
 test("В Rule Elements только сверенные пассивные схемы; стоимость Familiar Focus — 2 действия", () => {
   for (const e of catalog.entries)
     for (const rule of e.rules)
       assert.ok(
-        ["BaseSpeed", "Sense", "FlatModifier", "ActorTraits"].includes(
+        ["BaseSpeed", "Sense", "FlatModifier", "ActorTraits", "ChoiceSet", "Note", "Immunity", "Resistance"].includes(
           rule.key,
         ),
       );

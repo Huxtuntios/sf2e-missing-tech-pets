@@ -12,6 +12,8 @@
     "actions": {
       "value": 1
     },
+    "frequency": null,
+    "selfEffect": null,
     "category": "bonus",
     "location": null,
     "level": {
@@ -30,14 +32,31 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Shed bright light within 20 feet and dim light for 20 feet beyond that. Switch the light on or off with one action.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
+      "value": "<p>Shed bright light within 20 feet and dim light for 20 feet beyond that. Switch the light on or off with one action.</p><p>@Localize[SFMTP.CustomRulesHint]</p>"
     },
     "traits": {
       "rarity": "common",
       "value": [],
       "otherTags": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "RollOption",
+        "option": "light-mounts",
+        "toggleable": true,
+        "label": "SFMTP.LightMountsToggle"
+      },
+      {
+        "key": "TokenLight",
+        "predicate": [
+          "light-mounts"
+        ],
+        "value": {
+          "bright": 20,
+          "dim": 40
+        }
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -48,7 +67,7 @@
       "robotCustomization": true,
       "catalogId": "light-mounts",
       "customizationGrade": "commercial",
-      "automation": "manual"
+      "automation": "rules"
     }
   }
 }

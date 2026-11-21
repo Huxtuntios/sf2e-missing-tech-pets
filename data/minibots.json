@@ -8,7 +8,8 @@
     "traits": [
       "construct",
       "robot",
-      "tech"
+      "tech",
+      "minibot"
     ],
     "perception": {
       "mod": 0,
@@ -206,6 +207,9 @@
       ],
       "usage": "held-in-one-hand",
       "description": "<p>Petbots resemble specific Tiny animals, despite clearly being robots. It’s possible to hide an object of light Bulk in a petbot, but it takes 1 minute to access the compartment. You gain a +1 item bonus to Stealth checks to Conceal an Object in a petbot.</p>",
+      "rules": [
+        { "key": "FlatModifier", "selector": "stealth", "type": "item", "value": 1, "predicate": ["action:conceal-an-object"] }
+      ],
       "group": "petbot",
       "nameRu": "Петбот",
       "descriptionRu": "<p>Петботы напоминают конкретных крошечных животных, хотя очевидно являются роботами. В петботе можно спрятать предмет лёгкой Нагрузки, но доступ к отсеку занимает 1 минуту. Вы получаете предметный бонус +1 к проверкам Скрытности, чтобы Спрятать предмет в петботе.</p>"
@@ -222,6 +226,10 @@
       ],
       "usage": "held-in-one-hand",
       "description": "<p>Regularly seen accompanying vid streamers who like ambient music to make their livestreams more engaging on location, a beatbot consists of several parts. A floating “docking station” provides a charging pad for several small levitating speakers. The minibot uses these speakers to create a dynamic soundscape centered around the dock.</p>\n<p><strong>Activate—Drop the Beat</strong> <span class=\"action-glyph\">1</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You Command the minibot to play some music or generate a personal soundtrack tailored to whatever you’re doing, shifting reactively to your behavior and dialogue. You take a –4 penalty to Stealth checks while the music is playing. You can Dismiss this effect.</p>",
+      "rules": [
+        { "key": "RollOption", "option": "drop-the-beat", "toggleable": true, "label": "SFMTP.DropTheBeatToggle" },
+        { "key": "FlatModifier", "selector": "stealth", "value": -4, "predicate": ["drop-the-beat"] }
+      ],
       "group": "beatbot",
       "nameRu": "Битбот (коммерческий)",
       "descriptionRu": "<p>Битботов часто можно увидеть рядом с видеостримерами, которые любят фоновую музыку, чтобы сделать свои выездные эфиры интереснее. Битбот состоит из нескольких частей: парящая «док-станция» служит зарядной площадкой для нескольких маленьких левитирующих динамиков. Минибот использует эти динамики, чтобы создавать динамичное звуковое сопровождение вокруг дока.</p>\n<p><strong>Активация—Врубить бит</strong> <span class=\"action-glyph\">1</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы отдаёте миниботу Команду играть музыку или создавать персональный саундтрек под то, чем вы занимаетесь, реактивно подстраиваясь под ваше поведение и диалоги. Пока играет музыка, вы получаете штраф –4 к проверкам Скрытности. Вы можете Отменить этот эффект.</p>"
@@ -238,6 +246,11 @@
       ],
       "usage": "held-in-one-hand",
       "description": "<p>Regularly seen accompanying vid streamers who like ambient music to make their livestreams more engaging on location, a beatbot consists of several parts. A floating “docking station” provides a charging pad for several small levitating speakers. The minibot uses these speakers to create a dynamic soundscape centered around the dock.</p>\n<p><strong>Activate—Drop the Beat</strong> <span class=\"action-glyph\">1</span> (auditory, manipulate)</p><hr /><p><strong>Effect</strong> You Command the minibot to play some music or generate a personal soundtrack tailored to whatever you’re doing, shifting reactively to your behavior and dialogue. You take a –4 penalty to Stealth checks while the music is playing. You can Dismiss this effect.</p>\n<p>Drop the Beat provides a +1 item bonus to Performance checks. During your daily preparations, you can use 5 charges of the beatbot’s battery to set it to record 24 hours of audio that it can recall on command.</p>",
+      "rules": [
+        { "key": "RollOption", "option": "drop-the-beat", "toggleable": true, "label": "SFMTP.DropTheBeatToggle" },
+        { "key": "FlatModifier", "selector": "stealth", "value": -4, "predicate": ["drop-the-beat"] },
+        { "key": "FlatModifier", "selector": "performance", "type": "item", "value": 1, "predicate": ["drop-the-beat"] }
+      ],
       "group": "beatbot",
       "nameRu": "Битбот (тактический)",
       "descriptionRu": "<p>Битботов часто можно увидеть рядом с видеостримерами, которые любят фоновую музыку, чтобы сделать свои выездные эфиры интереснее. Битбот состоит из нескольких частей: парящая «док-станция» служит зарядной площадкой для нескольких маленьких левитирующих динамиков. Минибот использует эти динамики, чтобы создавать динамичное звуковое сопровождение вокруг дока.</p>\n<p><strong>Активация—Врубить бит</strong> <span class=\"action-glyph\">1</span> (слуховой, манипуляция)</p><hr /><p><strong>Эффект</strong> Вы отдаёте миниботу Команду играть музыку или создавать персональный саундтрек под то, чем вы занимаетесь, реактивно подстраиваясь под ваше поведение и диалоги. Пока играет музыка, вы получаете штраф –4 к проверкам Скрытности. Вы можете Отменить этот эффект.</p>\n<p>«Врубить бит» даёт предметный бонус +1 к проверкам Выступления. Во время ежедневных приготовлений вы можете потратить 5 зарядов батареи битбота, чтобы настроить его на запись 24 часов аудио, которое он может воспроизвести по команде.</p>"
@@ -245,6 +258,9 @@
     {
       "name": "Bellbot (Commercial)",
       "slug": "bellbot-commercial",
+      "rules": [
+        { "key": "BaseSpeed", "selector": "land", "value": 25, "requiresEquipped": false, "predicate": ["self:trait:minibot"] }
+      ],
       "level": 1,
       "price": 150,
       "bulk": 1,
@@ -261,6 +277,9 @@
     {
       "name": "Bellbot (Tactical)",
       "slug": "bellbot-tactical",
+      "rules": [
+        { "key": "BaseSpeed", "selector": "fly", "value": 30, "requiresEquipped": false, "predicate": ["self:trait:minibot"] }
+      ],
       "level": 5,
       "price": 1150,
       "bulk": 1,
@@ -277,6 +296,9 @@
     {
       "name": "Bellbot (Advanced)",
       "slug": "bellbot-advanced",
+      "rules": [
+        { "key": "BaseSpeed", "selector": "fly", "value": 30, "requiresEquipped": false, "predicate": ["self:trait:minibot"] }
+      ],
       "level": 8,
       "price": 4150,
       "bulk": 1,
@@ -293,6 +315,9 @@
     {
       "name": "Bellbot (Superior)",
       "slug": "bellbot-superior",
+      "rules": [
+        { "key": "BaseSpeed", "selector": "fly", "value": 30, "requiresEquipped": false, "predicate": ["self:trait:minibot"] }
+      ],
       "level": 12,
       "price": 16150,
       "bulk": 1,
@@ -309,6 +334,9 @@
     {
       "name": "Bellbot (Elite)",
       "slug": "bellbot-elite",
+      "rules": [
+        { "key": "BaseSpeed", "selector": "fly", "value": 30, "requiresEquipped": false, "predicate": ["self:trait:minibot"] }
+      ],
       "level": 14,
       "price": 36150,
       "bulk": 1,
@@ -357,6 +385,9 @@
     {
       "name": "Firebot (Commercial)",
       "slug": "firebot-commercial",
+      "rules": [
+        { "key": "Resistance", "type": ["fire"], "value": 12, "requiresEquipped": false, "predicate": ["self:trait:minibot"] }
+      ],
       "level": 4,
       "price": 1050,
       "bulk": 1,
@@ -373,6 +404,9 @@
     {
       "name": "Firebot (Tactical)",
       "slug": "firebot-tactical",
+      "rules": [
+        { "key": "Resistance", "type": ["fire"], "value": 24, "requiresEquipped": false, "predicate": ["self:trait:minibot"] }
+      ],
       "level": 9,
       "price": 5750,
       "bulk": 1,
@@ -389,6 +423,9 @@
     {
       "name": "Firebot (Advanced)",
       "slug": "firebot-advanced",
+      "rules": [
+        { "key": "Resistance", "type": ["fire"], "value": 36, "requiresEquipped": false, "predicate": ["self:trait:minibot"] }
+      ],
       "level": 14,
       "price": 36050,
       "bulk": 1,
@@ -524,7 +561,7 @@
       "traits": [
         "manipulate"
       ],
-      "frequency": "once per hour",
+      "frequency": { "max": 1, "per": "PT1H" },
       "description": "<p><strong>Frequency</strong> once per hour</p><p>You turn some dials and flick some levers to activate the linked minibot. You Activate Minibot for the linked minibot.</p>",
       "nameRu": "Управление миниботом",
       "descriptionRu": "<p><strong>Частота</strong> раз в час</p><p>Вы поворачиваете несколько циферблатов и щёлкаете рычагами, чтобы активировать связанный минибот. Вы выполняете Активацию минибота для связанного минибота.</p>"

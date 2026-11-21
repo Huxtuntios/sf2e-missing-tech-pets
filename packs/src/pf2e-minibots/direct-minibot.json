@@ -14,6 +14,10 @@
     "actions": {
       "value": 1
     },
+    "frequency": {
+      "max": 1,
+      "per": "PT1H"
+    },
     "category": "interaction",
     "publication": {
       "title": "Tech Core",

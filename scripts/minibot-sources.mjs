@@ -67,8 +67,8 @@ export function buildMinibotCreatureSource(creature) {
 }
 
 // Предметы minibot: нативная схема equipment SF2e (цена в sp = кредиты).
-// Способности активации описаны в тексте по образцу системных предметов;
-// автоматизация ограничена нативными полями, эффекты остаются ручными.
+// Пассивные бонусы и переключаемые эффекты активаций выражены нативными RE
+// без системных ссылок, поэтому документы идентичны для SF2e и PF2e.
 export function buildMinibotEquipmentSource(item) {
   return {
     name: item.name,
@@ -88,7 +88,7 @@ export function buildMinibotEquipmentSource(item) {
       price: { value: { sp: item.price } },
       publication: { ...publication },
       quantity: 1,
-      rules: [],
+      rules: structuredClone(item.rules ?? []),
       size: "med",
       traits: { rarity: "common", value: [...item.traits] },
       usage: { value: item.usage },
@@ -110,6 +110,7 @@ export function buildMinibotActionSource(action) {
       slug: action.slug,
       actionType: { value: action.actionType },
       actions: { value: action.actions },
+      frequency: action.frequency ? { ...action.frequency } : null,
       category: "interaction",
       publication: { ...publication },
       description: {

@@ -12,6 +12,11 @@
     "actions": {
       "value": 1
     },
+    "frequency": null,
+    "selfEffect": {
+      "uuid": "Compendium.sf2e-missing-tech-pets.pf2e-robot-customizations.Item.8a4adcb39a007962",
+      "name": "Effect: Recharge"
+    },
     "category": "bonus",
     "location": null,
     "level": {
@@ -30,7 +35,7 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Spend one concentrate action to recharge a touched battery. The robot then becomes clumsy 1 for 1 round.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
+      "value": "<p>Spend one concentrate action to recharge a touched battery. The robot then becomes clumsy 1 for 1 round.</p><p>@Localize[SFMTP.CustomSelfEffectHint]</p>"
     },
     "traits": {
       "rarity": "common",
@@ -50,7 +55,7 @@
       "robotCustomization": true,
       "catalogId": "recharge",
       "customizationGrade": "advanced",
-      "automation": "manual"
+      "automation": "rules"
     }
   }
 }

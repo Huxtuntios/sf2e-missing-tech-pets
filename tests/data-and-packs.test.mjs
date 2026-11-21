@@ -17,11 +17,14 @@ import {
   applyChassisChoices,
   COMPANION_CLASS_UUID,
 } from "../scripts/item-sources.mjs";
+import { buildEffectSource } from "../scripts/effect-sources.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const json = async (file) =>
   JSON.parse(await readFile(path.join(root, file), "utf8"));
 const catalog = await json("data/robot-chassis.json");
+const itemEffects = await json("data/item-effects.json");
+const packEffects = (name) => itemEffects.effects.filter((e) => e.pack === name);
 const definitions = [
   ["robot-chassis", "chassis", buildChassisSource, "ancestry"],
   ["robot-advanced-maneuvers", "maneuver", buildManeuverSource, "action"],
@@ -98,7 +101,7 @@ test("15 Items совпадают с фабриками, каталогом, JSO
       .trim()
       .split("\n")
       .map(JSON.parse);
-    assert.equal(sources.length, 5);
+    assert.equal(sources.length, 5 + packEffects(name).length);
     for (const entry of catalog.entries) {
       const expected = builder(entry);
       const stableKey =
@@ -119,8 +122,17 @@ test("15 Items совпадают с фабриками, каталогом, JSO
       assert.ok(!globalIds.has(source._id));
       globalIds.add(source._id);
     }
+    for (const effect of packEffects(name)) {
+      const expected = buildEffectSource(effect);
+      const source = sources.find((item) => item._id === effect.itemId);
+      assert.deepEqual(source, expected);
+      assert.equal(source.type, "effect");
+      assert.deepEqual(legacy.find((item) => item._id === effect.itemId), expected);
+      assert.ok(!globalIds.has(source._id));
+      globalIds.add(source._id);
+    }
   }
-  assert.equal(globalIds.size, 15);
+  assert.equal(globalIds.size, 15 + packEffects("robot-support").length);
 });
 test("Нативные поля шасси: size/speed/vision, полные пути навыков, способности без override", () => {
   for (const entry of catalog.entries) {
@@ -265,7 +277,7 @@ test("Реальные LevelDB читаются CLI: все документы �
     const files = (await readdir(output)).filter((file) =>
       file.endsWith(".json"),
     );
-    assert.equal(files.length, 5);
+    assert.equal(files.length, 5 + packEffects(name).length);
     for (const file of files) {
       const document = JSON.parse(
         await readFile(path.join(output, file), "utf8"),
@@ -316,7 +328,7 @@ test("Ключи локализации разрешаются по пути Fou
           : leaves(entry, fullKey);
       });
     const entries = leaves(translations.SFMTP);
-    assert.equal(entries.length, 371);
+    assert.equal(entries.length, 396);
     for (const [key, value] of entries) {
       assert.equal(typeof value, "string");
       assert.ok(lookup(translations, `SFMTP.${key}`));

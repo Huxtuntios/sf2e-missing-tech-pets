@@ -1324,6 +1324,24 @@ test("Выбор ChoiceSet Armored Plates сохраняется повторн�
   assert.equal(item.flags.sf2e.rulesSelections.armoredPlatesBonus, 2);
   assert.deepEqual(robot.writes, writes);
 });
+test("Новая frequency Emergency Repair доходит до старой управляемой копии и идемпотентна", async () => {
+  const h = await harness(),
+    { owner, robot } = await pair(h, {
+      modifications: [customizationChoice("emergency-repair")],
+    });
+  await h.api.syncAutomation(owner);
+  const item = robot.items.find((i) => i.system.slug === "emergency-repair");
+  // Имитируем копию 1.7.0: без frequency, снимок соответствует старому содержимому.
+  delete item.source.system.frequency;
+  item.getFlag(ID, "automationSource").fingerprint = h.subject.itemFingerprint(
+    item.toObject(),
+  );
+  await h.api.syncAutomation(owner);
+  assert.deepEqual(item.source.system.frequency, { max: 1, per: "PT10M" });
+  const writes = clone(robot.writes);
+  await h.api.syncAutomation(owner);
+  assert.deepEqual(robot.writes, writes);
+});
 test("Сменённый на Item выбор ChoiceSet не оставляет осиротевшую кастомизацию", async () => {
   const h = await harness(),
     { owner, robot } = await pair(h, {

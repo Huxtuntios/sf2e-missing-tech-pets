@@ -12,6 +12,8 @@
     "actions": {
       "value": null
     },
+    "frequency": null,
+    "selfEffect": null,
     "category": "bonus",
     "location": null,
     "level": {
@@ -30,14 +32,63 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Increase one of the robot’s Speeds to 40 feet. Choose which Speed manually.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
+      "value": "<p>Increase one of the robot’s Speeds to 40 feet. Choose which Speed manually.</p><p>@Localize[SFMTP.CustomRulesHint]</p>"
     },
     "traits": {
       "rarity": "common",
       "value": [],
       "otherTags": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ChoiceSet",
+        "flag": "speed",
+        "adjustName": false,
+        "prompt": "SFMTP.MovementTypePrompt",
+        "choices": [
+          {
+            "label": "PF2E.Actor.Speed.Type.Burrow",
+            "value": "burrow",
+            "predicate": [
+              "speed:burrow"
+            ]
+          },
+          {
+            "label": "PF2E.Actor.Speed.Type.Climb",
+            "value": "climb",
+            "predicate": [
+              "speed:climb"
+            ]
+          },
+          {
+            "label": "PF2E.Actor.Speed.Type.Fly",
+            "value": "fly",
+            "predicate": [
+              "speed:fly"
+            ]
+          },
+          {
+            "label": "PF2E.Actor.Speed.Type.Land",
+            "value": "land",
+            "predicate": [
+              "speed:land"
+            ]
+          },
+          {
+            "label": "PF2E.Actor.Speed.Type.Swim",
+            "value": "swim",
+            "predicate": [
+              "speed:swim"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "BaseSpeed",
+        "selector": "{item|flags.pf2e.rulesSelections.speed}",
+        "value": 40
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -48,7 +99,7 @@
       "robotCustomization": true,
       "catalogId": "high-speed",
       "customizationGrade": "tactical",
-      "automation": "manual"
+      "automation": "rules"
     }
   }
 }

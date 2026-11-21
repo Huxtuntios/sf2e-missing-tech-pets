@@ -25,7 +25,60 @@
       "rarity": "common",
       "value": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ChoiceSet",
+        "flag": "element",
+        "adjustName": false,
+        "prompt": "SFMTP.ElementPrompt",
+        "choices": [
+          {
+            "label": "PF2E.TraitAir",
+            "value": "air"
+          },
+          {
+            "label": "PF2E.TraitEarth",
+            "value": "earth"
+          },
+          {
+            "label": "PF2E.TraitFire",
+            "value": "fire"
+          },
+          {
+            "label": "PF2E.TraitMetal",
+            "value": "metal"
+          },
+          {
+            "label": "PF2E.TraitWater",
+            "value": "water"
+          },
+          {
+            "label": "PF2E.TraitWood",
+            "value": "wood"
+          }
+        ]
+      },
+      {
+        "key": "ActorTraits",
+        "add": [
+          "elemental",
+          "{item|flags.pf2e.rulesSelections.element}"
+        ],
+        "remove": [
+          "animal"
+        ]
+      },
+      {
+        "key": "Immunity",
+        "type": [
+          "bleed",
+          "paralyzed",
+          "poison",
+          "sleep",
+          "{item|flags.pf2e.rulesSelections.element}"
+        ]
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -35,7 +88,7 @@
       "familiarAbility": true,
       "catalogId": "elemental",
       "abilityCategory": "familiar",
-      "automation": "manual"
+      "automation": "rules"
     }
   },
   "effects": []

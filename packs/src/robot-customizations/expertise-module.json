@@ -12,6 +12,8 @@
     "actions": {
       "value": null
     },
+    "frequency": null,
+    "selfEffect": null,
     "category": "bonus",
     "location": null,
     "level": {
@@ -30,14 +32,245 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Choose a skill in which the robot is trained, including training from Skill Module. Its proficiency becomes expert. Repeat selections must choose different skills.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
+      "value": "<p>Choose a skill in which the robot is trained, including training from Skill Module. Its proficiency becomes expert. Repeat selections must choose different skills.</p><p>@Localize[SFMTP.CustomRulesHint]</p>"
     },
     "traits": {
       "rarity": "common",
       "value": [],
       "otherTags": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ChoiceSet",
+        "flag": "skill",
+        "adjustName": false,
+        "prompt": "SFMTP.SkillPrompt",
+        "choices": [
+          {
+            "label": "PF2E.Skill.Acrobatics",
+            "value": "acrobatics",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:acrobatics:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Arcana",
+            "value": "arcana",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:arcana:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Athletics",
+            "value": "athletics",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:athletics:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Computers",
+            "value": "computers",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:computers:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Crafting",
+            "value": "crafting",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:crafting:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Deception",
+            "value": "deception",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:deception:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Diplomacy",
+            "value": "diplomacy",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:diplomacy:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Intimidation",
+            "value": "intimidation",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:intimidation:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Medicine",
+            "value": "medicine",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:medicine:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Nature",
+            "value": "nature",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:nature:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Occultism",
+            "value": "occultism",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:occultism:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Performance",
+            "value": "performance",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:performance:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Piloting",
+            "value": "piloting",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:piloting:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Religion",
+            "value": "religion",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:religion:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Society",
+            "value": "society",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:society:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Stealth",
+            "value": "stealth",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:stealth:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Survival",
+            "value": "survival",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:survival:rank",
+                  1
+                ]
+              }
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Thievery",
+            "value": "thievery",
+            "predicate": [
+              {
+                "gte": [
+                  "skill:thievery:rank",
+                  1
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "upgrade",
+        "path": "system.skills.{item|flags.sf2e.rulesSelections.skill}.rank",
+        "value": 2
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -48,7 +281,7 @@
       "robotCustomization": true,
       "catalogId": "expertise-module",
       "customizationGrade": "tactical",
-      "automation": "manual"
+      "automation": "rules"
     }
   }
 }

@@ -39,7 +39,31 @@
       "remaster": true
     },
     "quantity": 1,
-    "rules": [],
+    "rules": [
+      {
+        "key": "RollOption",
+        "option": "drop-the-beat",
+        "toggleable": true,
+        "label": "SFMTP.DropTheBeatToggle"
+      },
+      {
+        "key": "FlatModifier",
+        "selector": "stealth",
+        "value": -4,
+        "predicate": [
+          "drop-the-beat"
+        ]
+      },
+      {
+        "key": "FlatModifier",
+        "selector": "performance",
+        "type": "item",
+        "value": 1,
+        "predicate": [
+          "drop-the-beat"
+        ]
+      }
+    ],
     "size": "med",
     "traits": {
       "rarity": "common",

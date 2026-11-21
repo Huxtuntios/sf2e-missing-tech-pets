@@ -20,9 +20,13 @@
       "category": "pet",
       "description": "It gains the amphibious trait, allowing it to breathe in both air and water, and has both a land Speed and a swim Speed, each equal to its highest land Speed or swim Speed.",
       "prerequisites": [],
-      "automation": "manual",
+      "automation": "rules",
       "repeatable": false,
-      "rules": [],
+      "rules": [
+        { "key": "BaseSpeed", "selector": "land", "value": "max(25, @actor.system.movement.speeds.swim.value)", "predicate": ["speed:swim"] },
+        { "key": "BaseSpeed", "selector": "swim", "value": "max(25, @actor.system.movement.speeds.land.value)" },
+        { "key": "ActorTraits", "add": ["amphibious"] }
+      ],
       "itemId": "0571004767ddef33"
     },
     {
@@ -88,9 +92,28 @@
       "category": "familiar",
       "description": "Choose one type of save. Your familiar takes no damage when it rolls a success on that type of save; this doesn't prevent effects other than damage.",
       "prerequisites": [],
-      "automation": "manual",
+      "automation": "rules",
       "repeatable": false,
-      "rules": [],
+      "rules": [
+        {
+          "key": "ChoiceSet",
+          "flag": "save",
+          "adjustName": false,
+          "prompt": "SFMTP.SavePrompt",
+          "choices": [
+            { "label": "PF2E.SavesFortitude", "value": "fortitude" },
+            { "label": "PF2E.SavesReflex", "value": "reflex" },
+            { "label": "PF2E.SavesWill", "value": "will" }
+          ]
+        },
+        {
+          "key": "Note",
+          "selector": "{item|flags.sf2e.rulesSelections.save}",
+          "outcome": ["success", "criticalSuccess"],
+          "text": "{item|description}",
+          "title": "{item|name}"
+        }
+      ],
       "itemId": "7ccd86aa03469d32"
     },
     {
@@ -156,9 +179,33 @@
       "prerequisites": [
         "resistance"
       ],
-      "automation": "manual",
+      "automation": "rules",
       "repeatable": false,
-      "rules": [],
+      "rules": [
+        {
+          "key": "ChoiceSet",
+          "flag": "element",
+          "adjustName": false,
+          "prompt": "SFMTP.ElementPrompt",
+          "choices": [
+            { "label": "PF2E.TraitAir", "value": "air" },
+            { "label": "PF2E.TraitEarth", "value": "earth" },
+            { "label": "PF2E.TraitFire", "value": "fire" },
+            { "label": "PF2E.TraitMetal", "value": "metal" },
+            { "label": "PF2E.TraitWater", "value": "water" },
+            { "label": "PF2E.TraitWood", "value": "wood" }
+          ]
+        },
+        {
+          "key": "ActorTraits",
+          "add": ["elemental", "{item|flags.sf2e.rulesSelections.element}"],
+          "remove": ["animal"]
+        },
+        {
+          "key": "Immunity",
+          "type": ["bleed", "paralyzed", "poison", "sleep", "{item|flags.sf2e.rulesSelections.element}"]
+        }
+      ],
       "itemId": "6f9ca398f2e351c8"
     },
     {
@@ -167,9 +214,23 @@
       "category": "pet",
       "description": "Increase one of the pet's Speeds from 25 feet to 40 feet.",
       "prerequisites": [],
-      "automation": "manual",
+      "automation": "rules",
       "repeatable": false,
-      "rules": [],
+      "rules": [
+        {
+          "key": "ChoiceSet",
+          "flag": "speed",
+          "adjustName": false,
+          "prompt": "SFMTP.MovementTypePrompt",
+          "choices": [
+            { "label": "PF2E.Actor.Speed.Type.Climb", "value": "climb", "predicate": ["speed:climb"] },
+            { "label": "PF2E.Actor.Speed.Type.Fly", "value": "fly", "predicate": ["speed:fly"] },
+            { "label": "PF2E.Actor.Speed.Type.Land", "value": "land", "predicate": ["speed:land"] },
+            { "label": "PF2E.Actor.Speed.Type.Swim", "value": "swim", "predicate": ["speed:swim"] }
+          ]
+        },
+        { "key": "BaseSpeed", "selector": "{item|flags.sf2e.rulesSelections.speed}", "value": 40 }
+      ],
       "itemId": "c3da6736c93494d3"
     },
     {
@@ -321,9 +382,42 @@
       "category": "familiar",
       "description": "Choose two of the following: acid, cold, electricity, fire, poison, or sonic. Your familiar gains resistance equal to half your level (minimum resistance 1) against the chosen damage types.",
       "prerequisites": [],
-      "automation": "manual",
+      "automation": "rules",
       "repeatable": false,
-      "rules": [],
+      "rules": [
+        {
+          "key": "ChoiceSet",
+          "flag": "resistanceOne",
+          "adjustName": false,
+          "rollOption": "resistance",
+          "prompt": "SFMTP.ResistancePrompt",
+          "choices": [
+            { "label": "PF2E.TraitAcid", "value": "acid" },
+            { "label": "PF2E.TraitCold", "value": "cold" },
+            { "label": "PF2E.TraitElectricity", "value": "electricity" },
+            { "label": "PF2E.TraitFire", "value": "fire" },
+            { "label": "PF2E.TraitPoison", "value": "poison" },
+            { "label": "PF2E.TraitSonic", "value": "sonic" }
+          ]
+        },
+        {
+          "key": "ChoiceSet",
+          "flag": "resistanceTwo",
+          "adjustName": false,
+          "rollOption": "resistance",
+          "prompt": "SFMTP.ResistancePrompt",
+          "choices": [
+            { "label": "PF2E.TraitAcid", "value": "acid", "predicate": [{ "not": "resistance:acid" }] },
+            { "label": "PF2E.TraitCold", "value": "cold", "predicate": [{ "not": "resistance:cold" }] },
+            { "label": "PF2E.TraitElectricity", "value": "electricity", "predicate": [{ "not": "resistance:electricity" }] },
+            { "label": "PF2E.TraitFire", "value": "fire", "predicate": [{ "not": "resistance:fire" }] },
+            { "label": "PF2E.TraitPoison", "value": "poison", "predicate": [{ "not": "resistance:poison" }] },
+            { "label": "PF2E.TraitSonic", "value": "sonic", "predicate": [{ "not": "resistance:sonic" }] }
+          ]
+        },
+        { "key": "Resistance", "type": "{item|flags.sf2e.rulesSelections.resistanceOne}", "value": "max(1, floor(@actor.level / 2))" },
+        { "key": "Resistance", "type": "{item|flags.sf2e.rulesSelections.resistanceTwo}", "value": "max(1, floor(@actor.level / 2))" }
+      ],
       "itemId": "d9ef781432ceced7"
     },
     {
@@ -350,9 +444,34 @@
       "category": "familiar",
       "description": "Choose a skill other than Acrobatics or Stealth . Your familiar's modifier for that skill is equal to your level plus your spellcasting attribute modifier, rather than just your level. You can select this ability repeatedly, choosing a different skill each time.",
       "prerequisites": [],
-      "automation": "manual",
+      "automation": "rules",
       "repeatable": true,
-      "rules": [],
+      "rules": [
+        {
+          "key": "ChoiceSet",
+          "flag": "skill",
+          "prompt": "SFMTP.SkillPrompt",
+          "choices": [
+            { "label": "PF2E.Skill.Arcana", "value": "arcana" },
+            { "label": "PF2E.Skill.Athletics", "value": "athletics" },
+            { "label": "PF2E.Skill.Computers", "value": "computers" },
+            { "label": "PF2E.Skill.Crafting", "value": "crafting" },
+            { "label": "PF2E.Skill.Deception", "value": "deception" },
+            { "label": "PF2E.Skill.Diplomacy", "value": "diplomacy" },
+            { "label": "PF2E.Skill.Intimidation", "value": "intimidation" },
+            { "label": "PF2E.Skill.Medicine", "value": "medicine" },
+            { "label": "PF2E.Skill.Nature", "value": "nature" },
+            { "label": "PF2E.Skill.Occultism", "value": "occultism" },
+            { "label": "PF2E.Skill.Performance", "value": "performance" },
+            { "label": "PF2E.Skill.Piloting", "value": "piloting" },
+            { "label": "PF2E.Skill.Religion", "value": "religion" },
+            { "label": "PF2E.Skill.Society", "value": "society" },
+            { "label": "PF2E.Skill.Survival", "value": "survival" },
+            { "label": "PF2E.Skill.Thievery", "value": "thievery" }
+          ]
+        },
+        { "key": "FlatModifier", "selector": "{item|flags.sf2e.rulesSelections.skill}", "value": "@actor.masterAttributeModifier" }
+      ],
       "itemId": "4ee4da9b2b284588"
     },
     {
