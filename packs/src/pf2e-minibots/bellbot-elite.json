@@ -39,7 +39,17 @@
       "remaster": true
     },
     "quantity": 1,
-    "rules": [],
+    "rules": [
+      {
+        "key": "BaseSpeed",
+        "selector": "fly",
+        "value": 30,
+        "requiresEquipped": false,
+        "predicate": [
+          "self:trait:minibot"
+        ]
+      }
+    ],
     "size": "med",
     "traits": {
       "rarity": "common",

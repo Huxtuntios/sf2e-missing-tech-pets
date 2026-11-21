@@ -12,6 +12,11 @@
     "actions": {
       "value": 1
     },
+    "frequency": {
+      "max": 1,
+      "per": "PT10M"
+    },
+    "selfEffect": null,
     "category": "bonus",
     "location": null,
     "level": {

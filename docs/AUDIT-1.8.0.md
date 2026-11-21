@@ -33,33 +33,43 @@
 | --- | --- | --- | --- |
 | Construct (фамильяр) | Автоматизировано | `ActorTraits` add construct / remove animal; иммунитеты выводит система (`setImmunitiesFromTraits`, не-character) | `familiars.test.mjs`, бандл sf2e |
 | Resistant Panels (кастомизация) | Автоматизировано | нативный `ChoiceSet` 7 типов урона + `Resistance` `(@actor.level + 1) / 2` = ceil(level/2); type-ссылка переключается по системе | `customizations.test.mjs`, `IWRRuleElement`/`ResistanceRuleElement` в бандле |
-| Skill Module | Оставлено ручным | computers/piloting только в SF2e; повторяемость с разными навыками не выражается одним RE | чтение схемы ChoiceSet |
-| Resistance / Elemental / Maneuver Module («выбрать два») | Оставлено ручным | ChoiceSet не поддерживает множественный выбор; выдумывать обходной RE нельзя | схема ChoiceSet (нет `count`) |
-| Эффекты активаций Minibot | Оставлено ручным | Повествовательные/исследовательские эффекты (запись, музыка, лечение, тушение, навигация) не имеют однозначного RE; стоимость действия и признаки нативны | системный образец Independent Obstructobot (`rules: []`) |
+| Skill Module / Expertise Module | Автоматизировано | `ChoiceSet` навыка (SF2e 18 / PF2e 16, computers/piloting отфильтрованы в PF2e) + `ActiveEffectLike` upgrade rank 1/2; предикаты по текущему рангу | `rule-elements.test.mjs`, живая проверка резолвимого AEL |
+| Resistance / Elemental / Maneuver Module («выбрать два») | Автоматизировано | Пара `ChoiceSet` с rollOption-взаимоисключением (образец официального Resistance) + `Resistance`/`ActorTraits`+`Immunity`/`FlatModifier` athletics; прежний вердикт «ChoiceSet не поддерживает множественный выбор» опровергнут | `rule-elements.test.mjs`, официальный Resistance в бандле |
+| Familiar Amphibious / Damage Avoidance / Fast Movement / Skilled | Автоматизировано | `BaseSpeed`+`ActorTraits`; `ChoiceSet`+`Note`; `ChoiceSet`+`BaseSpeed` 40; `ChoiceSet`+`FlatModifier` `@actor.masterAttributeModifier` | `rule-elements.test.mjs` |
+| Agility / Camoflage / Glow Up | Автоматизировано | Резолвимый `ActiveEffectLike` `min(3,max(2,rank+1))` (условное мастерство); Glow Up дополнительно override cha.mod 3; предикаты по рангу не используются (roll options ставятся после AEL) | живая проверка на тестовом character |
+| Light Mounts / Linguistic Upload | Автоматизировано | `RollOption` toggleable + `TokenLight` по предикату; `ActiveEffectLike` add languages.max 2 | `rule-elements.test.mjs` |
+| Recharge / поддержки Tank / Powerful | Автоматизировано (Effect) | Отдельные Effect-предметы в существующих паках: `selfEffect` → `GrantItem` clumsy 1 (1 раунд, cascade); `FlatModifier` strike-attack-roll; `ChoiceSet`+`DamageDice` persistent bleed | `customizations.test.mjs`, `data-and-packs.test.mjs` |
+| Свойства самого Minibot (Firebot resistance, Bellbot speed) | Автоматизировано, гейт на бота | `Resistance` fire 12/24/36 и `BaseSpeed` land 25 / fly 30 с `predicate:["self:trait:minibot"]` + `requiresEquipped:false`; существо несёт признак minibot | живая проверка на npc с признаком; `minibots.test.mjs` |
+| Бонусы владельца Minibot (Petbot/Beatbot «You …») | Выдаются по активации/условию | `FlatModifier` по `action:conceal-an-object` (Petbot) и переключаемый `RollOption` drop-the-beat + `FlatModifier` (Beatbot); без гейта на минибота, без всегда-включённой пассивки | `minibots.test.mjs`, `rule-elements.test.mjs` |
+| Эффекты активаций Minibot (повествовательные) | Оставлено ручным | Запись/музыка/лечение/тушение/навигация не имеют однозначного RE; стоимость действия и признаки нативны | системный образец Independent Obstructobot (`rules: []`) |
+| Independent Obstructobot (системный shield) | Оставлено системным/ручным | Уже в `sf2e.equipment`; Reconfigure Fields — активация владельца (Raise a Shield + deflecting), величину сопротивления задаёт системный признак deflecting; модуль не дублирует и не мутирует системный пак | живой дамп `sf2e.equipment`, `shieldTraits deflecting-*` |
 
-Границы соблюдены: числа не выдуманы; действия/ресурсы не тратятся без подтверждения; состояния/эффекты не применяются автоматически; характеристики не меняются; способности не выдаются/не снимаются; выбор пользователя не изменяется.
+Границы соблюдены: числа не выдуманы; действия/ресурсы не тратятся без подтверждения; состояния/эффекты владельца не применяются автоматически без активации/условия; свойства бота применяются только к актёру с признаком minibot; характеристики не меняются произвольно; допустимый выбор пользователя сохраняется при синхронизации (`choiceVariants`/`preserveRuleChoices`).
 
 ## Компендиум Minibot: решения
 
 - Independent Obstructobot (Advanced/Elite/Ultimate) **уже есть** в системном паке `sf2e.equipment` — намеренно не дублируется. Отсутствующие 9 типов (Camerabot, Medbot, Petbot, Beatbot, Bellbot, Butlerbot, Firebot, Glampbot, Grabot) дают 25 предметов; добавлены существо Minibot и действие Direct Minibot.
 - Схемы сверены с реальными системными документами: NPC (attributes.ac/hp/speed/immunities/weaknesses, details.publicNotes, perception.senses, saves, skills.base, traits.size), equipment (price.value.sp = кредиты, bulk, level, traits, usage, equipped.carryType), IWR-форма `{type}` / `{type,value}`.
-- Существо: нативный стат-блок Creature -1, Tiny construct/robot/tech, AC 14, HP 4, Fort +0 / Ref +4 / Will +0, иммунитеты по стат-блоку (включая mental и area-damage), weakness electricity 1, fly 30, darkvision, Acrobatics +6. Иммунитеты заданы явно; система дополнительно выводит construct-иммунитеты без дублирования.
+- Существо: нативный стат-блок Creature -1, Tiny construct/robot/tech/**minibot**, AC 14, HP 4, Fort +0 / Ref +4 / Will +0, иммунитеты по стат-блоку (включая mental и area-damage), weakness electricity 1, fly 30, darkvision, Acrobatics +6. Иммунитеты заданы явно; система дополнительно выводит construct-иммунитеты без дублирования. Признак `minibot` регистрируется и в `creatureTraits` (`registerMinibotCreatureTrait`), чтобы отображаться с системной меткой и давать roll-option `self:trait:minibot` для гейта свойств бота.
+- Разделение адресатов эффектов Minibot: свойства самого бота (Firebot resistance fire 12/24/36, Bellbot land 25 / fly 30) выражены нативными RE с `predicate:["self:trait:minibot"]` и `requiresEquipped:false` (на NPC `held` не считается equipped), поэтому работают только на актёре-миниботе. Бонусы владельца («You gain…») остаются в предмете и выдаются по условию действия (Petbot `action:conceal-an-object`) или переключаемой активации (Beatbot `drop-the-beat`), без гейта на минибота и без всегда-включённой пассивки. Camerabot darkvision через `Sense` в живой проверке не применился — оставлен ручным.
 - PF2e-варианты идентичны SF2e (документы без системных RE/UUID); для SF2e-признаков/иммунитетов в PF2e требуется Anachronism. Это отражено в RELEASE-NOTES и чек-листе.
-- `usage: held-in-one-hand` и `equipped.carryType: held` — представление переноски, не игровая механика; источник не задаёт usage явно. Эффекты активаций описаны в тексте по образцу системных предметов и остаются ручными.
+- `usage: held-in-one-hand` и `equipped.carryType: held` — представление переноски, не игровая механика; источник не задаёт usage явно. Повествовательные активации описаны в тексте по образцу системных предметов и остаются ручными.
+- Independent Obstructobot (Advanced/Elite/Ultimate) — системный `shield` (`sf2e.equipment`, `rules: []`, признаки minibot/tech). Его Reconfigure Fields — активация владельца: Raise a Shield + выбор физических типов, признак deflecting на 10 минут, раз в раунд. Величину сопротивления даёт системный признак `deflecting-<type>`; модуль не дублирует системный пак и не мутирует его на лету, поэтому полная автоматика Reconfigure Fields потребовала бы runtime-выдачи признака щиту — вынесено в отдельную доработку, сейчас ручное/системное.
 
 ## Собственные находки и исправления
 
 - **Упаковка релиза (подтверждено, исправлено):** runtime-модули `ability-row.mjs` и `rich-text.mjs`, импортируемые `main.mjs`, `sheet-integration.mjs`, `familiar-ui.mjs`, `companion-sources-ui.mjs`, отсутствовали в списке упаковываемых скриптов `tools/build-release.mjs`. Релизный ZIP был бы нерабочим. Добавлены в список и в обязательную проверку `verify-release.mjs`.
-- Проверка релиза и тесты переведов обновлены под 14 паков / 232 исходника и Actor-пак существа с mapping `system.details.publicNotes`.
+- Проверка релиза и тесты переводов обновлены под 14 паков / 238 исходников и Actor-пак существа с mapping `system.details.publicNotes`.
 
 ## Выполненные команды
 
-2026-11-20, локально Windows / Node.js v24.16.0:
+2026-11-21, локально Windows / Node.js v24.16.0:
 
-- `npm run build:packs`: 14 паков, 232 документа; сборка извлекает LevelDB обратно и сверяет с фабриками (включая 4 пака Minibot).
-- `npm run check`: 264 JSON, синтаксис 48 ES modules, 371 одинаковый ключ EN/RU; проверка запрещённых внешних ссылок.
-- `npm test`: 197 выполнено, 197 прошло, 0 ошибок и пропусков. Внутри suite выполнены упаковка, повторная сборка ZIP и штатный verifier; это не live-тест.
+- `npm run build:packs`: 14 паков, 238 документов; сборка извлекает LevelDB обратно и сверяет с фабриками (включая 4 пака Minibot).
+- `npm run check`: 271 JSON, синтаксис 51 ES modules, 393 одинаковых ключа EN/RU; проверка запрещённых внешних ссылок.
+- `npm test`: 212 выполнено, 212 прошло, 0 ошибок и пропусков. Внутри suite выполнены упаковка, повторная сборка ZIP и штатный verifier; это не live-тест.
 - `npm run package` и `npm run verify:release dist v1.8.0`: релизный ZIP и контрольные суммы проверены штатным инструментом.
+- `git diff --check`: без ошибок пробелов.
 
 ## Живая проверка через мост fvtt-world-cli
 
@@ -72,6 +82,11 @@
 - **Resistant Panels:** `ChoiceSet` (7 типов урона, prompt SFMTP.ResistantPanelsPrompt) + `Resistance` `type=["{item|flags.sf2e.rulesSelections.resistantPanels}"]`, `value="(@actor.level + 1) / 2"` — структура подтверждена в живом паке.
 - **Строки действий (живой DOM браузера):** компонент `ability-row` — header role=button tabindex=0; клик по строке раскрывает (aria-expanded true, body виден); вложенная кнопка управления и ссылка в теле НЕ сворачивают строку; Enter и Space переключают с клавиатуры; `enrichRowBodies` превращает `@UUID` в нативный `content-link` (data-uuid, draggable, aria-label). Просмотр не выполняет действие.
 - **Путь обновления Construct (2026-11-21, после перезагрузки клиента):** на тестовых character+familiar синхронизация `tough`+`construct` создаёт оба Item; имитация копии 1.7.0 (`system.rules: []` + соответствующий снимок) при повторном сохранении обновляется ровно один раз (`upgraded: 1`) и получает `ActorTraits`; снимок совпадает с фактическим Item (`familiarCanRemove: true`); повторная синхронизация идемпотентна (`upgraded: 0`, `protected: 0`); снятие выбора удаляет обе копии (`removed: 2`). Тестовые актёры удалены.
+- **Новые RE кастомизаций (2026-11-21, живой character level 5):** Glow Up → diplomacy rank 2 и cha.mod 3; Agility Optimization → acrobatics rank 2; Camoflage → stealth rank 3 (из base 2); High Speed (fly) → fly 40; Linguistic Upload → languages.max 2. Резолвимый `min(3,max(2,rank+1))` подтверждён на разных базовых рангах. Тестовый актёр удалён.
+- **Чтение новых паков (2026-11-21):** после чистой развёртки живой пак `robot-customizations` (37 документов) отдаёт recharge `selfEffect` → Effect `8a4adcb39a007962`, effect-recharge `GrantItem` clumsy (badge-value 1, cascade, 1 раунд turn-end), glow-up резолвимый AEL + override cha, maneuver-module 3×ChoiceSet+2×FlatModifier; `familiar-abilities` отдаёт skilled (ChoiceSet 16 + FlatModifier masterAttributeModifier) и resistance (2×ChoiceSet+2×Resistance).
+- **Гейт признака minibot (2026-11-21, живые npc/character):** признак актёра даёт roll-option `self:trait:minibot` (не голый `minibot`); `FlatModifier`/`Resistance`/`BaseSpeed` с `predicate:["self:trait:minibot"]` + `requiresEquipped:false` включаются на npc с признаком (resistance fire 12, land 25) и выключены на character без признака. На NPC `equipped.carryType:"held"` даёт `isEquipped:false`, поэтому для свойств бота нужен `requiresEquipped:false`. `Sense` (darkvision) на equipment в живой проверке не применился — оставлен ручным.
+- **Импорт реальных предметов пака (2026-11-21):** существо из `minibot-creature` несёт признаки construct/minibot/robot/tech; Firebot (tactical) + Bellbot (tactical), импортированные на npc с признаком, дают resistance fire 24 и fly 30; те же предметы на character без признака сопротивления не дают. Petbot на владельце в покое не активен (бонус только по `action:conceal-an-object`), что соответствует «без всегда-включённой пассивки». Тестовые актёры удалены.
+- **Развёртка и LevelDB (2026-11-21, урок):** горячая замена .ldb файлов при запущенном мире повреждает открытый дескриптор («Corruption: bad block type»), а при остановке мира Foundry сбрасывает своё старое состояние поверх новых файлов. Корректная развёртка: остановить мир (`game.shutDown`, сохраняет данные) → чисто заменить каталог модуля из проверенного ZIP → запустить мир. Выполнено; старые runtime-файлы паков удалены.
 
 ### Находка и исправление (живая проверка)
 
@@ -86,9 +101,9 @@
 
 ## Уровни доказательств
 
-- **Проверено тестами (mock):** 201 модульный и mock-тест `node --test`. Проверяют реальный код модуля с подменой API документов, но не запускают Foundry.
+- **Проверено тестами (mock):** 212 модульных и mock-тестов `node --test`. Проверяют реальный код модуля с подменой API документов, но не запускают Foundry.
 - **Схема и сборка:** документы Minibot сверены с извлечёнными системными образцами; LevelDB roundtrip совпадает с фабриками; релизный ZIP проходит штатный verifier.
-- **Живой мир:** сборка 1.8.0 развёрнута и клиент перезагружен; проверены импорт Minibot, иммунитеты Construct, структура Resistant Panels, строки действий в реальном DOM, обогащение `@UUID`, Babele и путь обновления Construct. PF2e+Anachronism и отдельный клиент игрока в живом мире не проверялись.
+- **Живой мир:** сборка 1.8.0 развёрнута (чистая замена при остановленном мире) и клиент перезапущен; проверены импорт Minibot, иммунитеты Construct, структура Resistant Panels, строки действий в реальном DOM, обогащение `@UUID`, Babele, путь обновления Construct, новые RE кастомизаций/фамильяров/Effect-предметов и гейт признака minibot на боте. PF2e+Anachronism и отдельный клиент игрока в живом мире не проверялись.
 
 ## Проверки в живом мире перед выпуском
 

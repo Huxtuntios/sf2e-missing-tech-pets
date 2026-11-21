@@ -25,7 +25,38 @@
       "rarity": "common",
       "value": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ChoiceSet",
+        "flag": "save",
+        "adjustName": false,
+        "prompt": "SFMTP.SavePrompt",
+        "choices": [
+          {
+            "label": "PF2E.SavesFortitude",
+            "value": "fortitude"
+          },
+          {
+            "label": "PF2E.SavesReflex",
+            "value": "reflex"
+          },
+          {
+            "label": "PF2E.SavesWill",
+            "value": "will"
+          }
+        ]
+      },
+      {
+        "key": "Note",
+        "selector": "{item|flags.sf2e.rulesSelections.save}",
+        "outcome": [
+          "success",
+          "criticalSuccess"
+        ],
+        "text": "{item|description}",
+        "title": "{item|name}"
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -35,7 +66,7 @@
       "familiarAbility": true,
       "catalogId": "damage-avoidance",
       "abilityCategory": "familiar",
-      "automation": "manual"
+      "automation": "rules"
     }
   },
   "effects": []

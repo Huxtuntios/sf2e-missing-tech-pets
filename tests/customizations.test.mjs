@@ -7,9 +7,11 @@ import { fileURLToPath } from "node:url";
 import { createHash } from "node:crypto";
 import { extractPack } from "@foundryvtt/foundryvtt-cli";
 import { buildCustomizationSource } from "../scripts/customization-sources.mjs";
+import { buildEffectSource } from "../scripts/effect-sources.mjs";
 const json = async (file) =>
   JSON.parse(await readFile(new URL("../" + file, import.meta.url), "utf8"));
 const catalog = await json("data/robot-customizations.json");
+const itemEffects = await json("data/item-effects.json");
 const byId = (id) =>
   buildCustomizationSource(catalog.entries.find((e) => e.id === id));
 test("36 кастомизаций: фабрика, JSON, JSONL и LevelDB совпадают; стабильные уникальные ID", async () => {
@@ -36,8 +38,8 @@ test("36 кастомизаций: фабрика, JSON, JSONL и LevelDB сов
       ),
   );
   assert.equal(catalog.entries.length, 36);
-  assert.equal(snapshot.length, 36);
-  assert.equal(extracted.length, 36);
+  assert.equal(snapshot.length, 37);
+  assert.equal(extracted.length, 37);
   assert.equal(new Set(catalog.entries.map((e) => e.itemId)).size, 36);
   for (const entry of catalog.entries) {
     const expected = buildCustomizationSource(entry);
@@ -68,6 +70,19 @@ test("36 кастомизаций: фабрика, JSON, JSONL и LevelDB сов
       `Compendium.sf2e-missing-tech-pets.robot-customizations.Item.${entry.itemId}`,
     );
   }
+  // Effect Item для Recharge живёт в том же паке отдельным документом.
+  const rechargeEffect = itemEffects.effects.find((e) => e.pack === "robot-customizations");
+  const expectedEffect = buildEffectSource(rechargeEffect);
+  assert.deepEqual(
+    await json(`packs/src/robot-customizations/${rechargeEffect.slug}.json`),
+    expectedEffect,
+  );
+  assert.deepEqual(snapshot.find((e) => e._id === rechargeEffect.itemId), expectedEffect);
+  const actualEffect = extracted.find((e) => e._id === rechargeEffect.itemId);
+  delete actualEffect._key;
+  assert.deepEqual(actualEffect, expectedEffect);
+  assert.equal(expectedEffect.type, "effect");
+  assert.equal(byId("recharge").system.selfEffect.uuid, expectedEffect.flags.core.sourceId);
 });
 test("Aquatic Adaptation даёт swim 20; Speakers остаётся описанием без выдуманной механики", () => {
   assert.deepEqual(byId("aquatic-adaptation").system.rules, [
@@ -77,11 +92,11 @@ test("Aquatic Adaptation даёт swim 20; Speakers остаётся описа�
   assert.match(byId("speakers").system.description.value, /CustomManualHint/);
   assert.equal(
     catalog.entries.filter((e) => e.automation === "rules").length,
-    11,
+    22,
   );
   assert.equal(
     catalog.entries.filter((e) => e.automation === "manual").length,
-    25,
+    14,
   );
 });
 test("Armored Plates: нативный выбор +1/+2 и item-бонус AC, не зависящий от лимита каталога", () => {

@@ -1,0 +1,93 @@
+{
+  "_id": "5540938c40c07162",
+  "name": "Effect: Powerful Support",
+  "type": "effect",
+  "img": "icons/svg/aura.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "effect-powerful-support",
+    "description": {
+      "value": "<p>Apply to the owner. While active, your Strikes that damage creatures within the robot’s melee reach also deal persistent bleed damage: 1d6, or 2d6 if the robot is burly or deft. The effect ends at the start of your next turn. Resolve reach and which Strikes qualify manually.</p>",
+      "gm": ""
+    },
+    "duration": {
+      "value": 1,
+      "unit": "rounds",
+      "expiry": "turn-start",
+      "sustained": false
+    },
+    "fromSpell": false,
+    "level": {
+      "value": 1
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "start": {
+      "initiative": null,
+      "value": 0
+    },
+    "tokenIcon": {
+      "show": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    },
+    "unidentified": false,
+    "badge": null,
+    "context": null,
+    "rules": [
+      {
+        "key": "RollOption",
+        "option": "powerful-support",
+        "toggleable": true,
+        "label": "SFMTP.PowerfulSupportToggle"
+      },
+      {
+        "key": "ChoiceSet",
+        "flag": "bleedDice",
+        "adjustName": false,
+        "prompt": "SFMTP.PowerfulSupportPrompt",
+        "choices": [
+          {
+            "label": "SFMTP.PowerfulSupportNormal",
+            "value": 1
+          },
+          {
+            "label": "SFMTP.PowerfulSupportSuperior",
+            "value": 2
+          }
+        ]
+      },
+      {
+        "key": "DamageDice",
+        "selector": "strike-damage",
+        "category": "persistent",
+        "damageType": "bleed",
+        "diceNumber": "{item|flags.sf2e.rulesSelections.bleedDice}",
+        "dieSize": "d6",
+        "predicate": [
+          "powerful-support"
+        ]
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.robot-support.Item.5540938c40c07162"
+    },
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "itemEffect": true,
+      "effectId": "effect-powerful-support"
+    }
+  }
+}

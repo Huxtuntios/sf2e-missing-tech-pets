@@ -1,5 +1,5 @@
 // SF2e-способности фамильяров: описание не выдаётся за выполненный игровой эффект.
-import { MODULE_ID, escapeHTML } from "./item-sources.mjs";
+import { MODULE_ID, escapeHTML, adaptRulesToSystem } from "./item-sources.mjs";
 import { ownPackName } from "./system-context.mjs";
 export function buildFamiliarSource(entry, system = "sf2e") {
   return {
@@ -24,7 +24,7 @@ export function buildFamiliarSource(entry, system = "sf2e") {
         remaster: true,
       },
       traits: { rarity: "common", value: [] },
-      rules: structuredClone(entry.rules ?? []),
+      rules: adaptRulesToSystem(entry.rules, system),
     },
     flags: {
       core: {

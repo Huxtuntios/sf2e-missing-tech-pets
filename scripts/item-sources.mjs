@@ -1,4 +1,4 @@
-import { companionClassUuid, systemId } from "./system-context.mjs";
+import { companionClassUuid, ownPackName, systemId } from "./system-context.mjs";
 export const MODULE_ID = "sf2e-missing-tech-pets";
 export const COMPANION_CLASS_UUID = companionClassUuid("sf2e");
 export const escapeHTML = (value) =>
@@ -34,6 +34,29 @@ export function ruleText(text, system = "sf2e") {
     (word) =>
       `@UUID[Compendium.${system}.${system === "pf2e" ? "conditionitems" : "conditions"}.Item.${conditionIds[word]}]{${word}}`,
   );
+}
+// Ссылки на выбор игрока хранятся в namespace системы: flags.sf2e → flags.pf2e.
+// Заменяем во всех строках правила; для PF2e убираем навыки, которых нет в системе.
+const SF2E_ONLY_SKILLS = new Set(["computers", "piloting"]);
+const localizeRuleRefs = (node, system) => {
+  if (typeof node === "string")
+    return node.replaceAll("flags.sf2e.", `flags.${system}.`);
+  if (Array.isArray(node)) return node.map((child) => localizeRuleRefs(child, system));
+  if (node && typeof node === "object")
+    return Object.fromEntries(
+      Object.entries(node).map(([key, value]) => [key, localizeRuleRefs(value, system)]),
+    );
+  return node;
+};
+export function adaptRulesToSystem(rules, system = "sf2e") {
+  const cloned = localizeRuleRefs(structuredClone(rules ?? []), system);
+  if (system === "pf2e")
+    for (const rule of cloned)
+      if (rule?.key === "ChoiceSet" && Array.isArray(rule.choices))
+        rule.choices = rule.choices.filter(
+          (choice) => !SF2E_ONLY_SKILLS.has(choice?.value),
+        );
+  return cloned;
 }
 export function allowedSizes(entry) {
   if (entry.id === "imitator-chassis") return [];
@@ -180,6 +203,9 @@ export function buildManeuverSource(entry, system = "sf2e") {
   );
 }
 export function buildSupportSource(entry, system = "sf2e") {
+  const effectUuid = entry.supportEffectId
+    ? `Compendium.${MODULE_ID}.${ownPackName("robot-support", system)}.Item.${entry.supportEffectId}`
+    : null;
   return buildAction(
     entry,
     `${entry.name}: Support`,
@@ -189,9 +215,11 @@ export function buildSupportSource(entry, system = "sf2e") {
     entry.supportBenefit,
     "robot-support",
     system,
+    effectUuid,
   );
 }
-function buildAction(entry, name, slug, actions, traits, description, kind, system) {
+function buildAction(entry, name, slug, actions, traits, description, kind, system, effectUuid = null) {
+  const effectLink = effectUuid ? `<p>@UUID[${effectUuid}]</p>` : "";
   return {
     name,
     type: "action",
@@ -205,7 +233,7 @@ function buildAction(entry, name, slug, actions, traits, description, kind, syst
       category: "offensive",
       publication: { ...publication },
       description: {
-        value: `<p>${ruleText(description, system)}</p><p>@Localize[SFMTP.ManualActionHint]</p>`,
+        value: `<p>${ruleText(description, system)}</p>${effectLink}<p>@Localize[SFMTP.ManualActionHint]</p>`,
       },
       rules: [],
       traits: { rarity: "common", value: traits ?? [], otherTags: [] },

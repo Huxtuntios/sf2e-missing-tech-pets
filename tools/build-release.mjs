@@ -52,7 +52,7 @@ execFileSync(
 import pathlib,sys,zipfile,re
 root=pathlib.Path(sys.argv[1]);dist=pathlib.Path(sys.argv[2])
 files=['module.json','module.css','README.md','README.ru.md','CHANGELOG.md','LICENSE.txt','docs/RELEASING.md','docs/RELEASE-NOTES.md','docs/COMPANION-SOURCES.md','docs/AUDIT-1.8.0.md']
-files += ['scripts/'+s for s in ['main.mjs','content-localization.mjs','babele.mjs','catalog-sources.mjs','system-context.mjs','customization-sources.mjs','dailies.mjs','sheet-integration.mjs','dialog.mjs','item-sources.mjs','familiars.mjs','familiar-ui.mjs','familiar-sources.mjs','i18n.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs','ability-row.mjs','rich-text.mjs']]
+files += ['scripts/'+s for s in ['main.mjs','content-localization.mjs','babele.mjs','catalog-sources.mjs','system-context.mjs','customization-sources.mjs','choice-variants.mjs','dailies.mjs','sheet-integration.mjs','dialog.mjs','item-sources.mjs','familiars.mjs','familiar-ui.mjs','familiar-sources.mjs','i18n.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs','ability-row.mjs','rich-text.mjs']]
 for folder in ['assets','data','lang','packs']:
  for p in (root/folder).rglob('*'):
   if p.is_file() and not p.is_symlink() and p.name not in ['LOG','LOG.old','LOCK'] and not p.name.endswith(('.dbtmp','-wal','-shm')):

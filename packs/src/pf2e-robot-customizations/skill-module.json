@@ -12,6 +12,8 @@
     "actions": {
       "value": null
     },
+    "frequency": null,
+    "selfEffect": null,
     "category": "bonus",
     "location": null,
     "level": {
@@ -30,14 +32,141 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>Choose one skill in which the robot becomes trained. Repeat selections must choose different skills.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
+      "value": "<p>Choose one skill in which the robot becomes trained. Repeat selections must choose different skills.</p><p>@Localize[SFMTP.CustomRulesHint]</p>"
     },
     "traits": {
       "rarity": "common",
       "value": [],
       "otherTags": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ChoiceSet",
+        "flag": "skill",
+        "adjustName": false,
+        "prompt": "SFMTP.SkillPrompt",
+        "choices": [
+          {
+            "label": "PF2E.Skill.Acrobatics",
+            "value": "acrobatics",
+            "predicate": [
+              "skill:acrobatics:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Arcana",
+            "value": "arcana",
+            "predicate": [
+              "skill:arcana:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Athletics",
+            "value": "athletics",
+            "predicate": [
+              "skill:athletics:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Crafting",
+            "value": "crafting",
+            "predicate": [
+              "skill:crafting:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Deception",
+            "value": "deception",
+            "predicate": [
+              "skill:deception:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Diplomacy",
+            "value": "diplomacy",
+            "predicate": [
+              "skill:diplomacy:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Intimidation",
+            "value": "intimidation",
+            "predicate": [
+              "skill:intimidation:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Medicine",
+            "value": "medicine",
+            "predicate": [
+              "skill:medicine:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Nature",
+            "value": "nature",
+            "predicate": [
+              "skill:nature:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Occultism",
+            "value": "occultism",
+            "predicate": [
+              "skill:occultism:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Performance",
+            "value": "performance",
+            "predicate": [
+              "skill:performance:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Religion",
+            "value": "religion",
+            "predicate": [
+              "skill:religion:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Society",
+            "value": "society",
+            "predicate": [
+              "skill:society:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Stealth",
+            "value": "stealth",
+            "predicate": [
+              "skill:stealth:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Survival",
+            "value": "survival",
+            "predicate": [
+              "skill:survival:rank:0"
+            ]
+          },
+          {
+            "label": "PF2E.Skill.Thievery",
+            "value": "thievery",
+            "predicate": [
+              "skill:thievery:rank:0"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "ActiveEffectLike",
+        "mode": "upgrade",
+        "path": "system.skills.{item|flags.pf2e.rulesSelections.skill}.rank",
+        "value": 1
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -48,7 +177,7 @@
       "robotCustomization": true,
       "catalogId": "skill-module",
       "customizationGrade": "commercial",
-      "automation": "manual"
+      "automation": "rules"
     }
   }
 }

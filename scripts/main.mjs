@@ -2,6 +2,7 @@ import {
   buildCustomizationSource,
   preserveCustomizationChoices,
 } from "./customization-sources.mjs";
+import { choiceVariants } from "./choice-variants.mjs";
 import { initializeDailiesIntegration } from "./dailies.mjs";
 import { openCatalogSource } from "./catalog-sources.mjs";
 import { abilityRow, bindAbilityRows } from "./ability-row.mjs";
@@ -51,6 +52,7 @@ import {
   companionPackKey,
   companionClassUuid,
   registerMinibotEquipmentTrait,
+  registerMinibotCreatureTrait,
 } from "./system-context.mjs";
 
 const MODULE_ID = "sf2e-missing-tech-pets";
@@ -1361,63 +1363,6 @@ function itemFingerprint(source) {
   return JSON.stringify(stable(value));
 }
 
-// Допустимый выбор ChoiceSet — не ручная правка. Снимок сверяется с подстановкой
-// каждого объявленного варианта, поэтому подходят и снимки прежних версий.
-function choiceVariants(source) {
-  const rules = (source.system?.rules ?? []).filter(
-    (rule) =>
-      rule?.key === "ChoiceSet" &&
-      typeof rule.flag === "string" &&
-      Array.isArray(rule.choices) &&
-      rule.choices.length,
-  );
-  if (!rules.length) return [];
-  const selections = source.flags?.[systemId()]?.rulesSelections ?? {};
-  const valid = (rule, value) =>
-    value === undefined ||
-    value === null ||
-    rule.choices.some((choice) => choice?.value === value);
-  if (
-    rules.some(
-      (rule) => !valid(rule, rule.selection) || !valid(rule, selections[rule.flag]),
-    )
-  )
-    return [];
-  const options = rules.map((rule) => [
-    undefined,
-    null,
-    ...rule.choices.map((choice) => choice.value),
-  ]);
-  if (options.reduce((total, list) => total * list.length, 1) > 256) return [];
-  let combinations = [[]];
-  for (const list of options)
-    combinations = combinations.flatMap((prefix) =>
-      list.map((value) => [...prefix, value]),
-    );
-  return combinations.map((values) => {
-    const variant = foundry.utils.deepClone(source);
-    const variantRules = variant.system.rules.filter(
-      (rule) =>
-        rule?.key === "ChoiceSet" &&
-        typeof rule.flag === "string" &&
-        Array.isArray(rule.choices) &&
-        rule.choices.length,
-    );
-    // Сохранённый null-флаг остаётся пустым даже при выбранном rule.selection.
-    const flags = variant.flags?.[systemId()]?.rulesSelections;
-    variantRules.forEach((rule, index) => {
-      const value = values[index];
-      if (value === undefined) delete rule.selection;
-      else rule.selection = value;
-      if (flags && Object.hasOwn(flags, rule.flag) && flags[rule.flag] !== null) {
-        if (value === undefined) delete flags[rule.flag];
-        else flags[rule.flag] = value;
-      }
-    });
-    return variant;
-  });
-}
-
 function managedItemState(item) {
   const fingerprint = item.getFlag?.(FLAG, AUTOMATION_FLAG)?.fingerprint;
   // У старых предметов снимка нет: без доказательства не перезаписываем старый предмет.
@@ -2401,6 +2346,7 @@ class TechPetsSettingsMenu extends Dialog {
 
 Hooks.once("init", () => {
   registerMinibotEquipmentTrait();
+  registerMinibotCreatureTrait();
   game.settings.registerMenu(MODULE_ID, "tools", {
     name: "SFMTP.ToolsMenu",
     label: "SFMTP.ToolsMenuOpen",

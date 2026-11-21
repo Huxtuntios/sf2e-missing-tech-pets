@@ -25,7 +25,114 @@
       "rarity": "common",
       "value": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ChoiceSet",
+        "flag": "resistanceOne",
+        "adjustName": false,
+        "rollOption": "resistance",
+        "prompt": "SFMTP.ResistancePrompt",
+        "choices": [
+          {
+            "label": "PF2E.TraitAcid",
+            "value": "acid"
+          },
+          {
+            "label": "PF2E.TraitCold",
+            "value": "cold"
+          },
+          {
+            "label": "PF2E.TraitElectricity",
+            "value": "electricity"
+          },
+          {
+            "label": "PF2E.TraitFire",
+            "value": "fire"
+          },
+          {
+            "label": "PF2E.TraitPoison",
+            "value": "poison"
+          },
+          {
+            "label": "PF2E.TraitSonic",
+            "value": "sonic"
+          }
+        ]
+      },
+      {
+        "key": "ChoiceSet",
+        "flag": "resistanceTwo",
+        "adjustName": false,
+        "rollOption": "resistance",
+        "prompt": "SFMTP.ResistancePrompt",
+        "choices": [
+          {
+            "label": "PF2E.TraitAcid",
+            "value": "acid",
+            "predicate": [
+              {
+                "not": "resistance:acid"
+              }
+            ]
+          },
+          {
+            "label": "PF2E.TraitCold",
+            "value": "cold",
+            "predicate": [
+              {
+                "not": "resistance:cold"
+              }
+            ]
+          },
+          {
+            "label": "PF2E.TraitElectricity",
+            "value": "electricity",
+            "predicate": [
+              {
+                "not": "resistance:electricity"
+              }
+            ]
+          },
+          {
+            "label": "PF2E.TraitFire",
+            "value": "fire",
+            "predicate": [
+              {
+                "not": "resistance:fire"
+              }
+            ]
+          },
+          {
+            "label": "PF2E.TraitPoison",
+            "value": "poison",
+            "predicate": [
+              {
+                "not": "resistance:poison"
+              }
+            ]
+          },
+          {
+            "label": "PF2E.TraitSonic",
+            "value": "sonic",
+            "predicate": [
+              {
+                "not": "resistance:sonic"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "Resistance",
+        "type": "{item|flags.sf2e.rulesSelections.resistanceOne}",
+        "value": "max(1, floor(@actor.level / 2))"
+      },
+      {
+        "key": "Resistance",
+        "type": "{item|flags.sf2e.rulesSelections.resistanceTwo}",
+        "value": "max(1, floor(@actor.level / 2))"
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -35,7 +142,7 @@
       "familiarAbility": true,
       "catalogId": "resistance",
       "abilityCategory": "familiar",
-      "automation": "manual"
+      "automation": "rules"
     }
   },
   "effects": []

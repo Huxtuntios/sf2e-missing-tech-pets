@@ -39,7 +39,17 @@
       "remaster": true
     },
     "quantity": 1,
-    "rules": [],
+    "rules": [
+      {
+        "key": "FlatModifier",
+        "selector": "stealth",
+        "type": "item",
+        "value": 1,
+        "predicate": [
+          "action:conceal-an-object"
+        ]
+      }
+    ],
     "size": "med",
     "traits": {
       "rarity": "common",

@@ -1,0 +1,74 @@
+{
+  "_id": "8a4adcb39a007962",
+  "name": "Effect: Recharge",
+  "type": "effect",
+  "img": "icons/svg/aura.svg",
+  "effects": [],
+  "ownership": {
+    "default": 0
+  },
+  "system": {
+    "slug": "effect-recharge",
+    "description": {
+      "value": "<p>The robot recharges a touched battery and becomes clumsy 1 for 1 round.</p>",
+      "gm": ""
+    },
+    "duration": {
+      "value": 1,
+      "unit": "rounds",
+      "expiry": "turn-end",
+      "sustained": false
+    },
+    "fromSpell": false,
+    "level": {
+      "value": 1
+    },
+    "publication": {
+      "title": "Tech Core",
+      "authors": "",
+      "license": "ORC",
+      "remaster": true
+    },
+    "start": {
+      "initiative": null,
+      "value": 0
+    },
+    "tokenIcon": {
+      "show": true
+    },
+    "traits": {
+      "rarity": "common",
+      "value": [],
+      "otherTags": []
+    },
+    "unidentified": false,
+    "badge": null,
+    "context": null,
+    "rules": [
+      {
+        "key": "GrantItem",
+        "uuid": "Compendium.sf2e.conditions.Item.i3OJZU2nk64Df3xm",
+        "alterations": [
+          {
+            "mode": "override",
+            "property": "badge-value",
+            "value": 1
+          }
+        ],
+        "onDeleteActions": {
+          "grantee": "cascade"
+        }
+      }
+    ]
+  },
+  "flags": {
+    "core": {
+      "sourceId": "Compendium.sf2e-missing-tech-pets.robot-customizations.Item.8a4adcb39a007962"
+    },
+    "sf2e-missing-tech-pets": {
+      "moduleProvided": true,
+      "itemEffect": true,
+      "effectId": "effect-recharge"
+    }
+  }
+}

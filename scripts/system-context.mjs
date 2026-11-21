@@ -32,3 +32,11 @@ export function registerMinibotEquipmentTrait(config = globalThis.CONFIG) {
   const traits = config?.PF2E?.equipmentTraits;
   if (traits && !("minibot" in traits)) traits.minibot = "PF2E.TraitMinibot";
 }
+
+// Признак minibot нужен и как признак существа: актёр-минибот несёт его в
+// traits.value, а RE предметов экипировки гейтятся предикатом self:trait:minibot.
+// Регистрируем в creatureTraits, чтобы признак отображался с системной меткой.
+export function registerMinibotCreatureTrait(config = globalThis.CONFIG) {
+  const traits = config?.PF2E?.creatureTraits;
+  if (traits && !("minibot" in traits)) traits.minibot = "PF2E.TraitMinibot";
+}

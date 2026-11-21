@@ -12,6 +12,8 @@
     "actions": {
       "value": null
     },
+    "frequency": null,
+    "selfEffect": null,
     "category": "bonus",
     "location": null,
     "level": {
@@ -30,14 +32,21 @@
       "remaster": true
     },
     "description": {
-      "value": "<p>The robot speaks two additional languages. Requires Artificial Personality or Sapient.</p><p>@Localize[SFMTP.CustomManualHint]</p>"
+      "value": "<p>The robot speaks two additional languages. Requires Artificial Personality or Sapient.</p><p>@Localize[SFMTP.CustomRulesHint]</p>"
     },
     "traits": {
       "rarity": "common",
       "value": [],
       "otherTags": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ActiveEffectLike",
+        "mode": "add",
+        "path": "system.build.languages.max",
+        "value": 2
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -48,7 +57,7 @@
       "robotCustomization": true,
       "catalogId": "linguistic-upload",
       "customizationGrade": "commercial",
-      "automation": "manual"
+      "automation": "rules"
     }
   }
 }

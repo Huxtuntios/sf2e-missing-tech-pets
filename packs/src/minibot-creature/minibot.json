@@ -172,7 +172,8 @@
       "value": [
         "construct",
         "robot",
-        "tech"
+        "tech",
+        "minibot"
       ]
     }
   },

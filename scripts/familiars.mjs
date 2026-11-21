@@ -5,6 +5,7 @@ import { sourceFamiliarAllowance } from "./companion-sources.mjs";
 // Нативный familiar SF2e отвечает за характеристики. Здесь только связь и выбор Items.
 import { MODULE_ID } from "./item-sources.mjs";
 import { buildFamiliarSource } from "./familiar-sources.mjs";
+import { choiceVariants, preserveRuleChoices } from "./choice-variants.mjs";
 const queues = new Map();
 
 const fail = (key) => {
@@ -146,13 +147,19 @@ function managed(item, owner) {
   );
 }
 export function familiarCanRemove(item, owner, familiar) {
+  if (
+    !managed(item, owner) ||
+    (familiar.getFlag(MODULE_ID, "innateFamiliarItems") ?? []).includes(item.id)
+  )
+    return false;
+  const fingerprint = item.flags[MODULE_ID].familiarManaged.fingerprint;
+  const source = item.toObject();
+  // Допустимый выбор ChoiceSet — не ручная правка: сверяем и варианты выбора.
   return (
-    managed(item, owner) &&
-    !(familiar.getFlag(MODULE_ID, "innateFamiliarItems") ?? []).includes(
-      item.id,
-    ) &&
-    item.flags[MODULE_ID].familiarManaged.fingerprint ===
-      familiarFingerprint(item)
+    fingerprint === familiarFingerprint(source) ||
+    choiceVariants(source).some(
+      (variant) => familiarFingerprint(variant) === fingerprint,
+    )
   );
 }
 export async function familiarCatalog() {
@@ -325,6 +332,7 @@ async function syncNow(owner, familiar, selectedIds) {
     // (description.gm, traits.otherTags, deathNote и т.п.): иначе снимок не
     // совпал бы с записанным Item и копия считалась бы «изменённой».
     const target = item.toObject();
+    const previous = item.toObject();
     target.name = source.name;
     target.img = source.img;
     target.effects = source.effects ?? [];
@@ -337,6 +345,9 @@ async function syncNow(owner, familiar, selectedIds) {
     sys.rules = source.system.rules;
     sys.description = { ...sys.description, value: source.system.description.value };
     sys.traits = { ...sys.traits, value: source.system.traits.value };
+    // Сохраняем подтверждённые выборы ChoiceSet, чтобы обновление не сбрасывало
+    // выбор и не делало неизменённую копию «изменённой» на каждой синхронизации.
+    preserveRuleChoices(target, previous, systemId());
     if (familiarFingerprint(item) === familiarFingerprint(target)) continue;
     // Содержимое и снимок пишутся одним update: прерванная запись не оставит
     // копию с новым содержимым и старым снимком, которую менеджер счёл бы

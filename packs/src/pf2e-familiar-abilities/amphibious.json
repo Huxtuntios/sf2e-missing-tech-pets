@@ -25,7 +25,24 @@
       "rarity": "common",
       "value": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "BaseSpeed",
+        "selector": "land",
+        "value": 25
+      },
+      {
+        "key": "BaseSpeed",
+        "selector": "swim",
+        "value": 25
+      },
+      {
+        "key": "ActorTraits",
+        "add": [
+          "amphibious"
+        ]
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -35,7 +52,7 @@
       "familiarAbility": true,
       "catalogId": "amphibious",
       "abilityCategory": "pet",
-      "automation": "manual"
+      "automation": "rules"
     }
   },
   "effects": []

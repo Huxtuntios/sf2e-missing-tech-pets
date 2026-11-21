@@ -25,7 +25,49 @@
       "rarity": "common",
       "value": []
     },
-    "rules": []
+    "rules": [
+      {
+        "key": "ChoiceSet",
+        "flag": "speed",
+        "adjustName": false,
+        "prompt": "SFMTP.MovementTypePrompt",
+        "choices": [
+          {
+            "label": "PF2E.Actor.Speed.Type.Climb",
+            "value": "climb",
+            "predicate": [
+              "speed:climb"
+            ]
+          },
+          {
+            "label": "PF2E.Actor.Speed.Type.Fly",
+            "value": "fly",
+            "predicate": [
+              "speed:fly"
+            ]
+          },
+          {
+            "label": "PF2E.Actor.Speed.Type.Land",
+            "value": "land",
+            "predicate": [
+              "speed:land"
+            ]
+          },
+          {
+            "label": "PF2E.Actor.Speed.Type.Swim",
+            "value": "swim",
+            "predicate": [
+              "speed:swim"
+            ]
+          }
+        ]
+      },
+      {
+        "key": "BaseSpeed",
+        "selector": "{item|flags.pf2e.rulesSelections.speed}",
+        "value": 40
+      }
+    ]
   },
   "flags": {
     "core": {
@@ -35,7 +77,7 @@
       "familiarAbility": true,
       "catalogId": "fast-movement",
       "abilityCategory": "pet",
-      "automation": "manual"
+      "automation": "rules"
     }
   },
   "effects": []
