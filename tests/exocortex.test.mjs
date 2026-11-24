@@ -361,6 +361,13 @@ test("Турель: сохранение конфигурации, урон до
   await updateExocortex(owner, "turret-repair", { confirmed: true });
   assert.equal(exocortexState(owner).turret.hp, 16);
 });
+test("Турель: пустое поле ОЗ не превращается в ноль", async () => {
+  const owner = new Actor("owner", ["turret"]);
+  await updateExocortex(owner, "turret-hp", { hp: 8 });
+  await assert.rejects(updateExocortex(owner, "turret-hp", { hp: "" }));
+  await assert.rejects(updateExocortex(owner, "turret-hp", { hp: "   " }));
+  assert.equal(exocortexState(owner).turret.hp, 8);
+});
 test("Турель: восстановление +5 не повторяется в одном ходе и требует хранения", async () => {
   const owner = new Actor("owner", ["turret"]);
   await updateExocortex(owner, "turret-hp", { hp: 0 });

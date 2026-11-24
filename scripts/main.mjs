@@ -15,7 +15,8 @@ import {
 } from "./sheet-integration.mjs";
 import { t, initializeLocalization } from "./i18n.mjs";
 import { openFamiliarManager } from "./familiar-ui.mjs";
-import { openExocortexManager } from "./exocortex-ui.mjs";
+import { openExocortexManager, renderExocortexSheet } from "./exocortex-ui.mjs";
+import { registerExocortexDevices, getExocortexDeviceData, performExocortexOperation, getTurretActor, rollTurretStrike } from "./exocortex-devices.mjs";
 import { sourceCustomizationSlots } from "./companion-sources.mjs";
 import { openCompanionSources } from "./companion-sources-ui.mjs";
 import {
@@ -25,8 +26,6 @@ import {
 } from "./exocortex-rules.mjs";
 import {
   droneCommercialSlots,
-  exocortexState,
-  updateExocortex,
   installExocortexActions,
 } from "./exocortex.mjs";
 import {
@@ -2417,6 +2416,7 @@ Hooks.once("ready", async () => {
     return;
   }
   initializeDailiesIntegration();
+  registerExocortexDevices();
   const missingPacks = dependency()?.active ? missingCompanionPacks() : [];
   if (missingPacks.length) {
     console.warn(
@@ -2435,8 +2435,10 @@ Hooks.once("ready", async () => {
     openFamiliar: (actor = activeActor()) => openFamiliarManager(actor),
     openExocortex: (actor = activeActor()) =>
       openExocortexManager(actor, { openTechPets: openHome }),
-    getExocortexData: exocortexState,
-    updateExocortex,
+    getExocortexData: getExocortexDeviceData,
+    updateExocortex: performExocortexOperation,
+    getTurretActor,
+    rollTurretStrike,
     installExocortexActions,
     createFamiliar,
     linkFamiliar,
@@ -2463,6 +2465,7 @@ Hooks.once("ready", async () => {
       openPackBrowser(packId(key), actor),
   };
   registerSheetIntegration({
+    renderExocortexSheet,
     getRobotData,
     robotSummary,
     loadCatalog,

@@ -14,6 +14,12 @@ const queues = new Map();
 const fail = (key) => {
   throw new Error(t(key));
 };
+const numeric = (value) =>
+  typeof value === "number"
+    ? value
+    : typeof value === "string" && value.trim()
+      ? Number(value)
+      : NaN;
 export function assertExocortexAccess(owner) {
   if (!supportedSystem()) fail("SystemMismatch");
   if (systemId() === "pf2e" && !hasAnachronism()) fail("AnachronismMissing");
@@ -127,7 +133,7 @@ export function updateExocortex(owner, operation, args = {}) {
         state.turret.deployed = !state.turret.deployed;
         break;
       case "turret-hp": {
-        const hp = Number(args.hp);
+        const hp = numeric(args.hp);
         if (!Number.isFinite(hp) || hp < 0 || hp > stats.turretHP)
           fail("ExoInvalidHP");
         state.turret.hp = Math.floor(hp);
