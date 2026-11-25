@@ -90,6 +90,14 @@ test("snapshot has stable feat ordering and does not infer ownership from level 
   assert.deepEqual(a.items.toReversed(), before);
 });
 
+test("duplicate owned feat records generate one reminder with a stable device key", () => {
+  const s = snapshot(16, [feat("energy-expulsion"), feat("energy-expulsion")]);
+  assert.equal(s.featSources.filter(source => source.slug === "energy-expulsion").length, 2);
+  const reminders = buildDeviceActionSources("turret", s).filter(source => source.system.slug === "tech-pets-energy-expulsion");
+  assert.equal(reminders.length, 1);
+  assert.equal(reminders[0].flags[ID].deviceKey, "tech-pets-energy-expulsion");
+});
+
 test("PWOL is explicit, and unavailable class DC is never fabricated", () => {
   const a = owner(15);
   assert.equal(captureDeviceSnapshot(a, { withoutLevel: true }).turretSave, 10);
@@ -142,6 +150,13 @@ test("mine roll uses only its unique selector and Targeting Mine is opt-in with 
   assert.equal(modifier.value, INT);
   assert.deepEqual(modifier.predicate, ["tech-pets:targeting-mine"]);
   assert.ok(source.system.rules.every((rule) => !JSON.stringify(rule).includes('"detonate-mine-inline-damage"')));
+});
+
+test("PSA mine rules derive their inline damage selector from the native item slug", () => {
+  const source = buildDeviceActionSources("mine", snapshot(5), { mineSlug: "detonate-mine" }).find(item => item.system.slug === "detonate-mine");
+  assert.equal(source.system.slug, "detonate-mine");
+  assert.equal(rules(source, "FlatModifier")[0].selector, "detonate-mine-inline-damage");
+  assert.ok(source.system.rules.every(rule => !JSON.stringify(rule).includes("tech-pets-detonate-mine-inline-damage")));
 });
 
 test("damage customization requires the owned native feature and never creates two base pools", () => {
@@ -224,7 +239,10 @@ test("Debilitating notes use the owner's Fort DC and the actual Foolproof thresh
       for (const note of notes) {
         assert.match(note.text, /@Check\[fortitude\|dc:23/);
         assert.match(note.text, /end of (?:the target's|their) next turn/);
-        assert.match(note.text, foolproof ? /only.*critical success/i : /failure or critical failure/i);
+        if (foolproof) {
+          assert.match(note.text, /enemy targets.*critical success/i);
+          assert.match(note.text, /other targets.*failure or critical failure/i);
+        } else assert.match(note.text, /failure or critical failure/i);
         assert.ok(note.predicate.some((option) => option.startsWith("tech-pets:debilitating-exocortex:")));
       }
     }

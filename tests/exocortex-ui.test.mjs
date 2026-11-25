@@ -2,6 +2,7 @@ import test, { beforeEach } from "node:test";
 import assert from "node:assert/strict";
 globalThis.foundry = { applications: { api: { DialogV2: class {} } } };
 const { renderExocortexSheet } = await import("../scripts/exocortex-ui.mjs");
+const { registerExocortexDevices } = await import("../scripts/exocortex-devices.mjs");
 const ID = "sf2e-missing-tech-pets";
 let owner, root, nodes, writes, resourceRows, resources, hasNativeResources, insertedResources;
 beforeEach(() => {
@@ -17,7 +18,11 @@ beforeEach(() => {
   const perceptionHeader = { before: section => insertedResources.push(section) };
   const perception = { previousElementSibling: perceptionHeader };
   root = { querySelector: selector => selector.includes('data-tab="actions"') ? target : selector === ".subsection.resources" ? (hasNativeResources ? resources : insertedResources.at(-1) ?? null) : selector === "section.perception" ? perception : null, querySelectorAll: selector => selector === ".sfmtp-exocortex-inline" ? [...nodes] : selector === ".sfmtp-mine-resource" ? [...resourceRows] : [] };
-  globalThis.game = { system: { id: "sf2e" }, actors: new Map(), scenes: [], modules: new Map(), i18n: { localize: key => key } };
+  globalThis.CONFIG = { queries: {} };
+  globalThis.Hooks = { on: () => {}, off: () => {} };
+  globalThis.ui = { notifications: { error: () => {}, warn: () => {}, info: () => {} } };
+  globalThis.game = { system: { id: "sf2e" }, actors: new Map(), scenes: [], modules: new Map(), user: { id: "gm", isGM: true }, users: { activeGM: { id: "gm", isGM: true } }, i18n: { localize: key => key } };
+  registerExocortexDevices();
   globalThis.document = { createElement: tag => ({ tagName: tag.toUpperCase(), innerHTML: "", dataset: {}, children: [], listeners: new Map(), append(...children) { this.children.push(...children); }, addEventListener(type, fn) { this.listeners.set(type, [...(this.listeners.get(type) ?? []), fn]); }, querySelector(selector) { return selector === "ol" ? this.children.find(child => child.tagName === "OL") : { value: "14", addEventListener: () => {} }; }, remove() { const index = nodes.indexOf(this); if (index >= 0) nodes.splice(index, 1); const row = resourceRows.indexOf(this); if (row >= 0) resourceRows.splice(row, 1); } }) };
   globalThis.foundry = { utils: { escapeHTML: value => String(value).replaceAll("<", "&lt;").replaceAll(">", "&gt;"), randomID: () => "resource-id" } };
 });
@@ -31,6 +36,23 @@ test("mechanic sheet displays real carried count even when above the limit", () 
   assert.ok(resourceRows[0].innerHTML.includes("/ 8"));
   assert.ok(resourceRows[0].innerHTML.includes('max="8"'));
   assert.equal(nodes.length, 1);
+  assert.equal(writes.length, 0);
+});
+
+test("inline mine count rejects a stale write after the client-side check", async () => {
+  const getFlag = owner.getFlag;
+  const saved = getFlag(ID, "exocortex");
+  let reads = 0;
+  owner.getFlag = (scope, key) => {
+    if (scope !== ID || key !== "exocortex") return getFlag(scope, key);
+    reads++;
+    return { ...saved, mines: { ...saved.mines, prepared: reads <= 4 ? 14 : 13 } };
+  };
+  const panel = renderExocortexSheet({ actor: owner, render: () => {} }, root);
+  panel.querySelector = () => ({ value: "7" });
+  const button = { dataset: { exoSheet: "mine-count" }, disabled: false };
+  await panel.listeners.get("click").at(-1)({ target: { closest: () => button }, stopPropagation: () => {} });
+  assert.ok(reads >= 5);
   assert.equal(writes.length, 0);
 });
 

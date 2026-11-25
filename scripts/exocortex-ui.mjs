@@ -227,7 +227,7 @@ export function renderExocortexSheet(app, root) {
       row.querySelector("input").addEventListener("change", safe(async event => {
         if (!owned) return;
         if (getExocortexDeviceData(owner).mines.prepared !== state.mines.prepared) throw new Error(t("InlineStale"));
-        await performExocortexOperation(owner, "mine-count", { count: event.currentTarget.value });
+        await performExocortexOperation(owner, "mine-count", { count: event.currentTarget.value, expected: state.mines.prepared });
         app.render(false);
       }));
       list.append(row);
@@ -253,7 +253,7 @@ export function renderExocortexSheet(app, root) {
     button.disabled = true;
     try {
       if (operation === "mine-count" && getExocortexDeviceData(owner).mines.prepared !== state.mines.prepared) throw new Error(t("InlineStale"));
-      const args = operation === "mine-count" ? { count: panel.querySelector("[data-exo-count]").value } : operation === "turret-array" ? { array: panel.querySelector("[data-exo-array]").value } : {};
+      const args = operation === "mine-count" ? { count: panel.querySelector("[data-exo-count]").value, expected: state.mines.prepared } : operation === "turret-array" ? { array: panel.querySelector("[data-exo-array]").value } : {};
       await performExocortexOperation(owner, operation === "turret-open" ? "turret-create" : operation, args);
       app.render(false);
       if (operation === "turret-open") getTurretActor(owner)?.sheet.render(true);

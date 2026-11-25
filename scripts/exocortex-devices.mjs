@@ -10,6 +10,7 @@ const queues = new Map();
 const registeredHooks = new WeakSet();
 const overrideWarnings = new WeakMap();
 const syncingToggles = new Set();
+const moduleHPWrites = new Map();
 export const EXPANDED_TURRET_ARRAYS = {
   mental: { damage: "mental", dice: 2, range: 60, trait: "tech", group: "mental" },
   poison: { damage: "poison", dice: 2, range: 60, trait: "tech", group: "dart" },
@@ -36,7 +37,20 @@ const weaponSystemKeys = ["slug", "description", "category", "group", "baseItem"
 const controlledSystemKeys = item => item.flags?.[ID]?.turretWeapon ? weaponSystemKeys : actionSystemKeys;
 const pick = (object, keys) => Object.fromEntries(keys.filter(key => Object.hasOwn(object ?? {}, key)).map(key => [key, object[key]]));
 const allTokens = () => [...game.scenes].flatMap(scene => [...scene.tokens]);
-const tokenActor = token => token?.baseActor ?? token?.actor;
+const tokenActor = token => token?.actor ?? token?.baseActor;
+const worldActor = token => token?.baseActor ?? game.actors.get(token?.actorId);
+async function updateActorDocument(actor, changes) {
+  const writesHP = value(changes, "system.attributes.hp.value") !== undefined || changes["system.attributes.hp.value"] !== undefined;
+  if (writesHP) moduleHPWrites.set(actor.id, (moduleHPWrites.get(actor.id) ?? 0) + 1);
+  try { return await actor.update(changes); }
+  finally {
+    if (writesHP) {
+      const remaining = moduleHPWrites.get(actor.id) - 1;
+      if (remaining > 0) moduleHPWrites.set(actor.id, remaining);
+      else moduleHPWrites.delete(actor.id);
+    }
+  }
+}
 const mineUuid = () => `Compendium.pf2e-summons-assistant.${systemId()}-summons-assistant-actors.Actor.sAVuxP25VE126TdZ`;
 const MINE_DETONATE = "tech-pets-detonate-mine";
 async function saveDeviceArt(owner, kind, key, art) {
@@ -71,7 +85,8 @@ export function getAvailableTurretArrays(owner) {
   return { ...TURRET_ARRAYS, ...Object.fromEntries(selected.filter(key => Object.hasOwn(EXPANDED_TURRET_ARRAYS, key)).map(key => [key, EXPANDED_TURRET_ARRAYS[key]])) };
 }
 function turretArray(owner) {
-  const selected = profile(owner).array;
+  const configured = profile(owner).array;
+  const selected = configured === undefined ? exocortexState(owner).turret.array : configured;
   const arrays = getAvailableTurretArrays(owner);
   return Object.hasOwn(arrays, selected) ? selected : "laser";
 }
@@ -83,6 +98,7 @@ export function getExocortexDeviceData(owner) {
     state.turret.hp = turret.system.attributes.hp.value;
     state.turret.maxHP = turret.system.attributes.hp.max;
     state.turret.actorId = turret.id;
+    state.turret.lastRecovery = marker(turret)?.lastRecovery ?? state.turret.lastRecovery;
     state.turret.deployed = allTokens().some(token => token.actorId === turret.id && marker(token)?.ownerActorId === owner.id);
   }
   return state;
@@ -174,6 +190,12 @@ async function syncItems(actor, sources, { damageType } = {}) {
   if (removable.length) await actor.deleteEmbeddedDocuments("Item", removable.map(item => item.id));
   return protectedItems;
 }
+function deviceActionSources(actor, kind, stats, damageType) {
+  const nativeSlug = kind === "mine" ? [...actor.items].find(item => item.system.slug === "detonate-mine")?.system.slug : undefined;
+  const sources = buildDeviceActionSources(kind, stats, { damageType, mineSlug: nativeSlug ?? MINE_DETONATE });
+  if (kind === "mine") sources[0].flags[ID].deviceKey = MINE_DETONATE;
+  return sources;
+}
 const turretWeapon = actor => [...(actor?.items ?? [])].find(item => item.flags[ID]?.turretWeapon);
 const turretControls = actor => [...(actor?.items ?? [])].find(item => item.flags[ID]?.deviceItem === "tech-pets-turret-operation");
 function toggleState(item) {
@@ -224,21 +246,38 @@ async function syncActor(actor, owner, damageType) {
   }
   const ownershipBaseline = data.ownership ?? stored.ownership;
   const ownerOwnershipBaseline = data.ownerOwnership ?? owner.ownership;
-  if (!equal(ownerOwnershipBaseline, owner.ownership) && equal(stored.ownership, ownershipBaseline)) patch.ownership = structuredClone(owner.ownership);
-  const { ownership, ...systemPatch } = patch;
-  if (Object.keys(systemPatch).length) await actor.update(systemPatch);
+  const ownershipOverrides = { ...(data.ownershipOverrides ?? {}) };
+  const users = new Set([...Object.keys(ownershipBaseline), ...Object.keys(stored.ownership), ...Object.keys(owner.ownership), ...Object.keys(ownershipOverrides)]);
+  for (const user of users) {
+    const baselineHas = Object.hasOwn(ownershipBaseline, user);
+    const currentHas = Object.hasOwn(stored.ownership, user);
+    const baselineValue = baselineHas ? ownershipBaseline[user] : null;
+    const currentValue = currentHas ? stored.ownership[user] : null;
+    if (currentValue !== baselineValue) ownershipOverrides[user] = currentValue;
+  }
+  let ownership;
+  if (!equal(ownerOwnershipBaseline, owner.ownership)) {
+    const next = { ...stored.ownership };
+    for (const user of users) {
+      if (Object.hasOwn(ownershipOverrides, user)) continue;
+      if (Object.hasOwn(owner.ownership, user)) next[user] = owner.ownership[user];
+      else delete next[user];
+    }
+    if (!equal(next, stored.ownership)) ownership = next;
+  }
   const device = {
     ...data,
     snapshot: stats,
     damageType,
-    ownership: ownership ?? ownershipBaseline,
+    ownership: structuredClone(ownership ?? stored.ownership),
+    ownershipOverrides,
     ownerOwnership: structuredClone(owner.ownership),
     control,
   };
-  const documentPatch = { flags: { [ID]: { device: _replace(device) } } };
+  const documentPatch = { ...patch, flags: { [ID]: { device: _replace(device) } } };
   if (ownership) documentPatch.ownership = _replace(ownership);
-  await actor.update(documentPatch);
-  return await syncItems(actor, buildDeviceActionSources(data.kind, stats, { damageType }), { damageType: explicitDamageType });
+  await updateActorDocument(actor, documentPatch);
+  return await syncItems(actor, deviceActionSources(actor, data.kind, stats, damageType), { damageType: explicitDamageType });
 }
 async function createDeviceActor(owner, kind, mineId) {
   if (!game.user.isGM) fail("ExoGMRequired");
@@ -284,7 +323,7 @@ async function createDeviceActor(owner, kind, mineId) {
   const actor = await CONFIG.Actor.documentClass.create(source);
   try {
     await markItems(actor);
-    await syncItems(actor, buildDeviceActionSources(kind, stats));
+    await syncItems(actor, deviceActionSources(actor, kind, stats));
   } catch (error) { await actor.delete(); throw error; }
   return actor;
 }
@@ -331,9 +370,10 @@ async function removeToken(owner, uuid) {
   const token = await fromUuid(uuid);
   if (!token) return;
   const actor = tokenActor(token);
+  const base = worldActor(token);
   if (!actor || marker(token)?.ownerActorId !== owner.id || marker(actor)?.ownerActorId !== owner.id) fail("ExoAccess");
   await token.delete();
-  if (marker(actor)?.kind === "mine" && marker(actor)?.ownerActorId === owner.id && marker(actor)?.createdByModule && !allTokens().some(token => token.actorId === actor.id)) await actor.delete();
+  if (marker(base)?.kind === "mine" && marker(base)?.ownerActorId === owner.id && marker(base)?.createdByModule && !allTokens().some(token => token.actorId === base.id)) await base.delete();
 }
 async function recall(owner) {
   const state = getExocortexDeviceData(owner);
@@ -362,12 +402,17 @@ async function adoptMine(owner, uuid) {
   if (state.mines.deployed.some(mine => mine.tokenUuid === uuid)) return state;
   const token = await fromUuid(uuid);
   const actor = tokenActor(token);
-  const source = actor?._stats?.compendiumSource ?? actor?.flags?.core?.sourceId ?? "";
-  if (!actor || !source.startsWith("Compendium.pf2e-summons-assistant.") || !source.endsWith(".Actor.sAVuxP25VE126TdZ") || actor.flags["pf2e-summons-assistant"]?.summoner?.id !== owner.id || (marker(actor) && marker(actor).ownerActorId !== owner.id)) fail("ExoAccess");
+  const base = worldActor(token);
+  const source = base?._stats?.compendiumSource ?? base?.flags?.core?.sourceId ?? "";
+  const existing = marker(actor) ?? marker(base);
+  if (!actor || !base || !source.startsWith("Compendium.pf2e-summons-assistant.") || !source.endsWith(".Actor.sAVuxP25VE126TdZ") || base.flags["pf2e-summons-assistant"]?.summoner?.id !== owner.id || (existing && existing.ownerActorId !== owner.id)) fail("ExoAccess");
   const id = foundry.utils.randomID();
-  await actor.setFlag(ID, "device", { ...marker(actor), kind: "mine", ownerActorId: owner.id, mineId: id, snapshot: snapshot(owner), createdByModule: false, ownership: actor.toObject().ownership, ownerOwnership: structuredClone(owner.ownership), control: { system: { details: { level: { value: actor.toObject().system.details.level.value } } } } });
+  const stats = snapshot(owner);
+  const device = { ...existing, kind: "mine", ownerActorId: owner.id, mineId: id, snapshot: stats, createdByModule: false, ownership: actor.toObject().ownership, ownerOwnership: structuredClone(owner.ownership), control: { system: { details: { level: { value: actor.toObject().system.details.level.value } } } } };
+  await base.setFlag(ID, "device", device);
+  if (base !== actor) await actor.setFlag(ID, "device", device);
   await token.setFlag(ID, "device", { kind: "mine", ownerActorId: owner.id, mineId: id });
-  await syncItems(actor, buildDeviceActionSources("mine", snapshot(owner)));
+  await syncItems(actor, deviceActionSources(actor, "mine", stats));
   if (!state.mines.prepared) ui.notifications.warn(t("ExoNoMines"));
   state.mines.prepared = Math.max(0, state.mines.prepared - 1);
   state.mines.deployed.push({ id, label: actor.name, tokenUuid: token.uuid });
@@ -384,12 +429,22 @@ async function rollDeviceAction(actor, slug) {
   const link = wrapper.querySelector("a[data-damage-roll]");
   if (!link) fail("ExoDamageUnavailable");
   let rolled;
+  const domain = `${item.system.slug}-inline-${slug === "tech-pets-healing-mine" ? "healing" : "damage"}`;
   const listener = Hooks.on("createChatMessage", message => {
-    if (message.speaker.actor === actor.id && message.flags[systemId()]?.context?.domains?.includes(`${slug}-inline-${slug === "tech-pets-healing-mine" ? "healing" : "damage"}`)) rolled = message;
+    if (message.speaker.actor === actor.id && message.flags[systemId()]?.context?.domains?.includes(domain)) rolled = message;
   });
   try { await editor._onClickInlineRoll({ target: link, shiftKey: true, altKey: false, ctrlKey: false, metaKey: false }); }
   finally { Hooks.off("createChatMessage", listener); }
   return rolled;
+}
+function postedDetonationMessage(mine) {
+  return [...game.messages].find(message => message.flags?.[ID]?.detonation?.attemptId === mine.detonationAttemptId && message.flags[ID].detonation.ownerActorId === mine.ownerActorId && message.flags[ID].detonation.mineId === mine.id);
+}
+async function removeResolvedMineActor(owner, mine) {
+  for (const actor of game.actors) {
+    const data = marker(actor);
+    if (data?.kind === "mine" && data.ownerActorId === owner.id && data.mineId === mine.id && data.createdByModule && !allTokens().some(token => token.actorId === actor.id)) await actor.delete();
+  }
 }
 async function detonateMine(owner, args) {
   const state = exocortexState(owner);
@@ -398,43 +453,68 @@ async function detonateMine(owner, args) {
   const mine = state.mines.deployed[index];
   if (!mine.tokenUuid) return updateExocortex(owner, "mine-detonate", args);
   if (!args.confirmed) fail("ExoConfirmRequired");
-  const token = await fromUuid(mine.tokenUuid);
-  const actor = tokenActor(token);
-  if (!actor || marker(actor)?.ownerActorId !== owner.id) fail("ExoMineMissing");
+  if (!mine.resolvedMessageId && mine.detonationAttemptId) {
+    const posted = postedDetonationMessage(mine);
+    if (posted) {
+      mine.resolvedMessageId = posted.id;
+      await owner.setFlag(ID, "exocortex", state);
+    }
+  }
   if (!mine.resolvedMessageId) {
+    const token = await fromUuid(mine.tokenUuid);
+    const actor = tokenActor(token);
+    if (!actor || marker(actor)?.ownerActorId !== owner.id) fail("ExoMineMissing");
     const healing = args.damageType === "healing";
     const protectedItems = await syncActor(actor, owner, healing || args.damageType === "selected" ? undefined : args.damageType ?? "fire");
     notifyProtected(actor, protectedItems);
+    mine.detonationAttemptId = foundry.utils.randomID();
+    mine.ownerActorId = owner.id;
+    await owner.setFlag(ID, "exocortex", state);
     const message = await rollDeviceAction(actor, healing ? "tech-pets-healing-mine" : "tech-pets-detonate-mine");
     if (!message) return state;
+    try {
+      await message.setFlag(ID, "detonation", { attemptId: mine.detonationAttemptId, ownerActorId: owner.id, mineId: mine.id });
+    } catch (error) {
+      mine.resolvedMessageId = message.id;
+      await owner.setFlag(ID, "exocortex", state);
+      throw error;
+    }
     mine.resolvedMessageId = message.id;
     await owner.setFlag(ID, "exocortex", state);
   }
-  await removeToken(owner, mine.tokenUuid);
+  if (mine.tokenUuid) await removeToken(owner, mine.tokenUuid);
+  await removeResolvedMineActor(owner, mine);
   state.mines.deployed.splice(index, 1);
   await owner.setFlag(ID, "exocortex", state);
   return state;
 }
 async function updateTurretHP(owner, operation, args) {
   const actor = getTurretActor(owner);
-  if (!actor) return updateExocortex(owner, operation, args);
+  if (!actor) return args.sync ? getExocortexDeviceData(owner) : updateExocortex(owner, operation, args);
   const state = getExocortexDeviceData(owner);
   const max = actor.system.attributes.hp.max;
-  let hp = numeric(args.hp);
+  let hp = args.sync ? actor.system.attributes.hp.value : numeric(args.hp);
+  let recoveryKey;
   if (operation === "turret-repair") {
     if (!args.confirmed) fail("ExoConfirmRequired");
     hp = max;
   } else if (operation === "turret-recover") {
     const combat = game.combat;
     if (state.turret.deployed || !combat?.started || combat.combatant?.actor?.id !== owner.id) fail("ExoRecoveryTurn");
-    const key = `${combat.id}:${combat.round}:${combat.turn}`;
-    if (state.turret.lastRecovery === key) fail("ExoRecoveryUsed");
-    state.turret.lastRecovery = key;
+    recoveryKey = `${combat.id}:${combat.round}:${combat.turn}`;
+    const lastRecovery = marker(actor)?.lastRecovery ?? state.turret.lastRecovery;
+    if (lastRecovery === recoveryKey) fail("ExoRecoveryUsed");
     hp = Math.min(max, state.turret.hp + 5);
   }
   if (!Number.isFinite(hp) || hp < 0 || hp > max) fail("ExoInvalidHP");
   hp = Math.floor(hp);
-  if (actor.system.attributes.hp.value !== hp) await actor.update({ "system.attributes.hp.value": hp });
+  if (recoveryKey) {
+    await updateActorDocument(actor, {
+      "system.attributes.hp.value": hp,
+      flags: { [ID]: { device: _replace({ ...marker(actor), lastRecovery: recoveryKey }) } },
+    });
+    state.turret.lastRecovery = recoveryKey;
+  } else if (actor.system.attributes.hp.value !== hp) await updateActorDocument(actor, { "system.attributes.hp.value": hp });
   state.turret.hp = hp;
   await owner.setFlag(ID, "exocortex", state);
   if (!hp) return recall(owner);
@@ -489,6 +569,7 @@ async function execute(owner, operation, args) {
     const count = numeric(args.count);
     if (!Number.isInteger(count) || count < 0 || count > mechanicStats(owner).mineCapacity) fail("InlineInvalidCount");
     const state = exocortexState(owner);
+    if (args.expected !== undefined && args.expected !== state.mines.prepared) fail("InlineStale");
     state.mines.prepared = count;
     await owner.setFlag(ID, "exocortex", state);
     return state;
@@ -544,10 +625,11 @@ export function registerExocortexDevices() {
       if (owner) await rememberActorArt(owner, actor);
     } else if (changes.flags?.["pf2e-summons-assistant"]?.summoner && !data?.createdByModule) {
       const owner = game.actors.get(actor.flags["pf2e-summons-assistant"]?.summoner?.id);
-      if (owner && isMechanic(owner)) for (const token of allTokens().filter(token => token.actorId === actor.id && tokenActor(token)?.flags["pf2e-summons-assistant"]?.summoner?.id === owner.id)) await performExocortexOperation(owner, "mine-adopt", { id: token.uuid });
+      if (owner && isMechanic(owner)) for (const token of allTokens().filter(token => token.actorId === actor.id && worldActor(token)?.flags["pf2e-summons-assistant"]?.summoner?.id === owner.id)) await performExocortexOperation(owner, "mine-adopt", { id: token.uuid });
     } else if (data?.kind === "turret" && (value(changes, "system.attributes.hp.value") !== undefined || changes["system.attributes.hp.value"] !== undefined)) {
+      if (moduleHPWrites.has(actor.id)) return;
       const owner = game.actors.get(data.ownerActorId);
-      if (owner) await performExocortexOperation(owner, "turret-hp", { hp: actor.system.attributes.hp.value });
+      if (owner) await performExocortexOperation(owner, "turret-hp", { sync: true });
     } else if (isMechanic(actor) && (changes.system || changes.ownership) && (getTurretActor(actor) || exocortexState(actor).mines.deployed.some(mine => mine.tokenUuid))) await performExocortexOperation(actor, "device-sync");
   }));
   for (const hook of ["createItem", "updateItem", "deleteItem"]) Hooks.on(hook, safe(async (item, _changes, _options, userId) => {

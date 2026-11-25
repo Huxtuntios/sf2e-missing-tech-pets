@@ -66,7 +66,10 @@ class Actor {
   toObject() { return { ...clone(this.data), items: [...this.items].map(item => item.toObject()) }; }
   getFlag(scope, key) { return this.flags[scope]?.[key]; }
   async setFlag(scope, key, value) {
-    if (this.failLedger && scope === ID && key === "exocortex") throw new Error("ledger write failed");
+    if (scope === ID && key === "exocortex") {
+      this.ledgerWrites = (this.ledgerWrites ?? 0) + 1;
+      if (this.failLedger || this.failLedgerAt === this.ledgerWrites) throw new Error("ledger write failed");
+    }
     this.data.flags ??= {}; this.data.flags[scope] ??= {}; this.data.flags[scope][key] = clone(value); return this;
   }
   async update(changes) { patch(this.data, changes); return this; }
@@ -119,7 +122,7 @@ beforeEach(async () => {
   globalThis.foundry = { utils: { randomID: () => `id${++serial}`, getProperty: (object, path) => path.split(".").reduce((node, key) => node?.[key], object), setProperty: (object, path, value) => patch(object, { [path]: value }) } };
   globalThis.ui = { notifications: { warn: key => warnings.push(key), error: () => {}, info: () => {} } };
   const gm = { id: "gm", isGM: true };
-  globalThis.game = { system: { id: "sf2e" }, actors: new Collection(), scenes: new Collection(), modules: new Map(), user: gm, users: { activeGM: gm }, i18n: { localize: key => key } };
+  globalThis.game = { system: { id: "sf2e" }, actors: new Collection(), scenes: new Collection(), messages: new Collection(), modules: new Map(), user: gm, users: { activeGM: gm }, i18n: { localize: key => key } };
   owner = await Actor.create({ name: "Mechanic", type: "character", system: { details: { level: { value: 5 } }, abilities: { int: { mod: 4 } } }, items: [{ name: "Mechanic", type: "class", system: { slug: "mechanic" } }, ...["mine", "turret"].map(slug => ({ name: slug, type: "feat", system: { slug, traits: { otherTags: ["mechanic-exocortex"] } } }))], ownership: { default: 0, player: 3 }, flags: { [ID]: { exocortex: { mines: { prepared: 4, deployed: [] }, turret: { hp: 40, array: "laser", deployed: false } } } } });
   scene = { id: "scene", active: true, width: 1000, height: 1000, levels: new Collection([["level", { id: "level" }]]), tokens: new Collection(), async createEmbeddedDocuments(type, sources) { assert.equal(type, "Token"); if (this.failCreate) throw new Error("token creation failed"); return sources.map(source => { const token = new Token(source, this); this.tokens.set(token.id, token); return token; }); } };
   game.scenes.set(scene.id, scene);
@@ -129,6 +132,11 @@ beforeEach(async () => {
   registerExocortexDevices();
 });
 const point = () => ({ sceneId: "scene", x: 200, y: 300, level: "level", elevation: 0 });
+const chatMessage = (id, actor, domain) => ({
+  id, speaker: { actor }, data: { flags: {} },
+  flags: { sf2e: { context: { domains: [domain] } } },
+  async setFlag(scope, key, entry) { this.data.flags ??= {}; this.data.flags[scope] ??= {}; this.data.flags[scope][key] = clone(entry); this.flags = this.data.flags; },
+});
 
 test("mine placement spends one mine only after its actor and token exist", async () => {
   const state = await performExocortexOperation(owner, "mine-place", { position: point(), label: "Alpha" });
@@ -175,6 +183,23 @@ test("PSA integration keeps its original action and never mutates pack source", 
   assert.equal(mine.flags[ID].device.snapshot.int, 4);
   assert.deepEqual(psaSource, original);
 });
+test("PSA detonation uses the native item slug for rules and message completion", async () => {
+  game.modules.set("pf2e-summons-assistant", { active: true });
+  await performExocortexOperation(owner, "mine-place", { position: point() });
+  const actor = scene.tokens.contents[0].actor;
+  const action = actor.items.find(item => item.system.slug === "detonate-mine");
+  assert.equal(action.system.rules.find(rule => rule.key === "FlatModifier").selector, "detonate-mine-inline-damage");
+  const message = chatMessage("psa-message", actor.id, "detonate-mine-inline-damage");
+  game.messages.set(message.id, message);
+  globalThis.document = { createElement: () => ({ dataset: {}, querySelector: () => ({ dataset: { damageRoll: "" } }) }) };
+  game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => {
+    for (const callback of events.get("createChatMessage") ?? []) await callback(message);
+  } } };
+  const result = await performExocortexOperation(owner, "mine-detonate", { id: owner.getFlag(ID, "exocortex").mines.deployed[0].id, damageType: "fire", confirmed: true });
+  assert.equal(result.mines.deployed.length, 0);
+  assert.equal(scene.tokens.size, 0);
+});
+
 test("recalling turret preserves the same owned actor and its damage", async () => {
   await performExocortexOperation(owner, "turret-place", { position: point() });
   const actor = getTurretActor(owner);
@@ -223,10 +248,9 @@ test("device synchronization preserves an external flag written before its final
     written = true;
   };
   actor.update = async (changes, options) => {
-    if (changes.flags) writeExternal();
-    const result = await update(changes, options);
     if (changes["system.details.level.value"] !== undefined) armed = true;
-    return result;
+    if (changes.flags) writeExternal();
+    return update(changes, options);
   };
   actor.setFlag = async (scope, key, entry) => {
     if (scope === ID && key === "device") writeExternal();
@@ -237,6 +261,24 @@ test("device synchronization preserves an external flag written before its final
   assert.equal(written, true);
   assert.deepEqual(actor.flags.external, { keep: true });
 });
+test("a rejected device commit leaves synchronized stats and control baseline unchanged", async () => {
+  await performExocortexOperation(owner, "turret-create");
+  const actor = getTurretActor(owner);
+  const update = actor.update.bind(actor);
+  let fail = true;
+  actor.update = async (changes, options) => {
+    if (fail && changes.flags) { fail = false; throw new Error("device commit failed"); }
+    return update(changes, options);
+  };
+  await owner.update({ "system.details.level.value": 10 });
+  await assert.rejects(performExocortexOperation(owner, "device-sync"), /device commit failed/);
+  assert.equal(actor.system.details.level.value, 5);
+  assert.equal(actor.flags[ID].device.control.system.details.level.value, 5);
+  await performExocortexOperation(owner, "device-sync");
+  assert.equal(actor.system.details.level.value, 10);
+  assert.equal(actor.flags[ID].device.control.system.details.level.value, 10);
+});
+
 test("second turret placement is refused instead of duplicating the device", async () => {
   await performExocortexOperation(owner, "turret-place", { position: point() });
   await assert.rejects(performExocortexOperation(owner, "turret-place", { position: point() }));
@@ -301,14 +343,14 @@ test("adopting a native PSA mine counts its token once", async () => {
   assert.equal(detonate.flags[ID].deviceItem, "tech-pets-detonate-mine");
   assert.equal(external.items.filter(item => ["detonate-mine", "tech-pets-detonate-mine"].includes(item.system.slug)).length, 1);
 });
-test("collecting an adopted unlinked mine authorizes its persistent actor", async () => {
+test("collecting an adopted unlinked mine authorizes its synthetic actor", async () => {
   const external = await Actor.create({ ...clone(psaSource), flags: { "pf2e-summons-assistant": { summoner: { id: owner.id } } } });
   const [token] = await scene.createEmbeddedDocuments("Token", [{ actorId: external.id, actorLink: false }]);
   const synthetic = new Actor(external.toObject());
   Object.defineProperty(token, "actor", { configurable: true, get: () => synthetic });
   await performExocortexOperation(owner, "mine-adopt", { id: token.uuid });
   assert.equal(external.flags[ID]?.device?.ownerActorId, owner.id);
-  assert.equal(synthetic.flags[ID]?.device, undefined);
+  assert.equal(synthetic.flags[ID]?.device?.ownerActorId, owner.id);
   const state = await performExocortexOperation(owner, "mine-collect");
   assert.equal(state.mines.deployed.length, 0);
   assert.equal(scene.tokens.size, 0);
@@ -337,6 +379,73 @@ test("detonation cancels without deleting its token when native roll is cancelle
   assert.equal(result.mines.deployed.length, 1);
   assert.equal(scene.tokens.size, 1);
 });
+test("a cancelled detonation persists its attempt identity and can retry", async () => {
+  await performExocortexOperation(owner, "mine-place", { position: point() });
+  const actor = scene.tokens.contents[0].actor;
+  const record = owner.getFlag(ID, "exocortex").mines.deployed[0];
+  let rolls = 0;
+  globalThis.document = { createElement: () => ({ dataset: {}, querySelector: () => ({ dataset: { damageRoll: "" } }) }) };
+  game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => {
+    rolls++;
+    if (rolls === 1) return;
+    const message = chatMessage("retry-message", actor.id, "tech-pets-detonate-mine-inline-damage");
+    game.messages.set(message.id, message);
+    for (const callback of events.get("createChatMessage") ?? []) await callback(message);
+  } } };
+  const cancelled = await performExocortexOperation(owner, "mine-detonate", { id: record.id, damageType: "fire", confirmed: true });
+  assert.equal(cancelled.mines.deployed.length, 1);
+  assert.ok(cancelled.mines.deployed[0].detonationAttemptId);
+  const result = await performExocortexOperation(owner, "mine-detonate", { id: record.id, damageType: "fire", confirmed: true });
+  assert.equal(rolls, 2);
+  assert.equal(result.mines.deployed.length, 0);
+});
+
+test("detonation retry resumes a tagged message instead of rolling twice", async () => {
+  await performExocortexOperation(owner, "mine-place", { position: point() });
+  const actor = scene.tokens.contents[0].actor;
+  const record = owner.getFlag(ID, "exocortex").mines.deployed[0];
+  const message = chatMessage("posted-message", actor.id, "tech-pets-detonate-mine-inline-damage");
+  game.messages.set(message.id, message);
+  const setFlag = owner.setFlag.bind(owner);
+  let failResolved = true;
+  owner.setFlag = async (scope, key, entry) => {
+    if (scope === ID && key === "exocortex" && failResolved && entry.mines?.deployed?.[0]?.resolvedMessageId) {
+      failResolved = false;
+      throw new Error("resolved ledger write failed");
+    }
+    return setFlag(scope, key, entry);
+  };
+  let rolls = 0;
+  globalThis.document = { createElement: () => ({ dataset: {}, querySelector: () => ({ dataset: { damageRoll: "" } }) }) };
+  game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => {
+    rolls++;
+    for (const callback of events.get("createChatMessage") ?? []) await callback(message);
+  } } };
+  await assert.rejects(performExocortexOperation(owner, "mine-detonate", { id: record.id, damageType: "fire", confirmed: true }), /resolved ledger write failed/);
+  assert.equal(rolls, 1);
+  assert.equal(owner.getFlag(ID, "exocortex").mines.deployed[0].resolvedMessageId, undefined);
+  assert.ok(owner.getFlag(ID, "exocortex").mines.deployed[0].detonationAttemptId);
+  const result = await performExocortexOperation(owner, "mine-detonate", { id: record.id, damageType: "fire", confirmed: true });
+  assert.equal(rolls, 1);
+  assert.equal(result.mines.deployed.length, 0);
+  assert.equal(scene.tokens.size, 0);
+});
+
+test("a resolved detonation cleans up when its token is already missing", async () => {
+  await performExocortexOperation(owner, "mine-place", { position: point() });
+  const token = scene.tokens.contents[0];
+  const actor = token.baseActor;
+  const state = owner.getFlag(ID, "exocortex");
+  state.mines.deployed[0].resolvedMessageId = "already-rolled";
+  await owner.setFlag(ID, "exocortex", state);
+  await token.delete();
+  globalThis.document = { createElement: () => ({ dataset: {}, querySelector: () => ({ dataset: { damageRoll: "" } }) }) };
+  game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => { throw new Error("must not roll again"); } } };
+  const result = await performExocortexOperation(owner, "mine-detonate", { id: state.mines.deployed[0].id, damageType: "fire", confirmed: true });
+  assert.equal(result.mines.deployed.length, 0);
+  assert.equal(game.actors.has(actor.id), false);
+});
+
 test("native inline healing spends the mine after the healing message exists", async () => {
   await owner.createEmbeddedDocuments("Item", [{ name: "Healing Mines", type: "feat", system: { slug: "healing-mines" } }]);
   await performExocortexOperation(owner, "mine-place", { position: point() });
@@ -344,7 +453,9 @@ test("native inline healing spends the mine after the healing message exists", a
   const record = owner.getFlag(ID, "exocortex").mines.deployed[0];
   globalThis.document = { createElement: () => ({ dataset: {}, querySelector: () => ({ dataset: { damageRoll: "" } }) }) };
   game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => {
-    for (const callback of events.get("createChatMessage") ?? []) await callback({ id: "healing-message", speaker: { actor: actor.id }, flags: { sf2e: { context: { domains: ["tech-pets-healing-mine-inline-healing"] } } } });
+    const message = chatMessage("healing-message", actor.id, "tech-pets-healing-mine-inline-healing");
+    game.messages.set(message.id, message);
+    for (const callback of events.get("createChatMessage") ?? []) await callback(message);
   } } };
   const result = await performExocortexOperation(owner, "mine-detonate", { id: record.id, damageType: "healing", confirmed: true });
   assert.equal(result.mines.deployed.length, 0);
@@ -381,22 +492,23 @@ test("losing Damage Customizations falls back to a basic mine damage type", asyn
   assert.equal(action.system.rules.some(rule => rule.option === "tech-pets:mine-damage-type"), false);
   assert.match(action.system.description.value, /@Damage\[\d+d6\[fire\]/);
 });
-test("unlinked mine synchronization updates the persistent world actor", async () => {
+test("unlinked mine synchronization updates the token synthetic actor", async () => {
   const feat = await owner.createEmbeddedDocuments("Item", [{ name: "Damage Customizations", type: "feat", system: { slug: "damage-customizations" } }]);
   await performExocortexOperation(owner, "mine-place", { position: point() });
   const token = scene.tokens.contents[0];
-  const mine = token.actor;
-  const action = mine.items.find(item => item.flags[ID]?.deviceItem === "tech-pets-detonate-mine");
+  const mine = token.baseActor;
+  const synthetic = new Actor(mine.toObject());
+  Object.defineProperty(token, "actor", { configurable: true, get: () => synthetic });
+  const action = synthetic.items.find(item => item.flags[ID]?.deviceItem === "tech-pets-detonate-mine");
   const rules = clone(action.system.rules);
   rules.find(rule => rule.option === "tech-pets:mine-damage-type").selection = "cold";
   await action.update({ "system.rules": rules });
-  const synthetic = new Actor(mine.toObject());
-  Object.defineProperty(token, "actor", { configurable: true, get: () => synthetic });
   await owner.deleteEmbeddedDocuments("Item", [feat[0].id]);
   await performExocortexOperation(owner, "device-sync");
-  assert.equal(mine.flags[ID].device.damageType, "fire");
+  assert.equal(synthetic.flags[ID].device.damageType, "fire");
   assert.equal(action.system.rules.some(rule => rule.option === "tech-pets:mine-damage-type"), false);
   assert.match(action.system.description.value, /@Damage\[\d+d6\[fire\]/);
+  assert.ok(mine.items.find(item => item.flags[ID]?.deviceItem === "tech-pets-detonate-mine").system.rules.some(rule => rule.option === "tech-pets:mine-damage-type"));
 });
 test("collecting an unlinked mine deletes its created world actor, not the synthetic actor", async () => {
   await performExocortexOperation(owner, "mine-place", { position: point() });
@@ -413,6 +525,19 @@ test("turret repair uses a GM-edited maximum rather than recalculated base HP", 
   await performExocortexOperation(owner, "turret-repair", { confirmed: true });
   assert.equal(actor.system.attributes.hp.value, 100);
 });
+test("turret recovery commits its marker with HP and survives a later ledger failure", async () => {
+  await performExocortexOperation(owner, "turret-create");
+  const actor = getTurretActor(owner);
+  await actor.update({ "system.attributes.hp.value": 10 });
+  game.combat = { id: "combat", started: true, round: 1, turn: 1, combatant: { actor: owner } };
+  owner.failLedgerAt = 1;
+  await assert.rejects(performExocortexOperation(owner, "turret-recover", { confirmed: true }), /ledger write failed/);
+  assert.equal(actor.system.attributes.hp.value, 15);
+  assert.equal(actor.flags[ID].device.lastRecovery, "combat:1:1");
+  await assert.rejects(performExocortexOperation(owner, "turret-recover", { confirmed: true }), /ExoRecoveryUsed/);
+  assert.equal(actor.system.attributes.hp.value, 15);
+});
+
 test("native PSA summon hook adopts the actual token after summoner is assigned", async () => {
   const external = await Actor.create({ ...clone(psaSource), flags: { "pf2e-summons-assistant": { summoner: { id: owner.id } } } });
   await scene.createEmbeddedDocuments("Token", [{ actorId: external.id }]);
@@ -420,6 +545,16 @@ test("native PSA summon hook adopts the actual token after summoner is assigned"
   assert.equal(owner.getFlag(ID, "exocortex").mines.prepared, 3);
   assert.equal(owner.getFlag(ID, "exocortex").mines.deployed.length, 1);
 });
+test("native PSA summon hook reads summoner metadata from the world actor", async () => {
+  const external = await Actor.create(clone(psaSource));
+  const [token] = await scene.createEmbeddedDocuments("Token", [{ actorId: external.id }]);
+  const synthetic = new Actor(external.toObject());
+  Object.defineProperty(token, "actor", { configurable: true, get: () => synthetic });
+  await external.setFlag("pf2e-summons-assistant", "summoner", { id: owner.id });
+  for (const callback of events.get("updateActor") ?? []) await callback(external, { flags: { "pf2e-summons-assistant": { summoner: { id: owner.id } } } }, {}, game.user.id);
+  assert.equal(owner.getFlag(ID, "exocortex").mines.deployed.length, 1);
+});
+
 test("expansive arrays require an owned feat and explicit two selections", async () => {
   assert.equal(Object.keys(getAvailableTurretArrays(owner)).length, 6);
   await assert.rejects(performExocortexOperation(owner, "turret-arrays", { arrays: ["mental", "poison"] }));
@@ -430,6 +565,26 @@ test("expansive arrays require an owned feat and explicit two selections", async
   assert.ok(getAvailableTurretArrays(owner).poison);
   assert.equal(getAvailableTurretArrays(owner).void, undefined);
   await assert.rejects(performExocortexOperation(owner, "turret-arrays", { arrays: ["mental", "poison", "void"] }));
+});
+
+test("a valid legacy turret array is used when the devices profile has no selection", async () => {
+  const state = owner.getFlag(ID, "exocortex");
+  state.turret.array = "volt";
+  await owner.setFlag(ID, "exocortex", state);
+  assert.equal(getExocortexDeviceData(owner).turret.array, "volt");
+  await owner.setFlag(ID, "devices", { array: "laser" });
+  assert.equal(getExocortexDeviceData(owner).turret.array, "laser");
+  await owner.setFlag(ID, "devices", { array: "not-an-array" });
+  assert.equal(getExocortexDeviceData(owner).turret.array, "laser");
+});
+
+test("duplicate Expansive Array records still increase the selection limit", async () => {
+  await owner.createEmbeddedDocuments("Item", [
+    { name: "Expansive Array", type: "feat", system: { slug: "expansive-array" } },
+    { name: "Expansive Array", type: "feat", system: { slug: "expansive-array" } },
+  ]);
+  await performExocortexOperation(owner, "turret-arrays", { arrays: ["mental", "poison", "vitality", "void"] });
+  assert.deepEqual(owner.getFlag(ID, "devices").arrays, ["mental", "poison", "vitality", "void"]);
 });
 
 test("inherited object keys are not accepted as turret arrays", async () => {
@@ -606,10 +761,37 @@ test("empty turret HP is rejected without recalling the turret", async () => {
   assert.equal(getTurretActor(owner).system.attributes.hp.value, 40);
 });
 
+test("module-originated turret HP writes do not queue another synchronization", async () => {
+  await performExocortexOperation(owner, "turret-create");
+  const actor = getTurretActor(owner);
+  const update = actor.update.bind(actor);
+  const pending = [];
+  let hookFired = false;
+  actor.update = async (changes, options) => {
+    const result = await update(changes, options);
+    if (!hookFired && changes["system.attributes.hp.value"] !== undefined) {
+      hookFired = true;
+      for (const callback of events.get("updateActor") ?? []) pending.push(callback(actor, changes, options, game.user.id));
+    }
+    return result;
+  };
+  await performExocortexOperation(owner, "turret-hp", { hp: 20 });
+  await Promise.all(pending);
+  assert.equal(actor.system.attributes.hp.value, 20);
+  assert.equal(owner.ledgerWrites, 1);
+});
+
 test("empty and over-capacity mine counts are rejected", async () => {
   await assert.rejects(performExocortexOperation(owner, "mine-count", { count: "" }), /InlineInvalidCount/);
   await assert.rejects(performExocortexOperation(owner, "mine-count", { count: 11 }), /InlineInvalidCount/);
   assert.equal(owner.getFlag(ID, "exocortex").mines.prepared, 4);
+});
+
+test("mine count rejects a stale displayed value before writing", async () => {
+  await performExocortexOperation(owner, "mine-count", { count: 2, expected: 4 });
+  assert.equal(owner.getFlag(ID, "exocortex").mines.prepared, 2);
+  await assert.rejects(performExocortexOperation(owner, "mine-count", { count: 3, expected: 4 }), /InlineStale/);
+  assert.equal(owner.getFlag(ID, "exocortex").mines.prepared, 2);
 });
 
 test("device ownership follows later mechanic permission changes", async () => {
@@ -650,6 +832,16 @@ test("manual device permission edits survive synchronization", async () => {
   assert.equal(actor.ownership.player, 3);
   owner.ownership.helper = 3;
   await performExocortexOperation(owner, "device-sync");
+  assert.equal(actor.ownership.helper, 2);
+});
+
+test("ownership synchronization reconciles unedited entries independently", async () => {
+  await performExocortexOperation(owner, "turret-create");
+  const actor = getTurretActor(owner);
+  await actor.update({ ownership: { ...actor.ownership, helper: 2 } });
+  delete owner.ownership.player;
+  await performExocortexOperation(owner, "device-sync");
+  assert.equal(Object.hasOwn(actor.ownership, "player"), false);
   assert.equal(actor.ownership.helper, 2);
 });
 

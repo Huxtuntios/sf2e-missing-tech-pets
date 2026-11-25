@@ -3,8 +3,7 @@ import { MODULE_ID } from "./item-sources.mjs";
 
 const publication = { title: "Starfinder Tech Core", authors: "", license: "ORC", remaster: true };
 const icon = "icons/svg/target.svg";
-const mineSlug = "tech-pets-detonate-mine";
-const mineSelector = `${mineSlug}-inline-damage`;
+const defaultMineSlug = "tech-pets-detonate-mine";
 const snapshotInt = `@actor.flags.${MODULE_ID}.device.snapshot.int`;
 const energyTypes = ["acid", "cold", "electricity", "fire", "sonic"];
 const physicalTypes = ["bludgeoning", "piercing", "slashing"];
@@ -78,7 +77,7 @@ function actionSource(kind, slug, name, description, { actionType = "action", ac
       traits: { rarity: "common", value: [...traits], otherTags: [] },
       rules: structuredClone(rules),
     },
-    flags: { [MODULE_ID]: { moduleProvided: true, deviceAction: true, kind } },
+    flags: { [MODULE_ID]: { moduleProvided: true, deviceAction: true, deviceKey: slug, kind } },
   };
 }
 function toggle(option, label, suboptions) {
@@ -94,7 +93,7 @@ function debilitatingRules(snapshot, selector) {
   if (!has(snapshot, "debilitating-exocortex")) return [];
   const conditions = ["dazzled", "deafened", "off-guard", "suppressed"];
   const threshold = has(snapshot, "foolproof-debilitations")
-    ? "On a failure or critical failure, apply the condition; enemy targets avoid it only on a critical success."
+    ? "Enemy targets avoid the condition only on a critical success; other targets receive it only on a failure or critical failure."
     : "On a failure or critical failure, apply the condition.";
   return [
     toggle("tech-pets:debilitating-exocortex", "Debilitating Exocortex", conditions),
@@ -114,8 +113,14 @@ function adaptNativeDescription(description, snapshot) {
 }
 function nativeActions(kind, snapshot, excluded = []) {
   const permitted = new Set([...(kind === "mine" ? mineFeats : turretFeats), ...sharedFeats]);
+  const seen = new Set();
   return snapshot.featSources
     .filter((source) => permitted.has(source.slug) && !["mine", "turret", "exocortex", ...excluded].includes(source.slug))
+    .filter(source => {
+      if (seen.has(source.slug)) return false;
+      seen.add(source.slug);
+      return true;
+    })
     .map((source) => actionSource(kind, `tech-pets-${source.slug}`, source.name,
       adaptNativeDescription(source.description, snapshot), {
         actionType: source.actionType, actions: source.actions,
@@ -129,13 +134,14 @@ function nativeActions(kind, snapshot, excluded = []) {
 export function getMineDamageTypes(snapshot) {
   return snapshot.level >= 5 && has(snapshot, "damage-customizations") ? [...energyTypes, ...physicalTypes] : ["fire", "piercing"];
 }
-function mineActions(snapshot, damageType) {
+function mineActions(snapshot, damageType, slug = defaultMineSlug) {
+  const selector = `${slug}-inline-damage`;
   const damageTypes = getMineDamageTypes(snapshot);
   const custom = damageTypes.length > 2;
   if (!damageTypes.includes(damageType)) throw new Error(`Invalid or unavailable mine damage type: ${damageType}`);
   const rules = [
     toggle("tech-pets:targeting-mine", "Targeting Mine"),
-    { key: "FlatModifier", selector: mineSelector, label: "Targeting Mine", value: snapshotInt, predicate: ["tech-pets:targeting-mine"] },
+    { key: "FlatModifier", selector, label: "Targeting Mine", value: snapshotInt, predicate: ["tech-pets:targeting-mine"] },
   ];
   if (custom) {
     rules.push({
@@ -143,7 +149,7 @@ function mineActions(snapshot, damageType) {
       value: true, alwaysActive: true, selection: damageType,
     });
     rules.push(...damageTypes.map((type) => ({
-      key: "DamageAlteration", selectors: [mineSelector], mode: "override",
+      key: "DamageAlteration", selectors: [selector], mode: "override",
       property: "damage-type", value: type, predicate: [`tech-pets:mine-damage-type:${type}`],
     })));
   }
@@ -151,22 +157,22 @@ function mineActions(snapshot, damageType) {
     const types = custom ? damageTypes : [damageType];
     for (const type of types) {
       const persistent = physicalTypes.includes(type) ? "bleed" : type;
-      rules.push(note(mineSelector, "Critical Explosion",
+      rules.push(note(selector, "Critical Explosion",
         `<p><strong>Failure</strong> 1 persistent ${persistent} damage: @Damage[1[persistent,${persistent}]|immutable]. <strong>Critical failure</strong> ${snapshot.int} persistent ${persistent} damage: @Damage[${snapshot.int}[persistent,${persistent}]|immutable]. Physical damage causes bleed; otherwise use the same damage type dealt by the mine. Apply persistent damage to the target manually.</p>`,
         custom ? [`tech-pets:mine-damage-type:${type}`] : []));
     }
   }
   if (has(snapshot, "maneuvering-mines")) {
     rules.push(toggle("tech-pets:maneuvering-mine", "Maneuvering Mine", ["big-bang", "black-hole"]));
-    rules.push(note(mineSelector, "Big Bang",
+    rules.push(note(selector, "Big Bang",
       "<p>On a failed save, push the creature 5 feet directly away from the mine; on a critical failure, push it 10 feet and knock it prone. Resolve this forced movement manually.</p>",
       ["tech-pets:maneuvering-mine:big-bang"]));
-    rules.push(note(mineSelector, "Black Hole",
+    rules.push(note(selector, "Black Hole",
       "<p>On a failed save, pull the creature 5 feet toward the mine; on a critical failure, pull it 10 feet and make it slowed 1. Resolve this forced movement and condition manually.</p>",
       ["tech-pets:maneuvering-mine:black-hole"]));
   }
-  rules.push(...debilitatingRules(snapshot, mineSelector));
-  const actions = [actionSource("mine", mineSlug, "Detonate Mine",
+  rules.push(...debilitatingRules(snapshot, selector));
+  const actions = [actionSource("mine", slug, "Detonate Mine",
     `<p><strong>Requirements</strong> The mine is deployed within 150 feet of its owner.</p><hr /><p>Detonate the mine in a @Template[type:burst|distance:${snapshot.mineRadius}], dealing @Damage[${snapshot.mineDice}d6[${damageType}]|options:area-damage,area-effect] damage with a ${saveCheck(snapshot, "reflex", { basic: true })} save.</p><p>This can also be used as a reaction when a creature enters or leaves a square in the mine's burst area; choose and resolve the trigger manually. Choose fire or piercing damage before rolling, or select a known damage customization. Only the displayed damage pool is rolled.</p>`, { rules, traits: ["concentrate", "mechanic"] })];
   if (has(snapshot, "healing-mines")) {
     const impressive = snapshot.level >= 12 && has(snapshot, "impressive-healing-mines");
@@ -198,9 +204,9 @@ function turretActions(snapshot) {
   return [...actions, ...nativeActions("turret", snapshot, ["self-destruct"])];
 }
 
-export function buildDeviceActionSources(kind, snapshot, { damageType = "fire" } = {}) {
+export function buildDeviceActionSources(kind, snapshot, { damageType = "fire", mineSlug = defaultMineSlug } = {}) {
   assertKind(kind);
-  return kind === "mine" ? mineActions(snapshot, damageType) : turretActions(snapshot);
+  return kind === "mine" ? mineActions(snapshot, damageType, mineSlug) : turretActions(snapshot);
 }
 
 export function buildDeviceActorSource(kind, snapshot, { ownerActorId = "", mineId = "", array = "laser", hp } = {}) {

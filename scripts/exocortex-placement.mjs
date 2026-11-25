@@ -7,7 +7,7 @@ const operations = new Set([
   "turret-array", "turret-arrays", "turret-create", "turret-deploy", "turret-place", "turret-recall", "turret-reconcile", "turret-hp", "turret-repair", "turret-recover",
   "drone-command", "device-sync",
 ]);
-const argumentKeys = new Set(["confirmed", "label", "id", "damageType", "array", "arrays", "hp", "actions", "count", "amount", "position"]);
+const argumentKeys = new Set(["confirmed", "label", "id", "damageType", "array", "arrays", "hp", "actions", "count", "expected", "sync", "amount", "position"]);
 let execute;
 let cancelPlacement;
 const fail = key => { throw new Error(t(key)); };
