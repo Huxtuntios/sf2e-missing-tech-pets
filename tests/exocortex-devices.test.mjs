@@ -132,11 +132,12 @@ beforeEach(async () => {
   registerExocortexDevices();
 });
 const point = () => ({ sceneId: "scene", x: 200, y: 300, level: "level", elevation: 0 });
-const chatMessage = (id, actor, domain) => ({
+const chatMessage = (id, actor, domain, options = []) => ({
   id, speaker: { actor }, data: { flags: {} },
-  flags: { sf2e: { context: { domains: [domain] } } },
+  flags: { sf2e: { context: { domains: [domain], options } } },
   async setFlag(scope, key, entry) { this.data.flags ??= {}; this.data.flags[scope] ??= {}; this.data.flags[scope][key] = clone(entry); this.flags = this.data.flags; },
 });
+const detonationOption = () => `tech-pets:detonation:${owner.getFlag(ID, "exocortex").mines.deployed[0].detonationAttemptId}`;
 
 test("mine placement spends one mine only after its actor and token exist", async () => {
   const state = await performExocortexOperation(owner, "mine-place", { position: point(), label: "Alpha" });
@@ -193,6 +194,7 @@ test("PSA detonation uses the native item slug for rules and message completion"
   game.messages.set(message.id, message);
   globalThis.document = { createElement: () => ({ dataset: {}, querySelector: () => ({ dataset: { damageRoll: "" } }) }) };
   game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => {
+    message.flags.sf2e.context.options = [detonationOption()];
     for (const callback of events.get("createChatMessage") ?? []) await callback(message);
   } } };
   const result = await performExocortexOperation(owner, "mine-detonate", { id: owner.getFlag(ID, "exocortex").mines.deployed[0].id, damageType: "fire", confirmed: true });
@@ -212,6 +214,30 @@ test("recalling turret preserves the same owned actor and its damage", async () 
   await performExocortexOperation(owner, "turret-place", { position: point() });
   assert.equal(getTurretActor(owner).id, actor.id);
   assert.equal(getExocortexDeviceData(owner).turret.hp, 22);
+});
+
+test("synchronization recalls a deployed turret when its synchronized HP reaches zero", async () => {
+  await owner.update({ "system.details.level.value": 20 });
+  await performExocortexOperation(owner, "turret-place", { position: point() });
+  const actor = getTurretActor(owner);
+  await actor.update({ "system.attributes.hp.value": 1 });
+  await owner.update({ "system.details.level.value": 1 });
+  await performExocortexOperation(owner, "device-sync");
+  assert.equal(actor.system.attributes.hp.value, 0);
+  assert.equal(scene.tokens.size, 0);
+  assert.equal(getExocortexDeviceData(owner).turret.deployed, false);
+});
+
+test("turret placement rechecks HP after synchronization before creating a token", async () => {
+  await owner.update({ "system.details.level.value": 20 });
+  await performExocortexOperation(owner, "turret-create");
+  const actor = getTurretActor(owner);
+  await actor.update({ "system.attributes.hp.value": 1 });
+  await owner.update({ "system.details.level.value": 1 });
+  await assert.rejects(performExocortexOperation(owner, "turret-place", { position: point() }), /ExoTurretZero/);
+  assert.equal(actor.system.attributes.hp.value, 0);
+  assert.equal(scene.tokens.size, 0);
+  assert.equal(getExocortexDeviceData(owner).turret.deployed, false);
 });
 
 test("device synchronization preserves identity metadata", async () => {
@@ -370,6 +396,37 @@ test("GM-edited action text remains untouched by device synchronization", async 
   await performExocortexOperation(owner, "device-sync");
   assert.equal(action.system.description.value, "GM CUSTOM DAMAGE");
 });
+test("item synchronization commits changes and control fingerprint without a separate flag write", async () => {
+  await performExocortexOperation(owner, "mine-place", { position: point() });
+  const actor = scene.tokens.contents[0].actor;
+  const action = actor.items.find(item => item.flags[ID]?.deviceItem === "tech-pets-detonate-mine");
+  action.setFlag = async () => { throw new Error("fingerprint write failed"); };
+  await owner.update({ "system.details.level.value": 10 });
+  await assert.doesNotReject(performExocortexOperation(owner, "device-sync"));
+  assert.match(action.system.description.value, /6d6/);
+  assert.equal(typeof action.flags[ID].control, "string");
+});
+
+test("a newly created synchronized item includes its retry fingerprint at creation", async () => {
+  await performExocortexOperation(owner, "mine-place", { position: point() });
+  const actor = scene.tokens.contents[0].actor;
+  const action = actor.items.find(item => item.flags[ID]?.deviceItem === "tech-pets-detonate-mine");
+  await actor.deleteEmbeddedDocuments("Item", [action.id]);
+  const create = actor.createEmbeddedDocuments.bind(actor);
+  actor.createEmbeddedDocuments = async (type, sources) => {
+    const created = await create(type, sources);
+    for (const item of created) item.setFlag = async () => { throw new Error("fingerprint write failed"); };
+    return created;
+  };
+  await assert.doesNotReject(performExocortexOperation(owner, "device-sync"));
+  const recreated = actor.items.find(item => item.flags[ID]?.deviceItem === "tech-pets-detonate-mine");
+  assert.ok(recreated);
+  assert.equal(typeof recreated.flags[ID].control, "string");
+  await owner.update({ "system.details.level.value": 10 });
+  await assert.doesNotReject(performExocortexOperation(owner, "device-sync"));
+  assert.match(recreated.system.description.value, /6d6/);
+});
+
 test("detonation cancels without deleting its token when native roll is cancelled", async () => {
   await performExocortexOperation(owner, "mine-place", { position: point() });
   const state = owner.getFlag(ID, "exocortex");
@@ -379,6 +436,37 @@ test("detonation cancels without deleting its token when native roll is cancelle
   assert.equal(result.mines.deployed.length, 1);
   assert.equal(scene.tokens.size, 1);
 });
+test("detonation correlates the posted roll by invocation option instead of domain", async () => {
+  await performExocortexOperation(owner, "mine-place", { position: point() });
+  const actor = scene.tokens.contents[0].actor;
+  const record = owner.getFlag(ID, "exocortex").mines.deployed[0];
+  globalThis.document = { createElement: () => ({ dataset: {}, querySelector: () => ({ dataset: { damageRoll: "" } }) }) };
+  game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => {
+    const attemptId = owner.getFlag(ID, "exocortex").mines.deployed[0].detonationAttemptId;
+    const message = chatMessage("option-message", actor.id, "unrelated-domain", [`tech-pets:detonation:${attemptId}`]);
+    game.messages.set(message.id, message);
+    for (const callback of events.get("createChatMessage") ?? []) await callback(message);
+  } } };
+  const result = await performExocortexOperation(owner, "mine-detonate", { id: record.id, damageType: "fire", confirmed: true });
+  assert.equal(result.mines.deployed.length, 0);
+  assert.equal(scene.tokens.size, 0);
+});
+
+test("an unrelated same-domain message does not detonate the mine", async () => {
+  await performExocortexOperation(owner, "mine-place", { position: point() });
+  const actor = scene.tokens.contents[0].actor;
+  const record = owner.getFlag(ID, "exocortex").mines.deployed[0];
+  globalThis.document = { createElement: () => ({ dataset: {}, querySelector: () => ({ dataset: { damageRoll: "" } }) }) };
+  game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => {
+    const message = chatMessage("unrelated-message", actor.id, "tech-pets-detonate-mine-inline-damage");
+    game.messages.set(message.id, message);
+    for (const callback of events.get("createChatMessage") ?? []) await callback(message);
+  } } };
+  const result = await performExocortexOperation(owner, "mine-detonate", { id: record.id, damageType: "fire", confirmed: true });
+  assert.equal(result.mines.deployed.length, 1);
+  assert.equal(scene.tokens.size, 1);
+});
+
 test("a cancelled detonation persists its attempt identity and can retry", async () => {
   await performExocortexOperation(owner, "mine-place", { position: point() });
   const actor = scene.tokens.contents[0].actor;
@@ -388,7 +476,7 @@ test("a cancelled detonation persists its attempt identity and can retry", async
   game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => {
     rolls++;
     if (rolls === 1) return;
-    const message = chatMessage("retry-message", actor.id, "tech-pets-detonate-mine-inline-damage");
+    const message = chatMessage("retry-message", actor.id, "tech-pets-detonate-mine-inline-damage", [detonationOption()]);
     game.messages.set(message.id, message);
     for (const callback of events.get("createChatMessage") ?? []) await callback(message);
   } } };
@@ -419,6 +507,7 @@ test("detonation retry resumes a tagged message instead of rolling twice", async
   globalThis.document = { createElement: () => ({ dataset: {}, querySelector: () => ({ dataset: { damageRoll: "" } }) }) };
   game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => {
     rolls++;
+    message.flags.sf2e.context.options = [detonationOption()];
     for (const callback of events.get("createChatMessage") ?? []) await callback(message);
   } } };
   await assert.rejects(performExocortexOperation(owner, "mine-detonate", { id: record.id, damageType: "fire", confirmed: true }), /resolved ledger write failed/);
@@ -453,7 +542,7 @@ test("native inline healing spends the mine after the healing message exists", a
   const record = owner.getFlag(ID, "exocortex").mines.deployed[0];
   globalThis.document = { createElement: () => ({ dataset: {}, querySelector: () => ({ dataset: { damageRoll: "" } }) }) };
   game.pf2e = { TextEditor: { enrichHTML: async () => "<a></a>", _onClickInlineRoll: async () => {
-    const message = chatMessage("healing-message", actor.id, "tech-pets-healing-mine-inline-healing");
+    const message = chatMessage("healing-message", actor.id, "tech-pets-healing-mine-inline-healing", [detonationOption()]);
     game.messages.set(message.id, message);
     for (const callback of events.get("createChatMessage") ?? []) await callback(message);
   } } };
@@ -843,6 +932,24 @@ test("ownership synchronization reconciles unedited entries independently", asyn
   await performExocortexOperation(owner, "device-sync");
   assert.equal(Object.hasOwn(actor.ownership, "player"), false);
   assert.equal(actor.ownership.helper, 2);
+});
+
+test("ownership synchronization preserves a concurrent same-entry writer", async () => {
+  await performExocortexOperation(owner, "turret-create");
+  const actor = getTurretActor(owner);
+  delete owner.ownership.player;
+  actor.data.ownership.player = 2;
+  const toObject = actor.toObject.bind(actor);
+  let firstRead = true;
+  actor.toObject = () => {
+    const source = toObject();
+    if (firstRead) { firstRead = false; source.ownership = { ...source.ownership, player: 3 }; }
+    return source;
+  };
+  await performExocortexOperation(owner, "device-sync");
+  assert.equal(actor.data.ownership.player, 2);
+  assert.equal(actor.flags[ID].device.ownership.player, 2);
+  assert.equal(actor.flags[ID].device.ownershipOverrides.player, 2);
 });
 
 test("failed ownership synchronization does not advance the device baseline", async () => {
