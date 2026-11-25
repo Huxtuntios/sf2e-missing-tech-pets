@@ -78,7 +78,7 @@ with zipfile.ZipFile(folder/'module.zip') as archive:
   assert set(payload['entries'])==ids,'Не совпали ID переводов'
  assert 'data/ru-content.json' in names,'Отсутствует русский каталог'
  for script in manifest['esmodules']:assert script in names,'Отсутствует entrypoint'
- for script in ['content-localization.mjs','babele.mjs','customization-sources.mjs','choice-variants.mjs','dailies.mjs','sheet-integration.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','companion-sources.mjs','companion-sources-ui.mjs','ability-row.mjs','rich-text.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
+ for script in ['content-localization.mjs','babele.mjs','customization-sources.mjs','choice-variants.mjs','dailies.mjs','sheet-integration.mjs','exocortex-rules.mjs','exocortex.mjs','exocortex-ui.mjs','exocortex-device-sources.mjs','exocortex-devices.mjs','exocortex-placement.mjs','companion-sources.mjs','companion-sources-ui.mjs','ability-row.mjs','rich-text.mjs']:assert 'scripts/'+script in names,'Отсутствует экзокортекс: '+script
  for language in manifest['languages']:assert language['path'] in names,'Отсутствует язык'
  for name in names:
   if pathlib.PurePosixPath(name).suffix in ['.json','.db','.mjs','.md','.txt','.css','.html','.svg']:

@@ -173,7 +173,11 @@ export function registerSheetIntegration(services) {
     if (!root?.querySelector || !actor) return;
     const generation = (generations.get(app) ?? 0) + 1;
     generations.set(app, generation);
-    root.querySelectorAll(".sfmtp-inline").forEach((node) => node.remove());
+    root.querySelectorAll(".sfmtp-inline, .sfmtp-mine-resource").forEach((node) => node.remove());
+    root.querySelectorAll("[data-sfmtp-mine-resources]").forEach((section) => {
+      if (!section.querySelector("li")) section.remove();
+    });
+    services.renderExocortexSheet?.(app, root);
     const controller =
       actor.type === "familiar"
         ? familiarOwner(actor)

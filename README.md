@@ -96,6 +96,22 @@ The source list is a curated SF2e integration, **not an exhaustive importer of P
 See [source guide](docs/COMPANION-SOURCES.md) for provenance and boundaries.
 
 
+## Mechanic mines and turret (unreleased)
+
+On the mechanic's **Actions → Encounter** tab, expand **Mechanic: Exocortex**. Edit the carried mine count or place/collect mines directly. The manager additionally offers daily preparations, crafting, mine sheets and detonation. Placement spends a mine only after creating its token; Escape/right-click cancels without spending it. The same carried/max mine count is shown in the character sheet's **Resources** block, and the turret array selector is available directly in the inline panel.
+
+**PF2e Summons Assistant (`pf2e-summons-assistant`) 2.20.6 is recommended, not required.** When active, placement clones its Mine actor source and preserves its inherited actions. Native PSA Mine summons are also added to the ledger after their summoner is known; they are counted once. Do not use both placement buttons for the same deployment. Without PSA, Tech Pets creates a hazard mine. No third-party pack or artwork is redistributed.
+
+**Create turret statblock** creates one persistent hazard actor with the mechanic's ownership. Place/recall its token from the sheet or manager. Recall preserves that actor and its HP. Level, Intelligence, mechanic class DC and owned feats drive its generated statistics and actions; manually edited fields and Items are protected. Custom actor and token artwork is remembered per mechanic and reused after recall or actor recreation. An active GM handles actor/token mutations through Foundry's authenticated query system; global player permissions are not changed.
+
+The turret's separate weapon on the mechanic supplies native proficiency, grade/upgrades, damage and shared MAP without ammunition. The manager offers three MAP buttons. **Range, cover, visibility and target-dependent modifiers must be checked manually from the turret's square**: the system has no supported origin-token override for the owner's Strike. Use the weapon's normal damage button and Pinpoint Shot toggle. The turret actor's **Turret Operation** action mirrors those toggles for convenience; toggle values and suboptions synchronize in both directions. Expansive Array additions are chosen explicitly, up to two per owned feat, maximum four. Editing generated mechanical fields protects them from further automatic changes; grade, runes and equipped state remain manual and do not block stat/array synchronization.
+
+Mine damage uses a single detonation action. With PSA, its native Detonate Mine Item is enhanced in place, so no duplicate Tech Pets action appears; without PSA, the module creates its own action. Enable Targeting Mine, damage customization and other owned mod toggles on the mine sheet. The selected sheet damage type is retained by synchronization; an explicit fire/piercing choice in the manager overrides it. Healing Mines and Impressive Healing Mines use their owned-feature progression. Conditional Notes remind you about Critical Explosion, Maneuvering Mines and Debilitating Exocortex; they do not apply conditions. Mines use the Small (`sm`) size. Custom mine artwork is reused for later placements. Generated rule-reference text remains canonical English; interface controls are EN/RU. No new compendium packs are required: statblocks are built from the actual owner when created.
+
+Actions, reaction triggers, targets, saving throws, forced movement, durations and mod activation through Modify remain manual. Automatic actor/token updates do not spend character actions or grant feats. Full multi-client race testing and PF2e/Anachronism verification remain separate gates.
+
+A standalone `*` in an action description is the manual-resolution marker: the module does not move tokens, roll Strikes, or apply conditions to targets automatically. Resolve those parts through Foundry's normal tools.
+
 ## Compatibility and optional integrations
 
 - Foundry VTT **v14**, minimum **14.361**. The manifest's `verified` value is unchanged; it is not proof of live testing of this build.
@@ -276,15 +292,15 @@ The integration uses native feature/action UUIDs reviewed in **SF2e 1.7.0**; in 
 
 - Track prepared/carried mines separately from individually labelled deployed mines. Capacity, damage dice, burst radius and Smart Mine target allowance follow owner level and Intelligence.
 - Record deployment, collect all deployed mines, craft up to two mines after ten minutes, or confirm daily preparations to replace all unused mines. Deployed mines do not occupy carried slots. Collection preserves all remaining mines even when it exceeds the carried limit; resolve excess capacity manually.
-- Detonating a selected mine uses the **native SF2e DamageRoll** with fire or piercing damage, then removes that mine from the ledger. A failed roll leaves the mine recorded. Base damage scales with level; mod bonuses are not silently added.
-- The ledger does **not** create scene objects, measure distance, choose targets, roll saves, apply damage or trigger reactions. Check the action/reaction and trigger yourself. Smart Mine exclusions and Targeting Mine are manual.
+- Detonating a selected mine uses the **native SF2e DamageRoll**, then removes its actor and token. A failed or cancelled roll leaves the mine recorded. Base damage scales with level; owned mod Rule Elements add only their supported bonuses.
+- Placement creates a real Small actor and token. The module does not measure distance, choose targets, roll saves, apply damage or trigger reactions. Check the action/reaction and trigger yourself. Smart Mine exclusions and Targeting Mine remain manual choices.
 
 ### Turret
 
 - Track one stored/deployed turret, current HP, broken threshold, Hardness, mechanic class DC as AC and base Fortitude/Reflex bonuses, including Proficiency Without Level.
 - Choose and save one of **six arrays**, with its base damage type, range increment, trait and weapon group. Changing an array requires its normal time or the appropriate mod; this panel does not apply a mod's duration.
 - At 0 HP the recorded turret returns to storage. Confirm daily repair for full HP. At the end of the owner's active combat turn, the stored turret's **+5 HP** button can be used once for that turn. Recovery is explicitly confirmed, not an automatic combat hook.
-- This is a device record, **not a generated weapon or autonomous actor**. Strikes, weapon grade/upgrades, shared MAP, targeting and cover are resolved using the native system sheet. A broken turret cannot Strike; the panel does not offer a separate attack that bypasses the owner's MAP.
+- This creates a persistent hazard actor and a separate native weapon proxy on the mechanic. Strikes use the owner's proficiency and shared MAP; range, targeting and cover are checked from the turret's square. A broken turret cannot Strike.
 
 ### Interaction with the mechanic class
 

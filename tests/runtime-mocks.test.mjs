@@ -234,6 +234,7 @@ async function harness({
   }
   const context = createContext({
     game,
+    CONFIG: { queries: {} },
     console: { info() {}, warn() {}, error() {}, debug() {} },
     structuredClone,
     JSON,
@@ -995,10 +996,12 @@ test("Экзокортекс: все варианты доступны чере�
     };
     await owner.createEmbeddedDocuments("Item", [
       { type: "class", system: { slug: "mechanic" } },
+      { type: "feat", system: { slug: "expansive-array" } },
       ...fixture.items.filter((i) =>
         ["drone", "mine", "turret"].includes(i.system.slug),
       ),
     ]);
+    owner.flags[ID].devices = { arrays: ["mental"], array: "mental" };
     await h.api.open(owner);
     assert.match(h.dialogs.at(-1).content, /data-open-exocortex/);
     await h.api.openExocortex(owner);
@@ -1010,15 +1013,16 @@ test("Экзокортекс: все варианты доступны чере�
     assert.doesNotMatch(panel.content, /SFMTP\.[A-Za-z]/);
     for (const operation of [
       "drone-command",
-      "mine-deploy",
+      "mine-place",
       "mine-detonate",
-      "turret-deploy",
+      "turret-place",
       "turret-array",
     ]) {
       if (operation === "mine-detonate") continue;
       assert.ok(panel.content.includes(operation), operation);
     }
     assert.match(panel.content, /data-exo-install/);
+    assert.match(panel.content, /2d8/);
     assert.equal(typeof h.api.getExocortexData, "function");
     assert.equal(typeof h.api.updateExocortex, "function");
     assert.equal(typeof h.api.installExocortexActions, "function");

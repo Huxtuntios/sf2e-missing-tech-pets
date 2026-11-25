@@ -52,6 +52,12 @@
         "compatibility": {
           "minimum": "7.6.3"
         }
+      },
+      {
+        "id": "pf2e-summons-assistant",
+        "type": "module",
+        "manifest": "https://github.com/ChasarooniZ/pf2e-summons-assistant/releases/latest/download/module.json",
+        "compatibility": { "minimum": "2.20.6" }
       }
     ]
   },
